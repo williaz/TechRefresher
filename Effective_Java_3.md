@@ -1,5 +1,9 @@
 ## Java Coding Best Practice:
 
+### JAVA SE design pitfall:
+- String copy <= no need for immutable
+- BigInteger add naming <= plus
+
 ### Item 3: Enforce the singleton property with a private constructor or an enum type
 - A singleton is simply a class that is instantiated exactly once
 - stateless object(a function) or intrinsically unique system component
@@ -101,6 +105,15 @@ Mosaic create(Supplier<? extends Tile> tileFactory) {
 ... 
 }
 ```
+
+
+### Item 50: Make defensive copies when needed
+- escaping reference
+- do not use the clone method to
+make a defensive copy of a parameter whose type is subclassable by
+untrusted parties.
+- defensive copy may be replaced by
+documentation outlining
 
 ### Item 57: Minimize the scope of local variables
 
