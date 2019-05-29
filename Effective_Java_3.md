@@ -3,6 +3,7 @@
 ### JAVA SE design pitfall:
 - String copy <= no need for immutable
 - BigInteger add naming <= plus
+- BigInteger and BigDecimal can be extended, so all of their methods may be overridden.
 
 ### Item 3: Enforce the singleton property with a private constructor or an enum type
 - A singleton is simply a class that is instantiated exactly once
@@ -106,6 +107,23 @@ Mosaic create(Supplier<? extends Tile> tileFactory) {
 }
 ```
 
+### Item 17: Minimize mutability
+- To make a class immutable:
+  - 1. Don’t provide methods that modify the object’s state
+  - 2. Ensure that the class can’t be extended. effective final
+    - final class
+    - provide static factories that cache frequently requested instances
+  - 3. Make all fields final.
+  - 4. Make all fields private.
+  - 5. Ensure exclusive access to any mutable components.
+    - defensively copy
+- Immutable objects are inherently thread-safe; they require no synchronization.
+- Not only can you share immutable objects, but they can share their internals.
+- provide a public mutable companion class
+- have one or
+more nonfinal fields in which they cache the results of expensive
+computations
+- always make small value objects immuable, conside for larger value objects
 
 ### Item 50: Make defensive copies when needed
 - escaping reference
@@ -114,6 +132,25 @@ make a defensive copy of a parameter whose type is subclassable by
 untrusted parties.
 - defensive copy may be replaced by
 documentation outlining
+
+### Item 51: Design method signatures carefully
+- Choose method names carefully.
+  - standard naming conventions
+  - consistent with other names in the same package
+  - consistent with the broader consensus, where it exists
+  - Avoid long method names.
+- Don’t go overboard in providing convenience methods.
+  - provide a fully functional method
+- Avoid long parameter lists.
+  - Aim for four parameters or fewer.
+  - Long sequences of identically typed parameters are especially harmful.
+  - techniques:
+    - break the method up into multiple methods
+    - create helper classes(static member classes) to hold groups of parameters.
+    - Builder pattern, especially if some of them are optional
+- For parameter types, favor interfaces over classes
+- Prefer two-element enum types to boolean parameters
+
 
 ### Item 57: Minimize the scope of local variables
 
