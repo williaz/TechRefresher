@@ -30,3 +30,20 @@ $0(the script filename), $1, $2
 
 read # to accept input
 ```
+
+
+### exit
+- All command return an exit status
+- 0-255
+- 0 = success; others = error condition
+- $? contains the value of the exit status of the previously executed command
+- &&, ||
+- ; will keep execute next command
+- exit
+
+```bash
+mkdir fstDir || mkdir secDir
+mkdir nexDir && cd nexDir
+echo $?
+```
+
