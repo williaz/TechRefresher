@@ -46,4 +46,10 @@ mkdir fstDir || mkdir secDir
 mkdir nexDir && cd nexDir
 echo $?
 ```
+### function
+- DRY(don't repeat yourself)
+- call with name only
+- all variable are Global scope, use local for local scope
+- use return to return exist code; or the exist status of the last command executed in the unction
+- parameters start from $1, ($0 is still script name)
 
