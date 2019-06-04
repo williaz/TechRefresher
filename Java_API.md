@@ -129,3 +129,70 @@ sb.setLength(0); //
     }
 ```
 
+- [x] BigInteger multiply()
+```java
+    public BigInteger multiply(BigInteger val) {
+        if (val.signum == 0 || signum == 0)
+            return ZERO;
+
+        int xlen = mag.length;
+
+        if (val == this && xlen > MULTIPLY_SQUARE_THRESHOLD) {
+            return square();
+        }
+
+        int ylen = val.mag.length;
+
+        if ((xlen < KARATSUBA_THRESHOLD) || (ylen < KARATSUBA_THRESHOLD)) {
+            int resultSign = signum == val.signum ? 1 : -1;
+            if (val.mag.length == 1) {
+                return multiplyByInt(mag,val.mag[0], resultSign);
+            }
+            if (mag.length == 1) {
+                return multiplyByInt(val.mag,mag[0], resultSign);
+            }
+            int[] result = multiplyToLen(mag, xlen,
+                                         val.mag, ylen, null); ///
+            result = trustedStripLeadingZeroInts(result);
+            return new BigInteger(result, resultSign);
+        } else {
+            if ((xlen < TOOM_COOK_THRESHOLD) && (ylen < TOOM_COOK_THRESHOLD)) {
+                return multiplyKaratsuba(this, val); // recursive divide-and-conquer
+            } else {
+                return multiplyToomCook3(this, val); // recursive divide-and-conquer
+            }
+        }
+    }
+    
+    private static BigInteger multiplyByInt(int[] x, int y, int sign) {
+        if (Integer.bitCount(y) == 1) {
+            return new BigInteger(shiftLeft(x,Integer.numberOfTrailingZeros(y)), sign);
+        }
+        int xlen = x.length;
+        int[] rmag =  new int[xlen + 1];
+        long carry = 0;
+        long yl = y & LONG_MASK;
+        int rstart = rmag.length - 1;
+        for (int i = xlen - 1; i >= 0; i--) {
+            long product = (x[i] & LONG_MASK) * yl + carry;
+            rmag[rstart--] = (int)product;
+            carry = product >>> 32;
+        }
+        if (carry == 0L) {
+            rmag = java.util.Arrays.copyOfRange(rmag, 1, rmag.length);
+        } else {
+            rmag[rstart] = (int)carry;
+        }
+        return new BigInteger(rmag, sign);
+    }
+       
+    private static int[] trustedStripLeadingZeroInts(int val[]) {
+        int vlen = val.length;
+        int keep;
+
+        // Find first nonzero byte
+        for (keep = 0; keep < vlen && val[keep] == 0; keep++)
+            ; // #
+        return keep == 0 ? val : java.util.Arrays.copyOfRange(val, keep, vlen);
+    }  
+```
