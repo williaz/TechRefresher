@@ -53,3 +53,29 @@ echo $?
 - use return to return exist code; or the exist status of the last command executed in the unction
 - parameters start from $1, ($0 is still script name)
 
+
+### wildcard
+- * matches 0 or more char
+- ? exactly 1 char
+- \[] A char class, matches exactly one char
+  - \[!] NOT included
+```bash
+ca[nt]*
+catch
+candy
+
+[!abc]*
+ddd
+
+ls -ltr abc?.txt
+```
+- Named char class
+```bash
+[[:alnum:]]
+```
+- escape \\
+```bash
+*\?
+yes?
+```
+
