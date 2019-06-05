@@ -55,23 +55,25 @@ echo $?
 
 
 ### wildcard
-- * matches 0 or more char
+- \* matches 0 or more char
 - ? exactly 1 char
 - \[] A char class, matches exactly one char
   - \[!] NOT included
+  - Named char class: \[\[:alnum:]]
 ```bash
 ca[nt]*
 catch
 candy
 
+ls -ltr abc?.txt
+
 [!abc]*
 ddd
 
-ls -ltr abc?.txt
-```
-- Named char class
-```bash
-[[:alnum:]]
+touch a.txt aa.txt
+ls [[:alpha:]].txt
+a.txt
+
 ```
 - escape \\
 ```bash
