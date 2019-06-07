@@ -81,3 +81,21 @@ a.txt
 yes?
 ```
 
+### case
+- wildcard
+ - \|
+```bash
+case "$VAR" in
+    pattern_1|pattern_3)
+         # commands
+         ;;
+    pattern_2)
+        # commands
+         ;;
+    [yY]*)
+        # commands
+        ;;
+esac
+```
+
+
