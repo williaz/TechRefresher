@@ -53,6 +53,28 @@ echo $?
 - use return to return exist code; or the exist status of the last command executed in the unction
 - parameters start from $1, ($0 is still script name)
 
+```bash
+$ function hell(){
+> case "$1" in
+>     *.txt)
+>       echo "it is file"
+>       ;;
+>     *.html)
+>       echo "it is webpage"
+>       ;;
+>     *.*)
+>       echo "something else"
+>       ;;
+> esac
+> }
+
+$ hell a.txt
+it is file
+$ hell a.thml
+something else
+$ hell a.html
+it is webpage
+```
 
 ### wildcard
 - \* matches 0 or more char
