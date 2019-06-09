@@ -119,5 +119,14 @@ case "$VAR" in
         ;;
 esac
 ```
+### Syslog
+- Facilitiy: kern, user, mail, daemon, auth, local0-local7
+- Severity: emerg, alert, crit, err, warning, notice, info, debug
+- log fil loc: /var/log/messages, /var/log/syslog
+```bash
+logger "Msg"
+logger -p local0.info "Msg"
 
-
+$ logger -s -i -t myTsting "msg"
+Jun  8 21:36:36  myTsting[34116] <Notice>: msg
+```
