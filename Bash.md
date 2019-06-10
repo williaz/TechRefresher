@@ -130,3 +130,29 @@ logger -p local0.info "Msg"
 $ logger -s -i -t myTsting "msg"
 Jun  8 21:36:36  myTsting[34116] <Notice>: msg
 ```
+
+### while
+```bash
+while [ CONDITION_IS_TRUE ]
+do
+  # commands
+done
+
+while read line
+do
+   echo "$line"
+done < "./bootstrap-sh.txt"
+----------------
+#!/bin/bash
+yum install httpd php php-mysql -y
+cd /var/www/html
+wget https://wordpress.org/latest.tar.gz
+tar -xzf latest.tar.gz
+cp -r wordpress/* /var/www/html/
+rm -rf wordpress
+rm -rf latest.tar.gz
+chmod -R 755 wp-content
+chown -R apache:apache wp-content
+service httpd start
+chkconfig httpd on
+```
