@@ -35,4 +35,26 @@ which ls
 $PATH
 echo $OLDPWD
 ```
+### listing file
 
+```bash
+>ls -l
+drwxr-xr-x   10 williaz  staff    320 Jul 10  2016 git
+
+# permisions, num of links, owner, group, num of bytes, last modify time, file name
+# r(read), w(write), x(execute)
+# d rwx r-x r-x
+# type, user, group, other
+ls -F # reveal file type
+/ dir
+@ link
+* executable
+
+-a # all, hidden files
+-- color
+-d # list dir??
+-l
+-r # reverse order
+-R # list files recursively
+-t # sort time, most recent first
+```
