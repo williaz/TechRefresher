@@ -58,3 +58,76 @@ ls -F # reveal file type
 -R # list files recursively
 -t # sort time, most recent first
 ```
+### Permission
+```bash
+chmod
+ugoa # user, group, other, all
++-=
+rwx  # read, write, execute
+
+# d rwx r-x r-x
+    111 101 101 # binary
+    7    5   5  # Octal
+```
+- chgrp
+```bash
+~ williaz$ groups
+staff com.apple.sharepoint.group.1 everyone localaccounts _appserverusr admin _appserveradm _lpadmin _appstore _lpoperator _developer _analyticsusers com.apple.access_ftp com.apple.access_screensharing com.apple.access_ssh
+~ williaz$ ls -ltr sp.txt
+-rw-r--r--  1 williaz  staff  0 May 23 20:59 sp.txt
+~ williaz$ chgrp everyone sp.txt 
+~ williaz$ ls -ltr sp.txt
+-rw-r--r--  1 williaz  everyone  0 May 23 20:59 sp.txt
+```
+- The umask acts as a set of permissions that applications cannot set on files
+```bash
+umask -S
+```
+### Finding
+- find \[path] \[exp]: recursively find
+```bash
+-name
+-iname  # ignore case
+-ls
+-exec command {} \;
+```
+- locate
+   - faster
+   - use index
+   - not real time
+   - may not be enabled
+   
+### View
+```bash
+cat file  # display
+more/less file  # browse
+head/tail file # default 10 lines
+```
+- nano, or pico
+  - ctrl + X
+
+### Vi
+```bash
+vi 
+vim
+view  # read only
+^  # top
+$  # bottom
+:n # cursor to line n
+:$ # curser on last
+:set nu  # turn on line no.
+:set nonu # off
+:help [cmd]
+
+u  # undo
+ctl + R  #redo
+
+x # delete a char
+dd # delete a line
+dw # del a word
+D # delete from [curr to right]
+
+/  # forwaed search
+?  # backward search
+
+```
