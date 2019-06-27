@@ -1,0 +1,22 @@
+- **Internet** is a huge collection of coumputers connected in a communications network
+  - network of networks <= local network
+- Internet Protocol(IP): four 8-bit numbers
+- Name servers which implement the DNS(Domain Name System) to convert domain name to IP address
+- Web is collection of software(servers, browers) and protocols installed on the computers on the Internet
+- a brower is a client on the Web to initiate the communication with a server
+- HTTP(Hypertext Transfer Protocol) provides a standard form of communication between browers and web servers
+- Web server: to monitor a communications port on its host machine, accept and perform HTTP commands
+  - document root: Web document; server maps requested URLs to the docu root
+  - server root: software
+  - proxy server
+  - Apache, httpd.conf
+  - MS IIS, IIS snap-in
+- URL（Uniform Resource Locators）
+  - scheme(protocol):obj-address
+  - default port for web server:80; others need be attach in the URL
+  - never have embedded spaces..: %20
+  - If the dirc doesnot have a file that can be recognozed as a home page, a directory listing is returned
+- MIME(Multiperpose Internet Mail Extensions)
+  - document type: type/subtype, text/html
+  - server side use file name's extension as the key to determine
+  - Experimental Docu type: subtype begins with x-, video/x-msvideo; need plug-in
