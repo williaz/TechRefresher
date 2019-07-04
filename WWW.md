@@ -1,3 +1,4 @@
+### Intro
 - **Internet** is a huge collection of coumputers connected in a communications network
   - network of networks <= local network
 - Internet Protocol(**IP**): four 8-bit numbers
@@ -40,10 +41,116 @@
   - relatively small response
 
 
+### HTML
+- to specify the general layout
+- tag: to specify categories of content; like suggestion; a browser has its own default presentation spec
+- browsers ignore all unrecognized tags and line breaks
+- An HTML must include <html>, <head>, <title>, <body>
+- <head> always contains <title> and <meta>
+- Image: GIF jiffy; JPEG Jay-peg; PNG ping
+```html
+<!-- comment -->
+<!DOCTYPE html>
+<html lang = "en">
+  <head>
+    <title> Sample html</title>
+    <meta charset = "utf-8">
+    <meta name = "keywords" content = "for search engine: html sample">
+  </head>
+  <body>
+    <header>
+      <h1> 6 levels headings </h1>
+      <h6> heading </h6>
+    </header>
+    <p> multiple   spaces in p will be replaced by single space <br />
+    </p>
+    <pre>  to
+             preserve
+                     the white spaces
+    </pre>
+    <blockquote>
+      "will be indented on both sides mostly as quotes"
+    </blockquote>
+    
+    <p> content-based style tags</p>
+    <em>italics</em>
+    <strong>bold</strong>
+    <code> X<sub>2</sub><sup>3</sup></code>
+    
+    <p> character entities like 2 &lt 5</p>
+    <!-- horizonal rule -->
+    <hr />
+    
+    
+    <a href = "google.com"> 
+      <img src= "image/goog_logo.jpeg" alt = "just logo pic">
+      Image as an effective link
+    </a>
+    
+    <h2 id = "uniqId"> id attribut must be unique within the docu</h2>
+    <a href = "#uniqId"> back to id </a>
+    
+    <ul>
+      <li> unordered list </li>
+      <ol> 
+        <li> ordered list, nested</li>
+      </ol>
+    </ul>
+    
+    <dl>
+      <dt> page 234</dt>
+      <dd> definition list <dd>
+    </dl>
+    
+    <table>
+       <caption> sample table </caption>
+       <tr>
+         <th colspan = "1"> header</th>
+       </tr>
+       <tr>
+         <td> data1 </td>
+         <td> data2 </td>
+       </tr>
+    </table>
+    <form action = "call">
+      <input type = "text" name = "comment" size = "25" maxlength = "25">
+      <!-- type as checkbox, radio-->
+      <select name = "classes" >
+        <option> English </option>
+        <option> others a lot .. </option>
+      </select>
+      <textarea name = "draft" row = "3", cols = "40">
+        (long and meaningless)
+      </textarea>
+      <input type = "submit" value = "trigger">
+      <input type = "reset"  value = "to default">
+    </form>
+    <!--html5-->
+    <audio contols = "controls">
+       <source src = "xx.ogg" />
+       <source src = "xx.wav" />
+       <source src = "xx.mp3" />
+    </audio>
+    <vedio contols = "controls" width = "900" heigth = "600" autoplay = "autoplay" preload = "preload">
+       <source src = "xx.ogv" />
+       <source src = "xx.webm" />
+       <source src = "xx.mp4" />
+    </audio>
+    <time datetime = "2019-07-04T15:45" pubdate = "pubdate">
+       Today
+    </time>
+  </body>
+</html>
+```
+- html5 organization elements
+  - <header>, <footer>, <hgroup>, <artical>
+  - <section>
+  - <aside>, <nav>
 
-
-
-
+#### html
+- case insensitve
+- can omit closed tag
+- attribute value must be quoted only if contans special char
 
 
 
