@@ -143,9 +143,11 @@
 </html>
 ```
 - html5 organization elements
-  - <header>, <footer>, <hgroup>, <artical>
+```html
+  - <header>, <footer>, <hgroup>, <artclel>
   - <section>
   - <aside>, <nav>
+```
 
 #### html
 - case insensitve
