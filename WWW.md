@@ -155,4 +155,75 @@
 - attribute value must be quoted only if contans special char
 
 
+### CSS
+- benefit: imposing consistency on the styl of Web documens
+- lower-level style sheets can override higher level style sheets
+  - inline: tag, appear in opening tag
+  - document: whole html body, ```<head> <style>```
+  - external: any htmls,``` <link>```
+  
+- comment: /*  */
+
+#### Selector
+- simple: element name
+- class: ````p.normal {prop-val list}  <p class = "normal">````
+- Generic: more than one tag ```.normal```
+- id: ```#spec-id {list}```
+- Contextual: position chain, direct child ```ul ol {list}```
+- Pseudo: events like link, visited, focus, hover ```h2:hover {list}```
+
+#### Properties
+- fonts, lists, alignment of text, margins, colors, background, borders
+- Font:
+  - font-family: generic font
+  - font-size: 12em == 120%
+  - font-variant: small-caps
+  - font-style: italic
+  - font-weight: bold
+  - font: includes all types
+  - text-decoration: line-through, overline, underline
+  - letter-spacing: spaces between letters
+- List
+  - ul level, li level
+  - bullet: can use image
+- Aligment of text
+  - text-indent
+- Color
+  - color: foreground
+  - background-color
+  
+#### Box Model
+- padding is the space between the content of an elelment and its border
+- margin is the space between the border of two elements
+
+```html
+no default layout
+<span> line
+  
+<div> section
+```
+#### Conflict
+- 1. level
+  - ```!important``` user origin
+  - ```!important```author orign
+  - normal author origin
+  - normal user 
+  - any browser
+- specificity
+  - id
+  - class, pseudo
+  - contextual
+  - universal
+- most recently seen: exteranl as seen in link or @import
+  
+  
+  
+
+
+
+
+
+
+
+
 
