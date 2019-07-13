@@ -24,7 +24,7 @@
 - HTTP:
   - Request
     - HTTP Method, Domain part of the URL, HTTP version
-      - GET, HEAD, POST, PUT, DELETE
+      - GET, HEAD, POST, PUT, DELETE, OPTIONS(cors)
       - HTTP 1.1 keep open
     - Header fields
       - General, Request, Response, Entity
@@ -216,14 +216,112 @@ no default layout
   - universal
 - most recently seen: exteranl as seen in link or @import
   
+
+### JS
+- explicit embedding: in HTML ```<script>```
+```html
+<!--
+// JS code in case browser doesn't have JS interpreters
+// -->
+```
+- implicit embedding: ```<script tyoe = "text/javascript" src = "roots.js" />```
+- prototype-based inheritance
+- JS objects are collections of properties, root object is Object
+- Number, String, Boolean, undefined, null
+  - undefined: a Type; means a variable has been declared but has not yet been assigned a value. initialized by JavaScript with a default value of undefined
+  - null is object; an assignment value. done programmatically
+```javascript
+var today = new Date();
+```
+#### Window
+- an HTML document
+- two prop:
+  - document: Document object
+  - window
   
-  
 
+```js
+// dyamically creating HTML document content, ca include any tag
+document.write("It is " + result+ "<br />");
 
+// default object for JS is Window object
+alert("Alert it \n"); // OK
+confirm("Approve?"); // OK, Cancel
+prompt("Waht's your name", "type your name"); // OK, Cancel, textfield
+```
+- false : "", "0", null, 0
+- strictly equal: ===
+```js
+var list = [1, 2, '5', "23"];
+// sort alphabetically by default
+function num_reverse_order(a, b) {return b - 1};
+list.sort(num_reverse_order);
+list.length
+```
+- declared without var is global scope
+- ^, $ only used in head/end to make effect
+```js
+var isValidPhone = str.search(/^\d{3}-\d{3}-\d{4}$/);
+```
 
+- this
+  - bind: bind this with preset value
+  - Store reference to context/this inside another variable
+  - arrow: ES6
+```js
+var module = {
+  x: 42,
+  getX: function() {
+    return this.x;
+  }
+}
 
+var unboundGetX = module.getX;
+console.log(unboundGetX()); // The function gets invoked at the global scope
+// expected output: undefined
 
+var boundGetX = unboundGetX.bind(module);
+console.log(boundGetX());
+// expected output: 42
 
+function MyConstructor(data, transport) {
+    this.data = data;
+    transport.on('data', () => alert(this.data));
+}
+```
+- SIAF(self-invoked anonymous function)
+```js
+for (var i=0; i<5; i++){
+  setTimeout(function(){ 
+    console.log(i); 
+    }, 1000);
+}
+// all 5
+
+for (var i=0; i<5; i++){
+  (function (j){
+    setTimeout(function(){ 
+      console.log(j); 
+      }, 1000);
+   })(i);
+}
+```
+- Closure: fucntion has access to the var in parent scope even after parent functions have returned
+  - To use a closure, define a function inside another function and expose it. To expose a function, return it or pass it to another function.
+  - The inner function will have access to the variables in the outer function scope, even after the outer function has returned.
+```js
+//
+var xhr = new XMLHttpRequest();
+xhr.open("POST", url, true);
+xhr.setRequestHeader(yourId, "wz12312");
+var fd = ew FormData;
+var obj = this;
+xht.onreadystartchange = function() {
+  this;// XMLHttpRequest
+  obj.otherFunc();
+}
+xhr.send(fd);
+```
 
 
 
