@@ -1,3 +1,7 @@
+- [x] print array
+```java
+System.out.println(Arrays.toString(nums));
+```
 - [x] Clear StringBuilder
 ```java
 StringBuilder sb = new StringBuilder();
