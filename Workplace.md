@@ -1,4 +1,4 @@
-[Seven Steps for Effective Problem Solving in the Workplace](https://www.mediate.com/articles/thicks.cfm)
+### [Seven Steps for Effective Problem Solving in the Workplace](https://www.mediate.com/articles/thicks.cfm)
 
 - problems and conflicts happen all the time and they are opportunities to improve the system and the relationships. They are actually providing us with information that we can use to fix what needs fixing and do a better job
 - The most common mistake in problem solving is trying to find a solution right away. 
@@ -32,3 +32,29 @@
   - **Conditions** may change. Make contingency agreements about foreseeable future circumstances (**If-then!**).
   - How will you monitor compliance and follow-through?
   - Create opportunities to evaluate the agreements and their implementation. ("Let's try it this way for three months and then look at it.")
+
+### Business process re-engineering (BPR) 20Q
+1. What is being done? (what is being achieved)
+- Why is it necessary?
+- What else could be done?
+- What else should be done?
+2. Where is it being done?
+- Why there?
+- Where else could it be done?
+- Where else should it be done?
+3. When is it done?
+- Why then?
+- When else could it be done?
+- When else should it be done?
+4. Who does it?
+- Why this person/group?
+- Who else could do it?
+- Who else should do it?
+5. How is it done?
+- Why this way?
+- How else could it be done?
+- How else should it be done? 
+
+
+
+
