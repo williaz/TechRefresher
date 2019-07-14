@@ -323,5 +323,23 @@ xht.onreadystartchange = function() {
 xhr.send(fd);
 ```
 
+### DOM
+- When a global variable is created in a client side script, it's created as a new prperty of the Window object
+- DOM 1: getElementById
+- event: all lowercase
+- The write method of document should never be used in an event handler
+- DOM2 Event propagation
+  - capturing: root -> target node
+    - addEventListener
+  - target node
+  - bubbling: back to rootm triggering any handlers in the path
+- navigator: browser info
+
+
+
+
+
+
+
 
 
