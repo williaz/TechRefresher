@@ -335,8 +335,21 @@ xhr.send(fd);
   - bubbling: back to rootm triggering any handlers in the path
 - navigator: browser info
 
+### Ajax
+- starts from iframe, Google map uses to update tiles
+- JS eval() func can convert JSON strings to JS objects, but it will interprets any JS code, security issue
+- When the readyState property of the request object is 4 and the status property is 200, the callback function can process the returned data.
+- if received text will be populated in text box, scanned for script tags first
+```js
+if (window.XMLHttpRequest)
+    xhr = new XMLHttpRequest();
+else
+    xhr = new AtiveXObject("Mircorsoft.XMLHTTP");
+xhr.open("GET", url, true); // true for asyc
 
-
+var response = xhr.responseText;
+var myObj = JSON.parse(response);
+```
 
 
 
