@@ -351,7 +351,11 @@ var response = xhr.responseText;
 var myObj = JSON.parse(response);
 ```
 
-
+### JSONP
+- JSON with Padding.
+- JsONP is a method for sending JSON data without worrying about cross-domain issues.
+- JSONP does not use the XMLHttpRequest object.
+- JSONP uses the <script> tag instead.
 
 
 
