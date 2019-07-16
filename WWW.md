@@ -1,3 +1,11 @@
+
+- [] Security
+  - SSL certificates protect data in transit between users and the websites they are connected to
+
+
+
+
+
 ### Intro
 - **Internet** is a huge collection of coumputers connected in a communications network
   - network of networks <= local network
