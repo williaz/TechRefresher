@@ -1,3 +1,16 @@
+- [x] print 10th line
+```bash
+sed -n '10p' file.txt
+```
+- [x] phone number search
+```
+grep -e '^([0-9]\{3\}) [0-9]\{3\}-[0-9]\{4\}$' file.txt
+```
+- [x] Word Frequency
+```bash
+cat words.txt | tr -s ' ' '\n' | sort | uniq -c | sort -r | awk '{ print $2, $1 }'
+```
+
 ### Linux Directory Structure
 ```bash
 /     # root
@@ -144,6 +157,7 @@ mv source destination
 mv -i
 
 sort file # sort text in file
+sort -r # reverse order
 
 tar [-] c|X|t f tarfiile [pattern] # create, extract, list contents of the tar
 
@@ -184,13 +198,14 @@ Documents/: director
 
 strings # display printable strings
 
-
+# PIPE
 command-output | command-input
 
 cut 
 -d delimiter 
 -f N # display Nth field
 
+tr ":" " " # translate char
 
 column # formats its input into multiple columns
 -s # delimiter
@@ -214,6 +229,7 @@ unalias -a # all
 printenv # env variables
 
 printenv HOME # case sensitive
+
 echo $HOME
 
 export VAR="value" # no space
