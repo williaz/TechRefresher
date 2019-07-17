@@ -131,3 +131,110 @@ D # delete from [curr to right]
 ?  # backward search
 
 ```
+### File
+
+```bash
+rm file
+rm -r fir
+
+cp -i # interactive if existing
+cp -r
+
+mv source destination
+mv -i
+
+sort file # sort text in file
+
+tar [-] c|X|t f tarfiile [pattern] # create, extract, list contents of the tar
+
+gzip # compress to .gz
+gunzip #uncompress
+gzcat
+zcat
+
+du -k # in KB
+du -h # human format
+
+
+stdin 0
+stdout 1
+stderr 2
+
+> # redirect stdout
+>> # append stdout
+< # redirect stdin
+
+2>&1
+2>file
+
+diff file1 file1
+stiff  # side by side
+vimdiff # highlight diff in vim
+
+
+grep 
+-i # ignoring case
+-c # count occ
+-n # line num
+-v # invert match
+
+file # file type
+williaz$ file Documents/
+Documents/: director
+
+strings # display printable strings
+
+
+command-output | command-input
+
+cut 
+-d delimiter 
+-f N # display Nth field
+
+
+column # formats its input into multiple columns
+-s # delimiter
+
+using a client
+SCP # secure copy
+SFTP # SSH
+
+scp source dest
+sftp host
+ftp host # start a session, plain text transfer
+
+alias ls='ls -ltr'
+unalias
+unalias -a # all
+```
+
+#### Env var
+- only affect current session only
+```bash
+printenv # env variables
+
+printenv HOME # case sensitive
+echo $HOME
+
+export VAR="value" # no space
+
+unset VAR # remove
+
+cat ~/.bash_profile
+
+
+su [usrname]
+- # fresh start
+-c command
+whoami
+
+sudo # Super User Do
+
+sudo su # root
+sudo -u user command
+
+sudo -s # root
+
+visudo # sudo conf
+```
+
