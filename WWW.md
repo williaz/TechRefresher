@@ -1,6 +1,26 @@
 
-- [] Security
-  - SSL certificates protect data in transit between users and the websites they are connected to
+- [] web speed
+  - data
+    - CDN (Content distribution networks) geo 
+    - browser caching
+    - only required field
+    - compression: zip
+  - Ajax
+  - async job
+    - server
+    - Remove render-blocking JavaScript: using the HTML async attribute on external scripts.
+  - reduce client code
+  
+
+- [] Security issue
+  - code injection
+    - JS 
+    - SQL
+  - Sensitive data exposure
+    - Authe, Authorization
+    - server config data, default value
+    - data transfer: HTPS
+    - SSL certificates protect data in transit between users and the websites they are connected to
 
 
 
