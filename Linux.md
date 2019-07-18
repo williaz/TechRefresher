@@ -253,4 +253,44 @@ sudo -s # root
 
 visudo # sudo conf
 ```
+#### Networking
+- TCP/IP
+- class A, B, C Network
+- Subnet Mask
+- Broadcast
+- CIDR
 
+- fully qualified domain name = sub_domain.domain.top_domain(com)
+
+```bash
+ip
+ifconfig
+
+~ williaz$ host google.com
+google.com has address 216.58.193.142
+google.com has IPv6 address 2607:f8b0:4000:814::200e
+google.com mail is handled by 50 alt4.aspmx.l.google.com.
+
+/etc/hosts
+/etc/nsswitch.conf
+```
+- port
+  - privileged: 1 - 1023 
+  - 80 HTTP
+  - 443 HTTPS
+- ping local
+- ping other host
+- ping ip 
+```bash
+~ williaz$ ping -c 3 google.com
+PING google.com (216.58.193.142): 56 data bytes
+64 bytes from 216.58.193.142: icmp_seq=0 ttl=55 time=18.442 ms
+64 bytes from 216.58.193.142: icmp_seq=1 ttl=55 time=18.689 ms
+64 bytes from 216.58.193.142: icmp_seq=2 ttl=55 time=18.463 ms
+
+--- google.com ping statistics ---
+3 packets transmitted, 3 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 18.442/18.531/18.689/0.112 ms
+
+
+```
