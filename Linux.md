@@ -10,6 +10,21 @@ grep -e '^([0-9]\{3\}) [0-9]\{3\}-[0-9]\{4\}$' file.txt
 ```bash
 cat words.txt | tr -s ' ' '\n' | sort | uniq -c | sort -r | awk '{ print $2, $1 }'
 ```
+- [x] EOL issue
+```bash
+# show EOL
+cat -v file
+
+vi file
+:set list
+:set nolist
+
+# convert
+dos2unix file
+unix2dos file
+
+```
+
 
 ### Linux Directory Structure
 ```bash
