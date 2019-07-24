@@ -73,7 +73,7 @@
   - Web Distribution: websites
   - RTMP: Media Streaming
   - only write also
-  - cached for the lieft of TTL(Time To Live)
+  - cached for the life of TTL(Time To Live)
   - can clear cached obj, but will be charged
 
 - Snowball: big disk for data transport, i/o S3
@@ -86,14 +86,71 @@
 
 #### [S3 FAQs](https://aws.amazon.com/s3/faqs/)
 
+### EC2
+- Elastic Compute Cloud
+- Price: on demand, Reserved, Spot, Dedicated hosts
 
+#### Security Group
+- All inbound traffic is bliced by default
+- All outboud is allowed
+- change effect immediately
+- any # of EC2 under
+- Stateful: if allow inbound, outbound auto allow
+- block specific IP
+- allow rules, no deny rules
 
+#### EBS
+- Elastic Block store
+- virtual hard drive
+- Voumn exist on EBS; Snapshot on S3
+- snapshot are incremental, changes
+- create AMI(Amazon Machine Image) from volume or snapshot
+- volume AZ same with EC2
+- to move EC2 volume AZ: take a snapshot, create an AMI from the snapshot, use AMI launch in new AZ
+- to move EC2 volumn from region: snap, AMI, copy AMI to another region, launch
 
+#### AMI
+- Instance store volume(Ephemeral Storage) cant be stoped, or lose data
+- reboot, not lose data for both
+- default, ROOT volumes will be delted on termination; EBS can config to keep
 
+- snapshot of encryted volume/volumnes restored from encrypted are encrypted auto
+- only unencrypted snapshot can be shared among AWS accounts or public
+- encrypt root device volume steps:
+  - create a snapshpt of the unencrypted volume
+  - create a copy of the snapshot and select encrypt option
+  - create AMI from it
+  - use AMI to lauch
 
+#### CloudWatch
+- for monitoring performance
+- for EC2, monitor events 5m by default
+- to have 1m interval by turning on detailed monitorung
+- CloudWatch alarms to trigger notification
+- CloudTrail for auditing(API call)
 
+- CLI(command line)
+```bash
+curl http://IP/latest/meta-data
+curl http://IP/latest/user-data
+```
 
+#### EFS
+- Elastic File System
+- can be share among EC2
+- NFSv4 protocol
+- petabytes
+- multiAZ
+- Read after Write Consistency
 
+### EC2 Placement Group
+- clustered
+  - in same AZ
+  - for low latency, high network throghtput
+- spread
+  - risk, seprate
+- unique naming in AWS account
+- can't merge, can't move existing EC2 into a group
 
 
 
