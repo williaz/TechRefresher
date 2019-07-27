@@ -90,24 +90,35 @@
 - Elastic Compute Cloud
 - Price: on demand, Reserved, Spot, Dedicated hosts
 
+
 #### Security Group
 - All inbound traffic is bliced by default
 - All outboud is allowed
 - change effect immediately
 - any # of EC2 under
 - Stateful: if allow inbound, outbound auto allow
-- block specific IP
+- can't block specific IP(use Network Access Control list)
 - allow rules, no deny rules
 
 #### EBS
 - Elastic Block store
-- virtual hard drive
+- virtual hard drive(SSD, HDD)
+- Termination Protection is turned off by default, you must turn it on
+- On an EBS-backed instance, the default action is for the root EBS volumn to be deleted when the instance is terminated.
+- EBS Root volumes of your defualt AMI is can;t be encrypted.
 - Voumn exist on EBS; Snapshot on S3
 - snapshot are incremental, changes
 - create AMI(Amazon Machine Image) from volume or snapshot
 - volume AZ same with EC2
 - to move EC2 volume AZ: take a snapshot, create an AMI from the snapshot, use AMI launch in new AZ
 - to move EC2 volumn from region: snap, AMI, copy AMI to another region, launch
+
+#### snapshot
+- can either stop instance or not when create a snapshot for EBS volumes
+- can create AMI for both Volumes and Snapshot
+= can change EBS volume size, storage type on the fly
+- Volume share same AZ as the EC2 instance
+
 
 #### AMI
 - Instance store volume(Ephemeral Storage) cant be stoped, or lose data
