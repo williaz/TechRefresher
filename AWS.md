@@ -154,7 +154,7 @@ curl http://IP/latest/user-data
 - multiAZ
 - Read after Write Consistency
 
-### EC2 Placement Group
+#### EC2 Placement Group
 - clustered
   - in same AZ
   - for low latency, high network throghtput
@@ -162,6 +162,59 @@ curl http://IP/latest/user-data
   - risk, seprate
 - unique naming in AWS account
 - can't merge, can't move existing EC2 into a group
+
+
+### DB
+- RDS(OLTP): 6 SQL, with Encryption as rest enable
+- DynamoDB (No SQL)
+- Red Shift OLAP
+- Elasticache
+
+- Multi-AZ for disaster Recovery(DR)
+- Read replicas for performance
+
+
+- RDS on virtual machinee which you can't log in
+- RDS is Not Serverless(Aurora is)
+
+#### Backup
+- Auto Backup: allow to recover in retention period(1- 35)
+- DB Snapshot(users manul initiate)
+- when resotre from both, get new RDS instance
+#### Read Replica
+- Read Replica must with backup turn on
+- can be Multi-AZ and diff region
+- can be promoted to master
+
+#### DynamoDB
+- stored on DDS 
+- spread across 3 geo
+- Eventual Consistent read(Default)
+- Stongly consistent reads
+
+#### Redshift
+- for BI
+- one AZ
+
+#### Aurora
+- default: 6 = 2 copies * 3 AZ
+- Automated failover is only availble with Aurora replicas
+- 2 types replicas: Aurora & MySql
+- backup by default
+
+#### Elasticache
+- Reddis is Multi-AZ
+- can do back ups and restores of Reddis
+- need scale horizontally use Memcached
+
+```
+Which of the following is not a feature of DynamoDB?
+With new RDS DB instances, automated backups are enabled by default?
+Under what circumstances would I choose provisioned IOPS over standard storage when creating an RDS instance?
+If you are using Amazon RDS Provisioned IOPS storage with a Microsoft SQL Server database engine, what is the maximum size RDS volume you can have by default?
+In RDS, changes to the backup window take effect ________.
+When you add a rule to an RDS DB security group, you must specify a port number or protocol.
+```
 
 
 
