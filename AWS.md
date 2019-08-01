@@ -216,6 +216,23 @@ In RDS, changes to the backup window take effect ________.
 When you add a rule to an RDS DB security group, you must specify a port number or protocol.
 ```
 
+### Route 53
+- DNS is on port 53
+- defualt 50 name limit
+- ELB don't have pre-define IPv4, you resolve to them using a DNS name
+- Alias Rec, CNAME(batman) -> alias
+- buy domain, up to 3d to register
+
+#### Routing policy
+
+- Simple: random return values for multi
+- Weighted: traffic
+- Health check: fail -> remove; SNS notify for it
+- Latency 
+- Failover: active/passive server
+- Geolocation: set by user location
+- Geoproximity(Trafiic Flow only): on user and your resource location
+- Multivalue Answer: simple + health check
 
 
 
