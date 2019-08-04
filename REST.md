@@ -136,6 +136,61 @@ PATCH	      no	        no
 - 422 Unprocessable Entity - Used for validation errors
 - 429 Too Many Requests - When a request is rejected due to rate limiting
 
-  
-  
-  
+
+
+#### Security
+- Basic Authentication (stateless)
+- Digest Authentication (stateless)
+- Form-based Authentication (stateful)
+- OAuth 2 (stateful)
+- OAuth 2 + JWT (stateless)
+- Custom Token Implementation (stateful or stateless)
+
+
+- Stateless
+```java
+@Autowired
+AuthenticationManagerBuilder auth
+
+protected void configuare(final HttpSecuirty http) throws Exception {
+    http.authorizeRequests().
+    
+    //anyRequest().
+    //antMatchers("/api/**").
+    /*
+    regexMatchers("^/login.*").
+    permitAll().
+    */
+    
+    authenticated().and().httpBasic().and().
+    sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+}
+
+```
+#### URL vs Method level security
+- mapp URL
+- configure
+```
+anonymous
+authenticated
+fullyAuthenticated
+denyAll
+hasAnyAuthority("ROLE_STH", "ROLE_STH2") / hasAnyRole / hasAuthority / hasRole / hasIp
+access
+permitAll
+```
+- method level
+```java
+// for security config class
+@EnableGlobalMathodSecuity(prePostEnabled = true, securedEnabled = true)
+
+
+@Secured(Privileges.CAN_USER_READ)
+```
+#### Documentation
+- enabling swagger on demand with @Profile("swagger") on SwaggerConfig
+  - -Dspring.profiles.active="dev,swagger"
+
+
+
+
