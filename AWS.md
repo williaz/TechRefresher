@@ -235,4 +235,70 @@ When you add a rule to an RDS DB security group, you must specify a port number 
 - Multivalue Answer: simple + health check
 
 
+### VPC
+- Virtual Private Cloud
+- subnet: 1 AZ
+- route table
+- gateway
+- securtiy groups - startful; Network Access control list - stateless
+- VPC peering as in a same intranet, no transitive peering
+- 5 VPC per region by default
+
+
+- When you create a VPC, a default Route table, Network Access control list(NACL) and a default security group are created
+- It won't create any subnets, nor will it create a default internet gateway
+- randomized AZ
+- Amazon reserver 5 IP addesses within your subnets
+- 1 Internet Gateway per VPC
+- An Application Load Balancer must be deployed into at least two subnets.
+- When create a new security group, all outbound traffic is allowed by default.
+
+#### NAT instance
+- when creating NAT ins, disable Source/Destination check on the ins
+- NAT instances must be in a public subnet
+- must be a route out of the private subnet
+- traffic size depends on the ins size
+- behind a Security group
+
+#### NAT Gateway
+- preferred
+- 5Gbps - 45, scale auto
+- not associsate security 
+- auto assign public IP
+- no need disable S/D check
+
+#### ACL
+- default ACL, all allow i/o
+- custom deny all i/o
+- each subnet in you VPC must be assiocaited with a ACL
+- block IP using ACL,not SG
+- one to many: ACL: subnet
+
+#### Flow log
+- can't enable flow logs for peer VPC
+- can't tag
+- no monitor AMZN DNS, windows instance(AMZn license), metadata, reserved IP for default VPC router
+
+#### Bastion Host
+- used t securly administer EC2 instances(using SSH or RDP)
+- can't use NAt gateway as a Bastion host
+
+#### Direct connect
+- connects your data center to AWS
+- high throughput
+- stable
+
+#### Endpoints
+- Interface
+- Gateway
+  - S3
+  - DynamoDB
+
+
+
+
+
+
+
+
 
