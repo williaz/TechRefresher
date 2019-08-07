@@ -295,6 +295,44 @@ When you add a rule to an RDS DB security group, you must specify a port number 
   - DynamoDB
 
 
+### HA
+
+
+#### LB
+- 3 types:
+  - App: Intelligent
+  - network: high speed
+  - classic
+- 504 Error: gateway time out
+- X-Forwarded-For get IPv4 address of end user
+- Instances monitored by ELB are reported as: InService,OutofService
+- Health Check
+- LB has own DNS name, never give IP
+- [ELB FAQ](https://aws.amazon.com/elasticloadbalancing/faqs/)
+
+#### theory
+- Sticky session
+- cross zone LB: m AZ
+- Path pattern: path based routing
+
+
+#### HA Arch
+- m AZ, m Region
+- Read Replica for RDS
+- cost
+- Adding Resillience: Resiliency can be described as the ability to a system to self heal after damage or an event. 
+- autoscaling
+- scale out: spread; scale up: higher
+#### CloudFormation
+ - scripting cloud env, template
+#### Beanstalk
+ - quicklu deploy and manage app
+ - auto handle capacity, LB, scaling, health check
+ 
+
+
+
+
 
 
 
