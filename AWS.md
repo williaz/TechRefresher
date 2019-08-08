@@ -330,8 +330,91 @@ When you add a rule to an RDS DB security group, you must specify a port number 
  - auto handle capacity, LB, scaling, health check
  
 
+### APP
+#### SQS
+- pull based
+- standard(default), general ordered
+- FIFO
+- 256K is size, if bigger in S3
+- kept 1m - 14d; default retention 4d
+- Visiblity Timeout; redo
+  - max: 12h
+- at least once proceed
+- long polling
+#### SWF
+- SWF vs SQS
+  - Retention: up to 1y; 14d
+  - task-oriented API: message
+  - never dup;
+  - auto track all tasks/events;
+- Actors
+  - starter: init
+  - Decider: control
+  - activity workers
+#### SNS
+- messaging
+- push
+#### Elastic Transoder
+- media transcoder, format
+#### API gateway
+- 5-10Q
+- at a high level
+- can caching
+- low cost, auto scale
+- can throttle 
+- log to CloudWatch
+- CORS
+##### Kinesis
+- load and analyze streaming data
+- Stream 
+ - shard(persistence)
+ - 24h - 7d retention
+- Firehouse
+  - Optional: lambda
+  - to S3/Elasticsearch
+- Analytic
+  - stream
+  - firehouse
+
+#### Cognito
+- Federation allowes user to authenticate  with A web Identity Provider(G,F A)
+- get token for WIP
+- a broker between your app and Web ID provider
+- user pool: user based: reg, auth, account recovery
+- Identity pools: access to AWS resource
 
 
+### Serverless
+#### Lambda
+- scale out auto
+- func: independent
+- serverless: S3, API Gataway, Aurora, 
+- trigger other lambda
+- X-ray to debug
+- do thing globally
+- triggers: Each time a Lambda function is triggered, an isolated instance of that function is invoked. Multiple triggers result in multiple concurrent invocations, one for each time it is triggered
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
 
 
 
