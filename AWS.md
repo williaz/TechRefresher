@@ -445,11 +445,69 @@ These core services are also called foundational ser- vices. Examples include re
   - Directory Service: MS Active dir
   - Web App Firewall(WAF): IP
   - Shield: DDos(Distributed denial-of-service)
-
-
-
-
-
+- Storage
+  - S3(Simple Shared Storage)
+  - Glacier
+  - EBS(Block): disk
+  - EFS(File System)
+  - Storage Gateway: integrate
+  - Import/Export OPtions
+    - Snowball
+    - Direct Connect
+  - CloudFront
+- DB
+  - RDS
+  - DynamoDB
+    - docu
+    - key-value
+  - Redshift
+    - columnar format
+  - ElastiCache
+  - Aurora
+- Analytic
+  - Athena: SQL on S3
+  - EMR; Hadoop
+  - Easicsearch
+  - CloudSearch
+  - Data Pipeline
+  - Kinesis
+  - QuickSight
+- APP
+  - API gateway
+  - Step fucntion: visualize component's workflow
+  - SWF(Simple Workflow Service)
+  - Elastic Transcoder
+- Dev tools
+  - CodeCommit: source control servie
+  - CodePipeline: CI/CD
+  - CodeBuild
+  - CodeDeploy
+- Management tools
+  - CloudFormation: template of resoure stack
+  - Servcie Catalog
+  - OpsWorks: Chef
+  - CloudWatch
+  - Config
+  - CloudTrail: Api call
+- Messaging
+  - SNS
+  - SES(Email)
+  - SQS(Queue)
+- Migration
+- AI
+  - Lex: chatbot
+  - Polly: lieflike spech
+  - Rekognition: vision
+  - ML: predictive
+- IoT(Internet of Things)
+  - IoT
+  - Greengrass
+  - Iot Button: Dash Button
+- Mobile
+  - Cognito: social identity, autentication
+  - Mobile Hub
+  - Device Farm: tst on real 
+  - Mobile Analytics
 
 
 
