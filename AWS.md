@@ -396,6 +396,57 @@ When you add a rule to an RDS DB security group, you must specify a port number 
 
 
 
+```
+These core services are also called foundational ser- vices. Examples include regions, AZs, Amazon Virtual Private Cloud (VPC), Amazon EC2 servers, ELB, AWS Auto Scaling, storage, networking, databases, AWS IAM, and security.
+
+
+```
+- Cloud Computing
+  - On demand: IT infrastructute as a resource
+  - Accessible from the Internet
+  - Pay as you go model
+
+- 3 Models
+  - IaaS: Infrastucture
+  - PaaS: Platform, AWS
+  - SaaS: Software, Salesforce
+
+- Deploy Model
+  - All in cloud
+  - Hybrid
+  - On premise/Private cloud: virtualization-compute node: VMware ESX
+
+- Region
+  - AZ
+  - Edge(Points Of Presence): content dilivery: CloundFront & Route 53
+  - Redundant
+
+- Shared Security model
+  - AWS for the security of the cloud: phyical
+  - Customers: in the cloud: data
+
+
+- Compute
+  - EC2
+  - EC2 Auto Scaling
+  - Lambda: code
+  - ECS(EC2 Contaiiner Service)
+  - Elastic Beanstalk: web app
+  - Lightsail: VPS(virtual private server)
+  - Batch
+- Networking
+  - VPC: data center
+  - Route 53
+  - ELB
+  - Direct Connet
+- Security
+  - IAM (Identiy and Access Management)
+  - Inspector: install and manage EC2 instances
+  - Directory Service: MS Active dir
+  - Web App Firewall(WAF): IP
+  - Shield: DDos(Distributed denial-of-service)
+
+
 
 
 
