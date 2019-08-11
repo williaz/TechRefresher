@@ -395,9 +395,10 @@ When you add a rule to an RDS DB security group, you must specify a port number 
 - triggers: Each time a Lambda function is triggered, an isolated instance of that function is invoked. Multiple triggers result in multiple concurrent invocations, one for each time it is triggered
 
 
-
+## AWS AIO
 ```
 These core services are also called foundational ser- vices. Examples include regions, AZs, Amazon Virtual Private Cloud (VPC), Amazon EC2 servers, ELB, AWS Auto Scaling, storage, networking, databases, AWS IAM, and security.
+
 
 
 ```
@@ -509,6 +510,98 @@ These core services are also called foundational ser- vices. Examples include re
   - Device Farm: tst on real 
   - Mobile Analytics
 
+### Storage
+
+- Object storage: docu/img/video with flat structure metadata
+- Block storage: EC2 disk, EBS, DB
+- File storage: EFS 
+
+#### S3
+- all obj stored in a flat namespace organized by buckets
+- regional sercieL ato replicated within
+- Advantages:
+  - Simple to use
+  - Scalable: unlimited storage
+  - Durable 9 of 9 after .
+  - Secured
+  - High performace: mulitpart, region
+  - Available
+  - Low cost
+  - Easy to manage
+  - Easy integration
+- Uses cases:
+  - Backup
+  - Tape replacement
+  - Static website hosting
+  - App hosting ??
+  - Disaster revobery
+  - Content Distribution
+  - Data lake
+  - Private repository
+- Basics
+  - Bucket: container, name must be unique universal; folder name under it can be any
+    - by default, not cross region replication
+    - Object inside has a key: path
+    - REST API
+  - Write once, read many
+  - read after write consistency for new objects: sync to multi facilities before returnig success
+  - eventually consistent system aprt from new ones
+  - no Object Locking, latest timestamp opt wins
+- Performance
+  - consider partition when the workload to run ob an S3 bucket is > 100 PUT/LOST/DELETE rps or 300 GET rps
+  - S3 auto partition based on the first 6 to 8 characters in object key prefix
+    - rename object key: first char
+    - reverse key
+    - MD5 hash of the char seq
+    - URL-safe implementation and avoiding the ‘+’ and ‘/’ characters, instead using ‘-‘ (dash) and ‘_’ (underscore) in their places.
+
+- Encrytion
+  - In transit
+    - HTTPS and use SSL-encryted endpoints
+    - S3 encryption client: KMS(Key Management Service) encrytion keys
+  - At rest: SSE(Server Side Encryption)
+    - SSE-SE(S3 Key Management)
+    - SSE-C(customer-provided keys): provide custom encryption key in upload/download request
+    - SSE-KMS: separate permission, audit trail
+- Access control
+  - ARN(Amazon resurce name): uniquely identify AWS resources, URI
+  - IAM policy to a group, user, role; finegrained control
+  - Bucket policy: condition, resource based, finegrained control
+  - ACL(access contril list) apply to bucket level and object level; coarse-grained control
+- Storage CLass(attribute on objects, sa,e buckets)
+  - S3 standard(SLA): 11 nines durability; sync cross 3 AZ
+  - S3 Standard Infrequent Access(IA)
+  - S3 Reduced Redundancy Storage(RRS): lower durability: 4 nines, sustain 1 AZ loss
+  - S3 Ine Zone IA: rapid access
+  - Glacier
+  - move class by creating a lifecycle policy, CLI S3 copy, S3 console, SDK
+- Versioning
+  - once enable, can't disable, but can suspend
+  - on bucket level
+- Lifecycle
+  - attached to a bucket, can enable on file prefix
+  - Expiration action
+  - Transition action
+- Cross Region Replication(CRR)
+  - Management-Replication
+  - auto async copy
+  - must enable visioning on both source and target bucket(can in same or diff AWS account)
+  - options for changing storage class, ownership
+  - can't CCR in same region
+  - (rule)status-Enabled to start right away
+  - select IAM
+  - CRR copied only the new object after it applied
+  - HEAD for meta data includes replication status
+- Static hosting
+  - Properties
+
+#### Glacier
+
+#### EBS
+
+#### EFS
+
+#### On-Premise Intg
 
 
 
