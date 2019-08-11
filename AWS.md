@@ -513,6 +513,8 @@ These core services are also called foundational ser- vices. Examples include re
 ### Storage
 
 - Object storage: docu/img/video with flat structure metadata
+  - immured/ unstructured data
+  - app manage storage inquiry
 - Block storage: EC2 disk, EBS, DB
 - File storage: EFS 
 
@@ -550,7 +552,7 @@ These core services are also called foundational ser- vices. Examples include re
 - Performance
   - consider partition when the workload to run ob an S3 bucket is > 100 PUT/LOST/DELETE rps or 300 GET rps
   - S3 auto partition based on the first 6 to 8 characters in object key prefix
-    - rename object key: first char
+    - rename object key
     - reverse key
     - MD5 hash of the char seq
     - URL-safe implementation and avoiding the ‘+’ and ‘/’ characters, instead using ‘-‘ (dash) and ‘_’ (underscore) in their places.
@@ -596,20 +598,54 @@ These core services are also called foundational ser- vices. Examples include re
   - Properties
 
 #### Glacier
+- same durablility of S3
+  - This object is in Glacier. You cannot download it or make it public. You cannot edit any property or permission.
+- Archive: immuntable, write once; if >100m, multipart upload
+  - aggreegate: tar/zip
+- vault contains archives
+  - need clean archives inside to delete vault
+  - IAM t set vault l;evel access policy
+  - Vault lock: policy is immutable
+  - cold index: inventory, SNS
+  - Vault name must be unique in an account and region
+- Retrievel: Expediated, standard, bulk
 
 #### EBS
+- independent outside the life span of an EC2 instance
+- as boot partition or attached to EC2
+- can attached to only one EC2 at a time, detach
+- AZ level replication
+- can create point- in-time consistent snapshot to S3
+- AFR(annual failure rate): 0.1 -0.2 perc
+- Volume
+  - IOPS: input/output operation per second 
+  - EC2 instance store: local to EC2, no snapshot support
+  - EBS SSD backed: transactional workload like DB, latency-sensitive
+  - EBS HDD-backed: throughput-intensive workload like log processing/mapreduce
+- for ensuring consistent snapshot, recommend to detach EBS from EC2 when issue snapshot
 
 #### EFS
+- auto availble in multi-AZ
+- NFS protocol
+- A mount target is an NFS v4 endpoiint in your VPC, create for each AZ
 
 #### On-Premise Intg
 
+- transfer > 10TB, on-premise instead of S3
+
+- SGW(Storage Gateway): deploy in VM in your env
+  - file gateway
+  - volume gateway
+    - cached: locally cache
+    - stored: stored all locall and async backup to S3
+  - tape gateway
+- Snowball
+  - NAS(newwork-attached storage)
+  - Snowball edge: 100TB
+  - Snowmobile
 
 
-
-
-
-
-
+##### S3 standard/EFS redundent in a region, EBS redundent in a AZ
 
 
 
