@@ -648,11 +648,71 @@ These core services are also called foundational ser- vices. Examples include re
 ##### S3 standard/EFS redundent in a region, EBS redundent in a AZ
 
 
+### VPC
+- private space in the cloud, manage IP namespace
+- once create a VPC, can't alter the size(CIDR block), have to migrate
+  - in IPv4, the prefix length /29 gives: 2^32 − 2^9 = 2^3 = 8 addresses.
+- in a region
+- subnet
+  - various subnets in a VPC
+  - private, public, VPN-only
+  - a subnet tied to only one AZ
+  - CIDR blocks can't overlap in subnets
+  - for any subnet, AWS reserves first 4 IP and last IP
+- Route Table
+  - each subnet must have a route table; but multiple subnets can have same route table
+  - IPv4 and IPv6 treated separeately
+  - auto created the main route table for the VPC, better keep i with only the local route
+  - destionation specifies the IP ranges that can be directed to the target
+  - target is where the traffic is directed 
+  
+- Internet Gateway (IG)
+  - allow VPC to commmunicate with the Internet
+  - IG is Horizontally scaled
 
+- Network Address Translation
+  - NAT device used for IP{v4 traffic only
+  - enable private subnet instance to connect to the Internet, but internet can't initiate a connection to it
+  - stateful
+  - NAT instance
+    - an elastic IP associate with the NAT instance
+    - single point of failure
+  - NAT gateway
+    - meanaged service
+    - better availablity and bandwidth
+- Egress-only Internet gateway
+  - IPv6 version of NAT gateway
+  - stateful @@
 
+- Elastic Network Interface(ENI)
+  - create one or more network interfaces and attach them to you instance
+  - attibutes of the ENI follow along with it
+  - can't change deggault NI
+  - ENI doesn't impact the network bandwidth
+- Elastic IP address
+  - static IP address
+  - map EIP to EC2, as launch a new EC2, get a new IP
+  - support only IPv4
+  - no charge as long EIP is assoicate to a runing EC2
+- Security Group
+- NACL
+- VPC Peering
+- VPC endpoint
+- DNS ad VPC
+- DHCP
+#### Connecting to a VPC
+#### Flow logs
+#### Default VPC
 
   
   
+  
+
+
+
+
+
+
 
 
 
