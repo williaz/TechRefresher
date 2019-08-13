@@ -735,9 +735,17 @@ These core services are also called foundational ser- vices. Examples include re
   - can't modify
   - new instance apply new DHCP, running instance ick up when DHCP lease is renewed
 #### Connecting to a VPC
+- Virtual private gateway: AWS side, VPN concentrator
+- Customer gateway
+- private connectivity types:@@@
+  - AWS hardware VPN: IPsec(Internet Protocol Seurity)
+  - AWS Direct Connect: dedicated private connection
+  - VPN CloudHub: multiple sites, simple hub-and spoke model
+  - Software VPN: an EC2 ruing VPN app
 #### Flow logs
+- IP traffice in and out from NI in VPC
 #### Default VPC
-
+- a VPC created in each region by default
   
   
   
