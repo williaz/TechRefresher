@@ -695,11 +695,45 @@ These core services are also called foundational ser- vices. Examples include re
   - support only IPv4
   - no charge as long EIP is assoicate to a runing EC2
 - Security Group
+  - virtual firewall, reflected in instance immediately and auto
+  - instance level, many to many
+  - stateful, outbound = inbound; by default all outbound is allowed, conside all rules
+  - always associated with the NI
+  - default security group
+    - inbound in the same SG
+    - can't delete but can change
 - NACL
+  - optional, sunet level
+  - stateless, can allow/deny
+  - default NACL, allow all i/o
+  - each subnet must be assigned with one and only one ACL
+  - apply ASAP from lowest numbered rule, mutiples of 100
+
 - VPC Peering
+  - route the traffic across VPC using a private IPv4/6 address
+  - NO transitive peering 
+  - within same region, can across accounts
+  - AWS internal infrastructure(hardware) => no signle point failure
+  - steps:
+    - accept peering connection, no CIDR block overlapo
+    - add a route in route table
+    - mod SG/ enable DNS
 - VPC endpoint
+  - private connection, no leave AWS
+  - for S3 and DynamoDB
+  - route table to control traffic
 - DNS ad VPC
-- DHCP
+  - IPv4 for AWS 
+  - instance in default VPC has public and private IP
+  - instance get a public DNS hostname, if both true
+    - enableDnsHostnames
+    - enableDnsSupport
+- DHCP@@@
+  - Dynamic Host Config Protocol
+  - default domain name and DNS server for instances
+  - VPC must have only one DHCP assigned
+  - can't modify
+  - new instance apply new DHCP, running instance ick up when DHCP lease is renewed
 #### Connecting to a VPC
 #### Flow logs
 #### Default VPC
