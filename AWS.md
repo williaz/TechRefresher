@@ -650,6 +650,7 @@ These core services are also called foundational ser- vices. Examples include re
 
 ### VPC
 - private space in the cloud, manage IP namespace
+- max VPC size: /16
 - once create a VPC, can't alter the size(CIDR block), have to migrate
   - in IPv4, the prefix length /29 gives: 2^32 − 2^9 = 2^3 = 8 addresses.
 - in a region
@@ -665,10 +666,12 @@ These core services are also called foundational ser- vices. Examples include re
   - auto created the main route table for the VPC, better keep i with only the local route
   - destionation specifies the IP ranges that can be directed to the target
   - target is where the traffic is directed 
+  - all subnets that are not explicitly associated with a more specific route table will use Main route table by default.
   
 - Internet Gateway (IG)
   - allow VPC to commmunicate with the Internet
   - IG is Horizontally scaled
+  - igw-
 
 - Network Address Translation
   - NAT device used for IP{v4 traffic only
@@ -691,9 +694,10 @@ These core services are also called foundational ser- vices. Examples include re
   - ENI doesn't impact the network bandwidth
 - Elastic IP address
   - static IP address
+  - EIP is associated with the instacne during the stop and start of EC2, will detached when explicitly terminate EC2.
   - map EIP to EC2, as launch a new EC2, get a new IP
   - support only IPv4
-  - no charge as long EIP is assoicate to a runing EC2
+  - no charge as long as EIP is assoicate to a runing EC2
 - Security Group
   - virtual firewall, reflected in instance immediately and auto
   - instance level, many to many
@@ -746,7 +750,6 @@ These core services are also called foundational ser- vices. Examples include re
 - IP traffice in and out from NI in VPC
 #### Default VPC
 - a VPC created in each region by default
-  
   
   
 
