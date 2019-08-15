@@ -750,8 +750,21 @@ These core services are also called foundational ser- vices. Examples include re
 - IP traffice in and out from NI in VPC
 #### Default VPC
 - a VPC created in each region by default
-  
-  
+
+#### VPC lab
+1. create VPC -> assign CIDRs(/16 - /28)
+2. get main route table, Network ACL, security group
+3. create subnet -> select VPC, AZ, IPv4/6 CIDR block(-5 IP)
+4. subnet -> action -> modify auto-assign IP setting -> enable
+5. Internet Gateway create -> action -> attach to VPC; 1 IGW per VPC
+6. Route table -> select VPC; Edit route -> dest : target(IGW)
+7. Route table -> edit association -> add subnet
+8. EC2 -> Newtwork: VPC, select subnet
+9. EC2 -> SG -> add i/o bound rules for private subnet's EC2
+
+
+### EC2
+
 
 
 
