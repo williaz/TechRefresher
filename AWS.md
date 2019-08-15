@@ -765,15 +765,57 @@ These core services are also called foundational ser- vices. Examples include re
 
 ### EC2
 
+- benefits:
+  - Time to market: instant deploy
+  - Scalability: pike
+  - Control: 
+  - Reliable
+  - Secure
+  - Multiple instance type
+  - Integration: with other AWS services
+  - Cost effective
 
+- types:
+  - General(T2, M5, M4, M3)
+    - balance
+    - T2 burstable performace
+  - Compute optimized (C5, C4, C3)
+    - media transcoding, app concurrent, long-runing batch, gaming
+  - Memory (X12, X1, R4, R3)
+    - in memory DB, big data processing engines, Genome
+  - Storage (H1, I3, D2)
+    - I/O bound app
+    - Cache, MapReduce, DB
+  - Advanced computing (P3, P2, G3, F1)
+    - GPU, CF
 
+- A placement group is a logic grouping of instances within a single AZ
+  - low latency or high network throughpt
+  - better same instance type, enhanced neworking type
+  - can't span AZ
+  - unique name per AWS account
+  
+- Storage
+- Steps
+- pricing
+- Shared Tenancy
+- Dedicated hosts
+- Dedicated instances
 
+- AMI
 
+- Root Volume
 
-
-
-
-
+- Lifecycle
+- Connecting
+- SG
+- ECS  
+  - Elastic Container Service
+  - manage Docker containers on a cluster of EC2
+    - containers isolate the process running on a single OS
+    - Container: isolated user space processes
+    - image: portable, consistent and immutable; includes dependencies
+  - AWS ECS API for cluster management infrastructure
 
 
 
