@@ -796,19 +796,77 @@ These core services are also called foundational ser- vices. Examples include re
   - unique name per AWS account
   
 - Storage
-- Steps
+  - EBS, persists independently for the life span of EC2 
+    - General purpose: default
+    - Provisioned IOPS
+    - Magnetic: dev
+  - instance store: ephemeral storage
+- lab
+  - select preconfig AMI(Amazon Machine Image)
+  - config VPC, subnet, SG
+  - choose instance type
+  - choose AZ, Attach EBS, EIP
+  - start
 - pricing
-- Shared Tenancy
-- Dedicated hosts
-- Dedicated instances
+  - On-demand
+  - Reserved
+    - 75% discount 
+    - standard
+    - convertible: exchange class based on compute req
+  - Spot
+    - 90% disc
+- Shared Tenancy: multi-tenant
+- Dedicated hosts: carve as many VM
+- Dedicated instances: in VPC on heardware dedicated to a single customer
 
 - AMI
-
-- Root Volume
-
+  - preconfig
+  - regional
+  - can share through sharing AWS ID
+  - using a single AMI, lauch diff instance types
+  - lauch permission: pulic, explicit, implicit
+  - Obtaining
+  - Virtualization 
+    - HVM(hardware WM)
+    - PV(Paravirtual)
+- Instance Root Volume  @@@
+  - instance store-backed AMI
+    - S3
+    - can't stop
+    - reboot: data persists
+    - terminated: data gone
+    - when use an instance with instance store, you can't detach an store vlolume form one instacne and reattach to another
+  - EBS-backed AMI
+    - data laways persis
+  
+  - can convet Linux AMI from store-backed to EBS backed; but no fro windows
 - Lifecycle
+  - Lauch
+  - start, stop
+    - can stop only if EBS-backup
+    - once stop, no charge; but charge on EBS
+  - Reboot: like for OS, lose nothing
+  - Termination
+    - Termination protection enabled
+    - DeleteOnTemination attribute: 
+      - default: delete root devcie volume, preserve any other EBS
+  - Retirement: due to irreparable hardware failure
 - Connecting
+  - public key(in EC2) for encrypt; private key for decrypt
 - SG
+  - by default
+    - allow all outbound 
+    - can't change outbound rules for EC2-classic
+    - permissive: no deny rule
+    - stateful, if send out, always back
+    - can change, auto apply shortly
+  - rule:
+    - Protocol
+    - Port range
+    - ICMP type and code
+    - Source/destination
+      - IP address
+      - SG: rule will be stale if the SG is in a peer VOC and the SG or VPC peering are deleted
 - ECS  
   - Elastic Container Service
   - manage Docker containers on a cluster of EC2
