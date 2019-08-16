@@ -818,7 +818,8 @@ These core services are also called foundational ser- vices. Examples include re
 - Shared Tenancy: multi-tenant
 - Dedicated hosts: carve as many VM
 - Dedicated instances: in VPC on heardware dedicated to a single customer
-
+- lab:
+  - create an EC2 instanc eusing an SSH key pair, pem file
 - AMI
   - preconfig
   - regional
@@ -834,7 +835,7 @@ These core services are also called foundational ser- vices. Examples include re
     - S3
     - can't stop
     - reboot: data persists
-    - terminated: data gone
+    - terminated/shut down: data gone
     - when use an instance with instance store, you can't detach an store vlolume form one instacne and reattach to another
   - EBS-backed AMI
     - data laways persis
