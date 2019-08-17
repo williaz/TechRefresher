@@ -408,9 +408,9 @@ These core services are also called foundational ser- vices. Examples include re
   - Pay as you go model
 
 - 3 Models
-  - IaaS: Infrastucture
-  - PaaS: Platform, AWS
-  - SaaS: Software, Salesforce
+  - IaaS: Infrastucture: EC2
+  - PaaS: Platform: RDS
+  - SaaS: Software: Salesforce, S3
 
 - Deploy Model
   - All in cloud
@@ -875,6 +875,106 @@ These core services are also called foundational ser- vices. Examples include re
     - Container: isolated user space processes
     - image: portable, consistent and immutable; includes dependencies
   - AWS ECS API for cluster management infrastructure
+
+### IAM
+- Authentication
+  - access
+  - SSO(federation)
+- Authorizaion
+  - privilege
+  - IAM policy- JSON: allow/deny
+  - entity: group/user/service
+- Auditing
+  - CloudTrail
+  - API call/event made
+  
+- Security Credential
+  - types
+    - IAM usernam and password
+    - E-mail addresss and password
+    - Access key
+    - Key pair
+    - Multifactor authentication
+  - temp SC
+    - short term: < a few hr
+    - AES STS(Security Token Service)
+  
+- Users
+  - created by IAM
+    - create a user via IAM
+    - provide SC
+    - attach permissions, roles and responsibilities
+    - Add the user to groups
+  - root account
+    - unrestricted access
+    - for creating Admin
+  - access key for each user
+    - access key ID
+    - secret access key(accessible only at the creating time)
+  
+- Groups
+  - consists of roles and privileges
+  - to users: many to many
+  - contains users, no group. no role
+  - no default group
+- Roles
+  - an IAM entity that defines a set o permissions for making AWS service requests
+  - control federated users, not assoicated with a user/group
+  - specify 2 policy for a role
+    - trust policy: principal, who can assume the role
+    - permission/access policy: resouces/action is allowed access to
+- Hierarchy
+  - root user/account owner
+  - IAM user
+  - temp sc
+  
+- Best Practices
+  - use IAM user: lock down root user
+  - create strong password policy, expired after 90d
+  - Rotate SC regularly: deactivate unused SC 
+  - enable MFA: or critical account
+  - manage permission with groups: job fucntion
+  - grant the least privileges
+  - use IAM role: no share SC
+  - use IAM role for EC2
+  - use IAM policy conditions for Extra Security
+  - use CloudTrail: enale in all regions, not publicly accessible for S3
+
+ - AWS Compliance program
+   - report from Artifact menu in Security, Identity & Compliance
+ 
+ - Shared Responsibility Model
+   - AWS: OF cloud
+     - Physical security of data center
+     - EC2 secrity
+     - Network
+     - configuration management
+     - HA data center
+     - disk management
+     - storage device decommissioning
+   - Customers: IN cloud
+     - guest OS
+     - app
+     - firewall
+     - VPC
+     - service config
+     - Authentication and account management
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
