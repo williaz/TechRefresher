@@ -933,12 +933,12 @@ These core services are also called foundational ser- vices. Examples include re
   - create strong password policy, expired after 90d
   - Rotate SC regularly: deactivate unused SC 
   - enable MFA: or critical account
-  - manage permission with groups: job fucntion
+  - manage permission with groups: job function
   - grant the least privileges
   - use IAM role: no share SC
   - use IAM role for EC2
   - use IAM policy conditions for Extra Security
-  - use CloudTrail: enale in all regions, not publicly accessible for S3
+  - use CloudTrail: enable in all regions, not publicly accessible for S3
 
  - AWS Compliance program
    - report from Artifact menu in Security, Identity & Compliance
@@ -970,7 +970,7 @@ These core services are also called foundational ser- vices. Examples include re
   - Target tracking: CPU utilization
 - Launch Config
   - a template stores all the info about the instance
-  -  to Auto scaling group: one to many
+  - to Auto scaling group: one to many
   - can't edit ASG's lauch config, but can create a new one to assocaite, new instance will follow
 
 - Auto Scaling Group
@@ -989,7 +989,7 @@ These core services are also called foundational ser- vices. Examples include re
   - simple scaling with steps
     - on range
     - Exact capacity
-    - chacne in capacity
+    - change in capacity
     - percentage change in capacity: nearest digit
   - target-tracking scaling policy
     - metrix, CloudWatch
@@ -1000,10 +1000,53 @@ These core services are also called foundational ser- vices. Examples include re
     - oldest launch config
 - ELB
   - Auto multi-AZ as a seperate ELB VPC
+  - if ELB instance failed, ELB cuts off the trafiice to that instacne ans starts a new
   - types
+    - Network LB
+      - OSI layer4, connection based, supports TCP and SLL
+      - no touch packet, no header modification(no X-Forwarded-For for IP address)
+    - App LB
+      - OSI layer7
+      - check header, content-based routing
+        - host- based routing
+        - path-based routing
+    - Classic LB
+      - support both network and App
+      - for classic EC2
+      - always Internal LB
+    - Define Schemar for it's internal or external
+      - External LB, for Internet
   - concepts
+    - multipe app:
+      - if classic LB, use DNS in front of LB
+      - ALB support content bsed rounting, up to ten rules(app)
+    - ALB for multiple ports from a host
+    - ECS: auto, dynamic port mapping
+    - Listener:
+      - per LB, at lest one listener to accept incoming traffic; <= 10
+      - define on the protocol and port
+      - support WebSocket
+      - HTTP/2 <= 128 req in parallel, use healthy targets with round-robin routing
+    - Target Group
+      - regional
+      - with Auto scaling
+      - a single target can be registered with multiple groups
+    - Rule
+      - like listener and target
+      - condition(host/path) and action(forward)
+      - path pattern is case-sensitive
+      - higest priority excuted first, default rule(created default for a listener) has the lowest
   - health check
+    - HA, by CloudWatch
+    - HealthCheckIntervalSeconds
+    - can customize frequency, failure thresholds, and list of successful response codes
+    - status: init, healthy, unhealthy, unused, drainiing
   - multi-AZ
+    - better maintain the state info ourside EC2, use DynmaoDB for session
+    - cross-zone lB
+      - default enabled
+      - evenly distribute to EC2 across AZ
+      - NLB only rout to EC2 in its AZ, flow hash on IP
 
 
 
