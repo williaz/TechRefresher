@@ -157,7 +157,7 @@ curl http://IP/latest/user-data
 #### EC2 Placement Group
 - clustered
   - in same AZ
-  - for low latency, high network throghtput
+  - for low latency, high network throghtput in between
 - spread
   - risk, seprate
 - unique naming in AWS account
@@ -961,11 +961,49 @@ These core services are also called foundational ser- vices. Examples include re
      - Authentication and account management
 
 
+### Auto Scaling
+- Benefit
+  - Dynamic scaling
+  - best user experience
+  - Health check and fleet management. fleet: a collection of EC2
+  - Load balancing: with ELB
+  - Target tracking: CPU utilization
+- Launch Config
+  - a template stores all the info about the instance
+  -  to Auto scaling group: one to many
+  - can't edit ASG's lauch config, but can create a new one to assocaite, new instance will follow
 
-
-
-
-
+- Auto Scaling Group
+  - in one region per group
+  - policy
+    - maintaining instance level: num of instance
+    - manual scaling
+    - per the demand: CloudWatch
+    - per schedule: time
+  - scaling policy: one for up,one for down
+  - prvide min and max num of instance
+  - simple scaling
+    - based on only one scaling adj
+    - cooldown period for time before new
+    - create alarm -> define action based on it
+  - simple scaling with steps
+    - on range
+    - Exact capacity
+    - chacne in capacity
+    - percentage change in capacity: nearest digit
+  - target-tracking scaling policy
+    - metrix, CloudWatch
+  - Termination policy
+    - which EC2 to shut down first
+    - longest running
+    - billing
+    - oldest launch config
+- ELB
+  - Auto multi-AZ as a seperate ELB VPC
+  - types
+  - concepts
+  - health check
+  - multi-AZ
 
 
 
