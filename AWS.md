@@ -1048,12 +1048,164 @@ These core services are also called foundational ser- vices. Examples include re
       - evenly distribute to EC2 across AZ
       - NLB only rout to EC2 in its AZ, flow hash on IP
 
+### APP
+
+#### Lambda
+- event-driven
+- serverless
+  - no infrastructrue to manage; Scalability; Built-in redundancy(HA); Pay only for usage(pay-for-usage model)
+  - S3, DynamoDB, API gateway, Lambda, SNS, SQS, CloudWatch Events, Kinese
+- event source:
+  - SNS function
+  - API Gateway event
+  - S3, CloudWatch
+- Lambda function is stateleess
+- support Java, Node.js, Python, C#
+- max execution duration per req is 5m
+- soft limit of 1000 concurrent executions
+- steps:
+  - upload code in ZIP
+  - scehdule, event
+  - compute resouce
+  - timeout
+  - VPC details
+  - launch
+
+#### API Gateway
+- ease to define, publish, deploy, maintain, monitor, and secure APIs at any scale
+- Benefits:
+  - Resiliency and preformance at any scale
+  - caching: output
+  - secuirty: authorize
+  - Metering: meters traffic
+  - Monitoring: dashboard
+  - lifecycle management: version
+  - integration with other AWS products: serverless API with Lambda
+  - Open API spec(Swagger) support
+  - SDK generation for iOS, Android and JS: integration test with auto generated client SDK
+
+#### Kinesis
+- continuous stream of data
+- app scenarios
+  - real time analytics
+  - real time app: app performace monitoring
+- Kinesis Data Stream
+  - enable to build custom app that process or analyze streaming data
+  - real time
+  - secure: VPC endpoint
+  - easy to use: data stream producer is any app to put data into DC(data ingestion)
+  - parallel processing: concurrently
+  - elasticL dynamically adjust throughput
+  - low cost
+  - reliable: replicates data across 3 AZ in a region and preserve up to 7d
+- Kinesis Data Firehose
+  - to laod streaming data into data stores and analytics tols
+  - auto scale, can batch, compress,a nd encrypt the data before loading it
+  - Benefits:
+    - eay to use
+    - integrated with AWS data stores
+    - Serverless data transformation without having to build you own data-processing pipeline
+    - Near real time
+    - NO ongoing admin
+    - pay only for what you use
+- Kinesis Data Analytics
+  - process and analyze real-time, steaming data
+  - running SQL queries conitnuously on data
+  - Benefits:
+    - real-time processing
+    - fully managed
+    - auto elasticity
+    - easy to use
+    - SQL
+    - pay for usage
+  - Use cases:
+    - Time-series analyics
+    - Feed real-time Dashboards
+    - create Real-time Alarm and Notification
+#### Reference Arch for using Serverless 
+- Lambda, API gateway, Kinesis
+- real-time file processing
+- real-time stream processing
+- ETL processing
+- IoT bank ends
+#### CloudFront
+- CDN, global content delivery newowrk
+- served by the closest edge
+- no data transfer charge for tranf between region and edge
+- use cases:
+  - caching static asset
+  - accelaerating dynamic contnent
+  - helping protect against DDoS attachs: with AWS shield and WAF
+  - Improving security
+  - Accelerating API calls
+  - distributing software
+  - streaming video: 4K
+- Concepts
+  - Edge loc: major cities
+  - Regional edge loc: cache longer at the nearest, enabled by default
+  - Distibution: your files' location
+  - origin: server, public DNS
+  - behaviors
+    - Path pattern matching
+    - headers
+    - query strings/cookies
+    - signed URL or Signed cookies: valid for a limited period of time
+    - protocol policy: HTTP, HTTPS
+    - TTL(time to live): in sec
+    - Gzip compression
+- Geo Restriction
+  - whitelist
+  - blacklist
+- Error handling
+  - custom error page for 4xx or 5xx
+  - can set min TTL for caching errors
+#### Route 53
+- DNS(Domain Name Service)
+- 100% SLA(uptime), across region
+- suport record types
+  - A(address record)
+  - AAAA(IPv6)
+  - CNAME(canonical)
+- use Alias record for zone apex
+- health check
+- routing policy
+  - Weighted round robin: A/B testing
+  - Latency-based: resource with best latency
+  - Failover: one resource takes all traffic
+  - Geo DNS: based on Users'location, ustomize localized content
+#### Web app Firewall
 
 
+#### SQS
+
+#### SNS
 
 
+#### SWF
 
 
+#### Elastic Beanstalk
+
+#### OpsWorks
+
+#### Cognito
+
+#### EMR
+
+#### CloudFormation
+
+#### CloudWatch
+
+
+#### CloudTrail
+
+#### AWS Config
+
+#### VPC Flow Log
+
+#### Trusted Advisor
+
+#### AWS Organization
 
 
 
