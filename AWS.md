@@ -1174,15 +1174,82 @@ These core services are also called foundational ser- vices. Examples include re
   - Failover: one resource takes all traffic
   - Geo DNS: based on Users'location, ustomize localized content
 #### Web app Firewall
-
-
+- use cases
+  - Vulnerability protection
+  - Malicious requests: overload crawler; scraper(extracing large amount)
+  - DDos mitigation(HTTP/HTTPS flood)
+- intg with CloudFront
+- WAF filter conditions
+  - corss-site scripting
+  - IP
+  - Geo
+  - Request size constraint
+  - SLQ Injection
+  - String match
+  - Regex match
+- action: allow, block, count
+- rules:
+  - regular rule
+  - rate-based rule(a rate limit in 5m interval)
+  - trigger action designated in web ACL
+- WAF resources can be managed with API, propaged globally in 1m
+- 1 minute metrixs are availabe in CloudWatch
+  
 #### SQS
-
+- CAP
+- mesage queue: a form of asynchronous service to service communication
+- MQ provides a buffer to temp store message and endpoints
+- redundant across AZ in each region
+- message retained up to 14d, max size 256k
+- types:
+  - standard
+    - default, unlimited transactions per sec
+    - at least onece message delivery
+    - generally in insertion order
+  - FIFO
+    - exactly once processing
+    - limited to 3000 tranx per sec
+- visiblity timeout: 
+  - stay in queue while processed, no return
+  - 0 sec - 12h
+- Message retention periodL 1m - 14d
+- max message size: 1k - 256K
+- Delivery delay: reamin invisible to consumers for this duration
+  - standard: not retroactive
+  - FIFO: retroactive, affect already in queue messages
+- receive message wait time
+  - return
+  - short polling: 0s
+  - long polling: 1 - 20s
+- content-based deduplication
+  - SHA-256 hash to gen deduplication ID
+- dead-letter queue: can't processed successfully, Max Receive: 1 -100
 #### SNS
-
-
+- send notification
+- pub-sub messaging
+- topic: communication channel, owner set policy for limiting sub/sub, protocol
+- publisher: to send msg to topic
+- subscriber tp receive message
+- features:
+  - across AZ
+  - support transport protocols: HTTP(S), email, SMS, Lambda, SQS
+  - push-based
+  - monitioring: CloudWatch
+  - message contain up to 256K, or split as multiple msg to fit(signle 1600b); SMS(140b)
 #### SWF
-
+- Simple WorkFlow
+- coordinate the components using visual workslow
+- AWS Step function: replacing SWF
+  - state as JSON blob
+  - multistep app
+  - state types:
+    - task: call your services
+    - choice: branching logic
+    - Parellel: fork-join
+    - wait
+    - fail
+    - succeed
+    - pass: pass input to output
 
 #### Elastic Beanstalk
 
