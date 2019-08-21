@@ -1099,7 +1099,7 @@ These core services are also called foundational ser- vices. Examples include re
   - low cost
   - reliable: replicates data across 3 AZ in a region and preserve up to 7d
 - Kinesis Data Firehose
-  - to laod streaming data into data stores and analytics tols
+  - to load streaming data into data stores and analytics tols
   - auto scale, can batch, compress,a nd encrypt the data before loading it
   - Benefits:
     - eay to use
@@ -1111,6 +1111,7 @@ These core services are also called foundational ser- vices. Examples include re
 - Kinesis Data Analytics
   - process and analyze real-time, steaming data
   - running SQL queries conitnuously on data
+  - transformation
   - Benefits:
     - real-time processing
     - fully managed
@@ -1288,17 +1289,52 @@ These core services are also called foundational ser- vices. Examples include re
 - stack: a collection of AWS resources
 - update: a change set to summarize proposed change
 #### CloudWatch
-
+- metrics, custom metrix
+- events: any changes made to your AWS resource
+- log agent, send your log to it and minitor in real time
+- alarmm, watch a single metrix
+  - state must have changed and been maintained for a specified period of time
+  - OK, ALARM, INSUFFICIENT_DATA
+- dashboard, view graph and stat
 
 #### CloudTrail
-
+- logs all API calls, including console activities and command line instructions
+- diff accounts can send yheir trails to a central account
+- can enable in al region
+- by default, log sent to S3 is encrypted
 #### AWS Config
+- record cinfig changes
+- config rule: represents desired config for a resource to assess your overall compliance and risk status
+- continuous monitoring
+- continous assessment
+- changes management
+- operational troubleshooting
+- compliance monitoring
 
 #### VPC Flow Log
-
+- info on IP traffic
+- use CloudWatch log, alarm
+- levels
+  - VPC
+  - Subnet
+  - Network interface
+- security monitoring , app troubleshooting
 #### Trusted Advisor
-
+- 5 categories
+  - cost optimization
+  - security
+  - fault tolerance
+  - performance
+  - service limits
+- status
+  - red: action
+  - yellow: investigation
+  - green
 #### AWS Organization
+- AWS account management
+- SCP(servuce control policy): centrally control the use fo AWS services down to the API level across multiple accounts
+- single payment method for all accounts
+
 
 
 
