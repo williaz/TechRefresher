@@ -1252,15 +1252,41 @@ These core services are also called foundational ser- vices. Examples include re
     - pass: pass input to output
 
 #### Elastic Beanstalk
-
+- simplest and fastest way to deploy web app
+- 3 key components
+  - environment
+    - standard web servers
+    - workers with a background processing task listening SQS
+  - app version
+  - saved config(on ev and resource)
+    - single instance
+    - LB with Auto scalling
+    - never manul config EC2
 #### OpsWorks
+- auto operational work, infrastructure
+- no charge
+- Chef Automate
+- AWS OpsWorks for Puppet Enterprise
+- AWS OpsWorks Stack
+
 
 #### Cognito
-
+- a user identity and data sync service
+- key-value pairs
+- control access to AWS resources
 #### EMR
-
+- Elastic MapReduce
+- load data to S3, lauch EMR cluster
+- in Hadoop, data remains on the servers taht process the data
+- 3 types of nodes
+  - Master node: coordinating
+  - core node: running
+  - taks node: optional, doesn't store data(can use spot instance)
 #### CloudFormation
-
+- model insfra architecture with version control
+- template: JSON/YAML
+- stack: a collection of AWS resources
+- update: a change set to summarize proposed change
 #### CloudWatch
 
 
