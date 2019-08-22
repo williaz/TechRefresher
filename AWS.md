@@ -1336,7 +1336,89 @@ These core services are also called foundational ser- vices. Examples include re
 - single payment method for all accounts
 
 
+## DB
+### RDS
+- hosting and managing relational database
+- benetifs:
+  - no infra management
+  - instant provisioning
+  - scaling
+  - cost effective
+  - app compatibility
+  - HA: easy multi-AZ 
+  - security
+- limits:
+  - no access to host OS
+  - storagee limit: 64 for Aurora, 16T for others
+- HA
+  - you choose AZ for primary DB, RDS then choose a standby instacne and storage in anohter AZ, all same config
+  - active/passive DB
+  - RDS auto does the DNS failover
+- Scaling
+  - chaneg instance type
+    - steps:
+      - moify 
+      - choose new class
+      - apply immediately or in preferred maintainance window
+    - not integrated with Auto scaling
+  - Read replica
+    - read-only copy
+    - up to 15 rep
+    - offload read only traffic
+    - can promoted to a master DB
+    - async, while master-standby is sync
+    - cross regional read replica
+    - not support Oracle or SQL server
 
+- Security
+  - VPC
+    - private subnet, firewall
+    - SG
+  - Data Encryption
+    - when encrypt RDS with AWS-provided encryption
+      - instance storage(EBS)
+      - auto backup
+      - read replica
+      - standby
+      - snapshot
+    - a default key created from KMS, and tie to your account
+    - or crate your own master key
+  - points;
+    - can encrypt only during data base creation
+    - once enctypt, can't remove
+    - when create a read replica, bot master and read replica must be encrypted; so for master-standby @@@with 1
+    - can't copy snapshot of encrypted DB, as KMS is regional
+    - can migrate an encrypted from MySQL to Aurora MySQl
+    
+ - backup
+   - Aurora: conitnuously back up to S3
+   - others: one backup per day
+   - multiple copies of backup in eac AZ where instance deployed
+   - store to any class of server
+   - custom restore time
+ - Snapshot
+   - manully 
+   - temporaray I/O suspension
+   - in S3
+ - Monitoring
+   - standard monitoring
+   - enhanced monitoring: 50 metrix: 1s interval
+   - event notification: SNS
+   - performace insgihts: on by default for Auroara PostgreSQL
+   
+#### Aurora
+  
+
+#### Redshift
+
+#### DynamoDB
+
+#### ElastiCache
+  
+  
+  
+    
+    
 
 
 
