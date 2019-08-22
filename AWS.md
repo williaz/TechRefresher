@@ -1414,10 +1414,43 @@ These core services are also called foundational ser- vices. Examples include re
    - performace insgihts: on by default for Auroara PostgreSQL
    
 #### Aurora
-  
+- MySQL and PostgreSQL compatible
+- auto repliacted across 6 storage nodes in 3 AZ, no cost, sync
+- no standby DB
 
 #### Redshift
-
+- data warehouse, read-oriented
+- OLAP(online analytical processing)
+- ETL
+- Benefits:
+  - Fast: columnar, parelleized
+  - cheap
+  - good comparession
+  - managed service
+  - scalable
+  - secure
+  - zone map functionality: track block
+- Arch
+  - built on Postgres
+  - signle node: one node 
+  - multi node: a leader and some compute
+  - cluster types: uses EC2; dense compute(DC)/dense storage(DS)
+  - leader node
+    - SQL endpoint
+    - one leader per cluster
+    - DB function, metadata, ODBC/JDBC, encryt, comnpress
+    - plan execution and aggregate result
+  - compute node
+    - can communicate with each other, and S3
+    - in own VPC, interconnected network, you can't access
+    - further divided into slices(a slice is allocated aportion of a node's CPU, memory and storage)
+- sizeing
+  - compression
+  - data mirroring is already included
+- VPC
+  - vps is manndatory for new 
+  - can choose a cluster subnet group(contains some subnets)
+  - enhanced VPC routing: enable to traffic through you VPC, otherwise through Internet
 #### DynamoDB
 
 #### ElastiCache
