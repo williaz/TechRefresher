@@ -1,4 +1,11 @@
 
+## EC2, VPC, RDS, Kinesis, ACL, SG, 
+
+
+
+
+
+
 - VPC(Virtual Private Cloud) - Networking Services, dedicated to a single AWS account.
 
 
