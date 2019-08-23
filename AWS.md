@@ -1451,8 +1451,95 @@ These core services are also called foundational ser- vices. Examples include re
   - vps is manndatory for new 
   - can choose a cluster subnet group(contains some subnets)
   - enhanced VPC routing: enable to traffic through you VPC, otherwise through Internet
+- Encryption
+  - can encrypt all data
+  - all cluseter communication are secured by default
+- Security
+  - db user
+  - master username
+- Back up
+  - auto backup
+  - snapshot incremental
+  - can turen off autp backup
+  - can table level restore
+- data loading
+  - file-based loading
+    - file from S3
+    - Kinesis Firehose
+    - database
+    - Redshift-specific tools to compute code from Dynamo DB, EMR via SSH cmd
+  - COPY
+    - can use multiple input files as each slice loads one file at a time
+    - 
+  - UNLOAD: export
+    - can write to S3 only
+    - can generate more than 1 file per slice for all compute node
+  - VACUUM
+    - reclaim space after deletion
+    - after COPY
+  - ANALYZE
+    - update stattistics for execution paln optimizer
+    - after made nontrivial number of changes to data
+- Data Distribution
+  - ALL
+    - distribute a copy of entire table to first slice(slice0) on eac node
+    - help join
+    - slower
+  - KEY
+    - hash of the defined column
+    - same key to same location
+  - EVEN
+    - round robin
+    - small dim table
+    - withput JOIN, GROUP BY, agg query
 #### DynamoDB
-
+- NoSQL
+  - ease of dev, scalable performace, HA, and resilience
+- support both document and key-value
+- specify request capacity per table
+- use cases:
+  - cookie, session, uer preference
+  - log, sensor data
+- benefits
+  - scalable: auto up/down
+  - managed service
+  - fast, consistent performace
+  - fine-grained access control: IAM
+  - cost effective
+  - Integration with other AWS services: Lambda trigger for data change
+- Term
+  - item: table
+    - composed of a primary key and key-value pairs(attributs)
+    - must have a PK
+    - can't exceed 400K
+    - object serialization and messaging
+  - Manipulation of data programmatically using API
+  - scalar data types: number, string, binary and boolean => PK
+  - NULL
+  - PK:
+    - parittion key: hash on it; must be scalar
+    - partition key and sort key: composite; sort key as range attribute(store physically close)
+  - Capacity
+    - Unit of cap req for Write: num of item writes per sec X item size per 1K block
+    - Unit for Read: read X 4K (can twice if use eventually consistent reads)
+  - Global Secondary index
+    - local secondary index: same parition key, local to parition
+    - global secondary index
+  - Consistency Model
+    - stores 3 geo replica 
+    - Eventualy consistent read: default
+    - Strongly consistent reads: reflect for all successful responsed writes
+  - Global table
+    - across AWS regions
+- Stream API:
+  pdates and receive item-level data befre and after items are changed
+  - auto notify status change, Redshift sync, ElasticSearch
+- Accelerator
+  - DAX
+  - in-memory cache
+- Encryption and secrity
+  - encryption at rest
+  - VPC endpoint
 #### ElastiCache
   
   
