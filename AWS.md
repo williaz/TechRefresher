@@ -1408,7 +1408,7 @@ These core services are also called foundational ser- vices. Examples include re
    - temporaray I/O suspension
    - in S3
  - Monitoring
-   - standard monitoring
+   - standard monitoring: 1m
    - enhanced monitoring: 50 metrix: 1s interval
    - event notification: SNS
    - performace insgihts: on by default for Auroara PostgreSQL
@@ -1417,7 +1417,7 @@ These core services are also called foundational ser- vices. Examples include re
 - MySQL and PostgreSQL compatible
 - auto repliacted across 6 storage nodes in 3 AZ, no cost, sync
 - no standby DB
-
+- uses a quorum system for reads and writes to ensure that you data is available in multiple storage data
 #### Redshift
 - data warehouse, read-oriented
 - OLAP(online analytical processing)
@@ -1541,6 +1541,14 @@ These core services are also called foundational ser- vices. Examples include re
   - encryption at rest
   - VPC endpoint
 #### ElastiCache
+- in-memory cache
+- scaling with sharding
+- engine
+  - Memcached: meultithreaded
+  - Redis: replication, stateful
+- does npt directly communicate with your DB tier
+- choose AZ(Preferred Zone) the cluster lives in
+
   
   
   
