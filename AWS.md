@@ -701,7 +701,7 @@ These core services are also called foundational ser- vices. Examples include re
   - ENI doesn't impact the network bandwidth
 - Elastic IP address
   - static IP address
-  - EIP is associated with the instacne during the stop and start of EC2, will detached when explicitly terminate EC2.
+  - EIP is associated with the instacne during the stop@@ and start of EC2, will detached when explicitly terminate EC2.
   - map EIP to EC2, as launch a new EC2, get a new IP
   - support only IPv4
   - no charge as long as EIP is assoicate to a runing EC2
@@ -1167,6 +1167,7 @@ These core services are also called foundational ser- vices. Examples include re
 - Error handling
   - custom error page for 4xx or 5xx
   - can set min TTL for caching errors
+- create an origin access identity(OAI) for CloudFront and grant access to objects in your non-public S# to that OAI
 #### Route 53
 - DNS(Domain Name Service)
 - 100% SLA(uptime), across region
@@ -1605,13 +1606,145 @@ These core services are also called foundational ser- vices. Examples include re
 - plan fo events
   - simulation
 #### Best Pratice
-
-### Performace
-### Reliability
-### Cost optimization
+- Use Identity and Access Management
+- Use Detective Control: identify a threat or incident
+  - AWS Config
+  - AWS Config rule: overal complicance and risk status
+  - AWS CloudTrail
+  - CloudWatch
+  - VPC flow logs to help with networking monitoring
+  - Amazon Inspector
+- Use Infra protection
+  - AWS Ssytem manager: visibilty and control of your infra
+- Use Data protection
+  - classify data sensitivity
+- Use Incident Response
+  - Wb App Firewall
   
-    
-    
+### Performace
+- speed
+- principles
+  - Go global in a few click
+  - Leverage new tech sch as serverless
+  - Consume advanced tech: managed services
+  - Leverage multiple tech
+  - Experiment more often
+- Efficiency
+  - selection
+    - by workload
+    - compute: instance, container, function
+    - storage
+    - network
+    - database
+  - Review
+  - Monitoring
+### Reliability
+- SLA(service level agreement)
+- failure scenarios and work backward
+- principles
+  - Test recovery procedures
+  - Automate recovery from failure
+  - Scale horizontally
+  - Stop guessing capacity
+  - Automate changes to the system
+- Best Practices
+  - Lay the Foundation: HA
+    - Fault isolation zones: > 1 AZ
+    - Redundant components
+    - Leveraging managed services
+  - Implement Changes Management
+    - Blue-green deployment: two stack for old and new version, slowly increaing traffic
+    - Canary deployment: A/B
+    - Feature toggle: can turn off feature
+  - Implement Failure Management: DR(Disaster Recovery) plan
+### Cost optimization
+- principles
+  - choose the best comsumption module: on-demand, pay-as-you-go
+  - use managed services
+  - measure the overal efficiency
+  - analyze the expenditure
+  - stop sending on a data ceneter
+- Finding Cost-Effectve Resources
+  - start with minimum resource
+  - Trusted Advisor
+- Matching Supply with Demand
+- Being aware of expenditures
+- optimizing over time: gap analysis
+
+### AWS Best Practices
+- deploy to cloud
+  - life and shift
+  - cloud optimized
+  - cloud native architecture
+- Design for Failure
+  - all layers
+  - assume everything fails and design backward
+```
+•Use multiple availability zones
+
+•Use elastic load balancing
+
+•Use elastic IP addresses
+
+•Do real-time monitoring with CloudWatch
+
+•Use Simple Notification Service (SNS) for real-time alarms based on
+CloudWatch metrics
+
+•Create database slaves across availability zones
+```
+- Build Secuirty in Every Layer
+- Leverage Multiple Storage Options
+```
+Amazon S3: Large objects
+
+Amazon Glacier: Archive data
+
+Amazon CloudFront: Content distribution
+
+Amazon DynamoDB: Simple nonrelational data
+
+Amazon EC2 Ephemeral Storage: Transient data
+
+Amazon EBS: Persistent block storage with snapshots
+
+Amazon RDS: Automated, managed MySQL, PostgreSQL, Oracle, Maria DB, SQL Server
+
+Amazon Aurora: Cloud-optimized flavors of MySQL and PostgreSQL
+
+Amazon Redshift: Data warehouse workloads
+
+```
+- Implement Elasticity
+```
+Auto Scaling: Use Auto Scaling to automatically scale your infrastructure by adding or removing EC2 instances to your environment.
+
+Elastic load balancing: Use ELB to distribute the load across EC2 instances in multiple availability zones.
+
+DynamoDB: Use DynamoDB to maintain the user state information
+```
+- Think Parellel
+  - use multithreading and concurrent requests to the cloud service: a thread waiting for a response from a cloud service is not consuming CPU cycles
+  - Run parallel MapReduce jobs
+  - Use elastic load balancing to distributed load
+  - Use Amzon Kinesis for concurrent processing of data
+
+- Loosely couple your Architecutr
+- There are No Constreaintes in the AWS cloud
+  - rip-and replace for hardware
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
