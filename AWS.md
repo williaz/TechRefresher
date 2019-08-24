@@ -1549,8 +1549,66 @@ These core services are also called foundational ser- vices. Examples include re
 - does npt directly communicate with your DB tier
 - choose AZ(Preferred Zone) the cluster lives in
 
-  
-  
+
+## Well-Architected Framework
+- is docu and arch
+- benefits:
+  - Build and depoly faster: reducing firefighting
+  - Lower or mitigate risks: understand risk
+  - Make infromed decision: highlight impact on busisness
+  - Implement AWS best practices
+- goal: secure, efficient, scalable, reliable and cost effective
+### Operation
+- understands bussiness's goal, priorites and metrics
+- design principles:
+    - Preform operation as code: script
+    - Document everything: annotate
+    - Push small changes instead of big
+    - Refine operating procedure often
+    - Anticipate failure: assume failres
+    - Learn from the operational failures: not happen twice
+- areas:
+  - Prepare: baseline
+  - Operate: 
+    - success is measured by outcome and metrics
+    - dashboard
+      - CloudWatch log
+      - ES: Elasticsearch
+      - Personal Health dashboard
+      - Service Health dashboard
+    - automate as much as possible
+  - Evolve
+    - start with saml and continuously keep on adding
+### Security
+- Strong Identity Foundation
+  - IAM manage acount: least privilege, central team to manage
+  - IAM user/federate users
+  - employee life cycle, strong password policy
+  - Security Token Service: temporay credential
+- Enable Traceability
+  - log everythime, real time
+  - auto action for respond
+  - AWS Config: auto check
+  - CloudTrail
+- Implement at all layers
+  - NACL: filter the traffic at subnet level
+  - isolate every component
+  - seperate firewall
+- Secure data
+  - at rest / in transit
+  - tier to tier
+  - data flow path
+- Automate
+  - alert
+  - auto triggered response
+  - log
+- plan fo events
+  - simulation
+#### Best Pratice
+
+### Performace
+### Reliability
+### Cost optimization
   
     
     
