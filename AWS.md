@@ -1,7 +1,8 @@
 
-## EC2, VPC, RDS, Kinesis, ACL, SG, 
-
-
+## EC2, VPC, RDS, Kinesis, ACL, SG, serverless
+[EC2](https://tutorialsdojo.com/aws-cheat-sheet-amazon-elastic-compute-cloud-amazon-ec2/)
+[RDS](https://tutorialsdojo.com/amazon-relational-database-service-amazon-rds/)
+[DynamoDB](https://tutorialsdojo.com/amazon-dynamodb/)
 
 
 - VPC(Virtual Private Cloud) - Networking Services, dedicated to a single AWS account.
@@ -579,7 +580,7 @@ These core services are also called foundational ser- vices. Examples include re
   - S3 standard(SLA): 11 nines durability; sync cross 3 AZ
   - S3 Standard Infrequent Access(IA)
   - S3 Reduced Redundancy Storage(RRS): lower durability: 4 nines, sustain 1 AZ loss
-  - S3 Ine Zone IA: rapid access
+  - S3 One Zone IA: rapid access, store in 1 AZ only
   - Glacier
   - move class by creating a lifecycle policy, CLI S3 copy, S3 console, SDK
 - Versioning
@@ -601,7 +602,9 @@ These core services are also called foundational ser- vices. Examples include re
   - HEAD for meta data includes replication status
 - Static hosting
   - Properties
-
+- tips
+  - By using Versioning and enabling MFA (Multi-Factor Authentication) Delete, you can secure and recover your S3 objects from accidental deletion or overwrite. 
+  - 
 #### Glacier
 - same durablility of S3
   - This object is in Glacier. You cannot download it or make it public. You cannot edit any property or permission.
@@ -870,11 +873,11 @@ These core services are also called foundational ser- vices. Examples include re
     - stateful, if send out, always back
     - can change, auto apply shortly
   - rule:
-    - Protocol
+    - Protocol: The SSH protocol uses TCP and port 22.
     - Port range
     - ICMP type and code
     - Source/destination
-      - IP address
+      - IP address: The /32 denotes one IP address and the /0 refers to the entire network.
       - SG: rule will be stale if the SG is in a peer VPC and the SG or VPC peering are deleted
 - ECS  
   - Elastic Container Service
@@ -926,7 +929,8 @@ These core services are also called foundational ser- vices. Examples include re
   - contains users, no group. no role
   - no default group
 - Roles
-  - an IAM entity that defines a set o permissions for making AWS service requests
+  - principle: 3rd-party users, AWS services
+  - an IAM entity that defines a set of permissions for making AWS service requests
   - control federated users, not assoicated with a user/group
   - specify 2 policy for a role
     - trust policy: principal, who can assume the role
@@ -1307,10 +1311,13 @@ These core services are also called foundational ser- vices. Examples include re
 - metrics, custom metrix
 - events: any changes made to your AWS resource
 - log agent, send your log to it and minitor in real time
-- alarmm, watch a single metrix
+- alarm, watch a single metrix
   - state must have changed and been maintained for a specified period of time
   - OK, ALARM, INSUFFICIENT_DATA
 - dashboard, view graph and stat
+- CloudWatch does not automatically provide memory and disk utilization metrics of your instances. => custom metrix
+- You can also install CloudWatch Agent to collect more system-level metrics from Amazon EC2 instances
+- CloudWatch gathers metrics about CPU utilization from the hypervisor for a DB instance, and RDS Enhanced Monitoring gathers its metrics from an agent on the instance.
 
 #### CloudTrail
 - logs all API calls, including console activities and command line instructions
@@ -1362,13 +1369,19 @@ These core services are also called foundational ser- vices. Examples include re
   - app compatibility
   - HA: easy multi-AZ 
   - security
+- IAM database authentication provides the following benefits:
+  - encrypted Network traffic using Secure Sockets Layer (SSL).
+  - to centrally manage access to your database resources, instead of managing access individually on each DB instance.
+  - For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security
 - limits:
   - no access to host OS
   - storagee limit: 64 for Aurora, 16T for others
-- HA
-  - you choose AZ for primary DB, RDS then choose a standby instacne and storage in anohter AZ, all same config
+- Multi-AZ deployment(2 choice: single vs multi)
+  - you choose AZ for primary DB, RDS then choose a standby instance and storage in anohter AZ, all same config
   - active/passive DB
   - RDS auto does the DNS failover
+  - cross-region replica
+  - no standby for Aurora, as it has sync read replica
 - Scaling
   - chaneg instance type
     - steps:
@@ -1539,15 +1552,18 @@ These core services are also called foundational ser- vices. Examples include re
     - Strongly consistent reads: reflect for all successful responsed writes
   - Global table
     - across AWS regions
-- Stream API:
-  pdates and receive item-level data befre and after items are changed
-  - auto notify status change, Redshift sync, ElasticSearch
+- Stream:
+  - updates and receive item-level data before and after items are changed
+  - auto notify status change, Lambda, Redshift sync, ElasticSearch
 - Accelerator
-  - DAX
+  - DAX: tem times improvement >> ElasticCache
   - in-memory cache
 - Encryption and secrity
   - encryption at rest
   - VPC endpoint
+- tips:
+  - DAX: accelerator
+  - stream with Lambda, SNS, notify status update
 #### ElastiCache
 - in-memory cache
 - scaling with sharding
@@ -1557,6 +1573,9 @@ These core services are also called foundational ser- vices. Examples include re
 - does npt directly communicate with your DB tier
 - choose AZ(Preferred Zone) the cluster lives in
 
+#### tips
+  - AWS Budgets gives you the ability to set custom budgets that alert you when your costs or usage exceed (or are forecasted to exceed) your budgeted amount.
+  - 
 
 ## Well-Architected Framework
 - is docu and arch
