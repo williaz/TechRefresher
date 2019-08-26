@@ -697,10 +697,11 @@ These core services are also called foundational ser- vices. Examples include re
 - Elastic Network Interface(ENI)
   - create one or more network interfaces and attach them to you instance
   - attibutes of the ENI follow along with it
-  - can't change deggault NI
+  - can't change/detach default NI(eth0)
   - ENI doesn't impact the network bandwidth
 - Elastic IP address
   - static IP address
+  - regional, limited to 5 per region
   - EIP is associated with the instacne during the stop@@ and start of EC2, will detached when explicitly terminate EC2.
   - map EIP to EC2, as launch a new EC2, get a new IP
   - support only IPv4
@@ -796,18 +797,19 @@ These core services are also called foundational ser- vices. Examples include re
   - Advanced computing (P3, P2, G3, F1)
     - GPU, CF
 
-- A placement group is a logic grouping of instances within a single AZ
+- A placement group is a logic grouping of instances within a **single AZ**
   - low latency or high network throughpt
   - better same instance type, enhanced neworking type
   - can't span AZ
   - unique name per AWS account
   
 - Storage
+  - (Redundant Array of Inexpensive disk, data storage virtualization)RAID0: throughput of i/o multiplied by num of disk; RAID1: data mirroring
   - EBS, persists independently for the life span of EC2 
     - General purpose: default
     - Provisioned IOPS
     - Magnetic: dev
-  - instance store: ephemeral storage
+  - instance store(for some EC2,  directly attached, block-device storage): ephemeral storage, always be deleted when stop(instances store backed can't stop) or terminate, though the instacne is EBS-backed
 - lab
   - select preconfig AMI(Amazon Machine Image)
   - config VPC, subnet, SG
@@ -831,23 +833,24 @@ These core services are also called foundational ser- vices. Examples include re
   - preconfig
   - regional
   - can share through sharing AWS ID
-  - using a single AMI, lauch diff instance types
+  - using a single AMI, launch diff instance types
+  - you can launch encrypted EBS-backed EC2 instances from unencryoted AMI directly
   - lauch permission: pulic, explicit, implicit
   - Obtaining
   - Virtualization 
-    - HVM(hardware WM)
+    - HVM(hardware WM), it's required t use enhanced networking and GPU processing
     - PV(Paravirtual)
 - Instance Root Volume  @@@
-  - instance store-backed AMI
+  - instance store-backed(S3) AMI
     - S3
     - can't stop
     - reboot: data persists
     - terminated/shut down: data gone
-    - when use an instance with instance store, you can't detach an store vlolume form one instacne and reattach to another
+    - when use an instance with instance store, you can't detach an store vlolume form one instance and reattach to another
   - EBS-backed AMI
     - data laways persis
-  
-  - can convet Linux AMI from store-backed to EBS backed; but no fro windows
+    - (by default, delete root volume when terminate)
+  - can convet Linux AMI from store-backed to EBS backed; but no for windows
 - Lifecycle
   - Lauch
   - start, stop
@@ -874,7 +877,7 @@ These core services are also called foundational ser- vices. Examples include re
     - ICMP type and code
     - Source/destination
       - IP address
-      - SG: rule will be stale if the SG is in a peer VOC and the SG or VPC peering are deleted
+      - SG: rule will be stale if the SG is in a peer VPC and the SG or VPC peering are deleted
 - ECS  
   - Elastic Container Service
   - manage Docker containers on a cluster of EC2
