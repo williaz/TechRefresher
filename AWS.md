@@ -4,8 +4,6 @@
 
 
 
-
-
 - VPC(Virtual Private Cloud) - Networking Services, dedicated to a single AWS account.
 
 
@@ -781,7 +779,7 @@ These core services are also called foundational ser- vices. Examples include re
   - Secure
   - Multiple instance type
   - Integration: with other AWS services
-  - Cost effective
+  - Cost effective: transfering data from EC2 to S3, DynamoDB, SQS in same Region has no cost 
 
 - types:
   - General(T2, M5, M4, M3)
@@ -809,7 +807,7 @@ These core services are also called foundational ser- vices. Examples include re
     - General purpose: default
     - Provisioned IOPS
     - Magnetic: dev
-  - instance store(for some EC2,  directly attached, block-device storage): ephemeral storage, always be deleted when stop(instances store backed can't stop) or terminate, though the instacne is EBS-backed
+  - instance store(for some EC2,  directly attached, block-device storage): ephemeral storage, always be deleted when stop(instances store backed can't stop) or terminate, though the instacne is EBS-backed; persist when reboot
 - lab
   - select preconfig AMI(Amazon Machine Image)
   - config VPC, subnet, SG
@@ -981,7 +979,7 @@ These core services are also called foundational ser- vices. Examples include re
 - Launch Config
   - a template stores all the info about the instance
   - to Auto scaling group: one to many
-  - can't edit ASG's lauch config, but can create a new one to assocaite, new instance will follow
+  - can't edit ASG's lauch config, but can create a new one to assocaite, **new instance will follow**
 
 - Auto Scaling Group
   - in one region per group
@@ -990,7 +988,7 @@ These core services are also called foundational ser- vices. Examples include re
     - manual scaling
     - per the demand: CloudWatch
     - per schedule: time
-  - scaling policy: one for up,one for down
+  - scaling policy: one policy for up,one for down
   - prvide min and max num of instance
   - simple scaling
     - based on only one scaling adj
@@ -1008,13 +1006,18 @@ These core services are also called foundational ser- vices. Examples include re
     - longest running
     - billing
     - oldest launch config
+    - Default termination policy
+      - AZ has most non-scale-in-protected instance
+      - oldest launch config
+      - closest to next billing hour
+      - random
 - ELB
   - Auto multi-AZ as a seperate ELB VPC
-  - if ELB instance failed, ELB cuts off the trafiice to that instacne ans starts a new
+  - if ELB instance failed, ELB cuts off the traffic to that instacne ans starts a new
   - types
     - Network LB
       - OSI layer4, connection based, supports TCP and SLL
-      - no touch packet, no header modification(no X-Forwarded-For for IP address)
+      - **no touch packet**, no header modification(no X-Forwarded-For for IP address)
     - App LB
       - OSI layer7
       - check header, content-based routing
@@ -1053,7 +1056,7 @@ These core services are also called foundational ser- vices. Examples include re
     - status: init, healthy, unhealthy, unused, drainiing
   - multi-AZ
     - better maintain the state info ourside EC2, use DynmaoDB for session
-    - cross-zone lB
+    - cross-zone LB
       - default enabled
       - evenly distribute to EC2 across AZ
       - NLB only rout to EC2 in its AZ, flow hash on IP
@@ -1289,7 +1292,8 @@ These core services are also called foundational ser- vices. Examples include re
 #### EMR
 - Elastic MapReduce
 - load data to S3, lauch EMR cluster
-- in Hadoop, data remains on the servers taht process the data
+- in Hadoop, data remains on the servers that process the data
+- can access OS of these EC2
 - 3 types of nodes
   - Master node: coordinating
   - core node: running
