@@ -1,12 +1,13 @@
 
 ## EC2, VPC, RDS, Kinesis, ACL, SG, serverless
+keywords, 7
 ### 1 S3, EC2, RDS
-[EC2](https://tutorialsdojo.com/aws-cheat-sheet-amazon-elastic-compute-cloud-amazon-ec2/)
-[RDS](https://tutorialsdojo.com/amazon-relational-database-service-amazon-rds/)
-[DynamoDB](https://tutorialsdojo.com/amazon-dynamodb/)
+- [EC2](https://tutorialsdojo.com/aws-cheat-sheet-amazon-elastic-compute-cloud-amazon-ec2/)
+- [RDS](https://tutorialsdojo.com/amazon-relational-database-service-amazon-rds/)
+- [DynamoDB](https://tutorialsdojo.com/amazon-dynamodb/)
 
 ### 2 VPC, Route53, IAM, Security
-[IAM](https://tutorialsdojo.com/aws-cheat-sheet-aws-identity-and-access-management-iam/)
+- [IAM](https://tutorialsdojo.com/aws-cheat-sheet-aws-identity-and-access-management-iam/)
 
 - VPC(Virtual Private Cloud) - Networking Services, dedicated to a single AWS account.
 
@@ -549,6 +550,7 @@ These core services are also called foundational ser- vices. Examples include re
   - Backup
   - Tape replacement
   - Static website hosting
+    - An S3 bucket that is configured to host a static website. The bucket must have the same name as your domain or subdomain. 
   - App hosting ??
   - Disaster revobery
   - Content Distribution
@@ -680,6 +682,7 @@ These core services are also called foundational ser- vices. Examples include re
 ####  Quick
 - Subnet: 1AZ, 5IP reserved
 - NACL: apply ASAP from lowest rule num to high
+- NI: Attach: hot(running), warm(stopped), cold(during launch)
 - private connectivity: hardware/software VPN, AWS direct conect, CloudHub(multi-sites), small Bastion
 
 #### VPC
@@ -804,6 +807,9 @@ These core services are also called foundational ser- vices. Examples include re
 
 
 ### EC2
+
+#### Quick
+- soft limit: 20 EC2 per region
 
 - benefits:
   - Time to market: instant deploy
@@ -1033,6 +1039,7 @@ These core services are also called foundational ser- vices. Examples include re
     - per schedule: time
   - scaling policy: one policy for up,one for down
   - prvide min and max num of instance
+  - 300s default cooldown
   - simple scaling
     - based on only one scaling adj
     - cooldown period for time before new
@@ -1109,8 +1116,13 @@ These core services are also called foundational ser- vices. Examples include re
 #### Quickie
 - Lambda: async/sync, stateless, <=5m
 - SQS: 14d messag rention, consumers should delete msg
+- Route 53: Routing: weighted, failedover, latency(resource), Geo DNS(user geo, ELB can't across region)
+- Route 53: record: A(IPv4), AAAA(IPv6), CNAME(subdomain), Alias(domain/subdomain)
+- Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access
 - OpsWork: Chef, Puppet, Stacks(3 tools)
-
+- Snowball: 50T/80T; Snowabll Edge: 100T
+- Perfect Forward Secrecy: against the eavesdropping of encrypted data, through the use of a unique random session key. 
+  - CloudFront and ELB
 
 #### Lambda
 - event-driven
@@ -1201,12 +1213,14 @@ These core services are also called foundational ser- vices. Examples include re
 #### CloudFront
 - CDN, global content delivery newowrk
 - served by the closest edge
-- no data transfer charge for tranf between region and edge
+- no data transfer charge for tranfer between region and edge
 - use cases:
   - caching static asset
   - accelaerating dynamic contnent
   - helping protect against DDoS attachs: with AWS shield and WAF
   - Improving security
+    - CloudFront delivers your content from each edge location and offers the same security as the Dedicated IP Custom SSL feature. 
+      - SNI Custom SSL relies on the SNI extension of the Transport Layer Security protocol, which allows multiple domains to serve SSL traffic over the same IP address by including the hostname which the viewers are trying to connect to.
   - Accelerating API calls
   - distributing software
   - streaming video: 4K
@@ -1236,8 +1250,8 @@ These core services are also called foundational ser- vices. Examples include re
 - suport record types
   - A(address record)
   - AAAA(IPv6)
-  - CNAME(canonical)
-- use Alias record for zone apex
+  - CNAME(canonical for subdomain only)
+- use Alias record for zone apex(for both domain and subdomain)
 - health check
 - routing policy
   - Weighted round robin: A/B testing
@@ -1350,7 +1364,7 @@ These core services are also called foundational ser- vices. Examples include re
 
 #### Cognito
 - a user identity and data sync service
-- key-value pairs
+- sync user data and key-value pairs
 - control access to AWS resources
 #### EMR
 - Elastic MapReduce
@@ -1746,10 +1760,11 @@ These core services are also called foundational ser- vices. Examples include re
     - Redundant components
     - Leveraging managed services
   - Implement Changes Management
-    - Blue-green deployment: two stack for old and new version, slowly increaing traffic
+    - Blue-green deployment: two stack for old and new version, slowly increasing traffic
     - Canary deployment: A/B
     - Feature toggle: can turn off feature
   - Implement Failure Management: DR(Disaster Recovery) plan
+    - Pilot Light is often used to describe a DR scenario in which a minimal version of an environment is always running in the cloud
 ### Cost optimization
 - principles
   - choose the best comsumption module: on-demand, pay-as-you-go
