@@ -562,7 +562,7 @@ These core services are also called foundational ser- vices. Examples include re
     - reverse key
     - MD5 hash of the char seq
     - URL-safe implementation and avoiding the ‘+’ and ‘/’ characters, instead using ‘-‘ (dash) and ‘_’ (underscore) in their places.
-
+- S3 Select: SQL on object
 - Encrytion
   - In transit
     - HTTPS and use SSL-encryted endpoints
@@ -623,13 +623,16 @@ These core services are also called foundational ser- vices. Examples include re
 - as boot partition or attached to EC2
 - can attached to only one EC2 at a time, detach
 - AZ level replication
-- can create point- in-time consistent snapshot to S3
+- can create point-in-time consistent snapshot to S3
+  - occur asynchronously, no affect on-going r/w
 - AFR(annual failure rate): 0.1 -0.2 perc
 - Volume
   - IOPS: input/output operation per second 
   - EC2 instance store: local to EC2, no snapshot support
   - EBS SSD backed: transactional workload like DB, latency-sensitive
+    - IOPS, small/random workload, transactional
   - EBS HDD-backed: throughput-intensive workload like log processing/mapreduce
+    - Throughput, large/sequential workload, infreq access
 - for ensuring consistent snapshot, recommend to detach EBS from EC2 when issue snapshot
 
 #### EFS
@@ -694,7 +697,10 @@ These core services are also called foundational ser- vices. Examples include re
 - Egress-only Internet gateway
   - IPv6 version of NAT gateway
   - stateful @@
-
+- Bring Your Own IP Addresses (BYOIP): 
+  - You can bring part or all of your public IPv4 address range from your on-premises network to your AWS account. 
+  - The ROA authorizes Amazon to advertise an address range under a specific AS number
+  - IP pool, use EIP
 - Elastic Network Interface(ENI)
   - create one or more network interfaces and attach them to you instance
   - attibutes of the ENI follow along with it
@@ -886,6 +892,7 @@ These core services are also called foundational ser- vices. Examples include re
     - Container: isolated user space processes
     - image: portable, consistent and immutable; includes dependencies
   - AWS ECS API for cluster management infrastructure
+  - Amazon ECS enables you to inject sensitive data into your containers by storing your sensitive data in either AWS Secrets Manager secrets or AWS Systems Manager Parameter Store parameters and then referencing them in your container definition. This feature is supported by tasks using both the EC2 and Fargate launch types.
 
 ### IAM
 - Authentication
@@ -909,6 +916,7 @@ These core services are also called foundational ser- vices. Examples include re
   - temp SC
     - short term: < a few hr
     - AES STS(Security Token Service)
+      - SAML, IAM Role
   
 - Users
   - created by IAM
@@ -935,6 +943,7 @@ These core services are also called foundational ser- vices. Examples include re
   - specify 2 policy for a role
     - trust policy: principal, who can assume the role
     - permission/access policy: resouces/action is allowed access to
+  - you can assign an IAM Role to the users or groups from your Active Directory once it is integrated with your VPC via the AWS Directory Service AD Connector.
 - Hierarchy
   - root user/account owner
   - IAM user
@@ -978,6 +987,7 @@ These core services are also called foundational ser- vices. Examples include re
   - Dynamic scaling
   - best user experience
   - Health check and fleet management. fleet: a collection of EC2
+    - instance status check (VS ELB app/port health check)
   - Load balancing: with ELB
   - Target tracking: CPU utilization
 - Launch Config
@@ -1087,14 +1097,19 @@ These core services are also called foundational ser- vices. Examples include re
   - timeout
   - VPC details
   - launch
-
+- When you create or update Lambda functions that use environment variables, AWS Lambda encrypts them using the AWS Key Management Service.
+  - Although Lambda encrypts the environment variables in your function by default, the sensitive information would still be visible to other users who have access to the Lambda console. This is because Lambda uses a default KMS key to encrypt the variables, which is usually accessible by other users. 
+- Lambda@Edge lets you run Lambda functions to customize the content that CloudFront delivers, executing the functions in AWS locations closer to the viewer. 
+  - 
 #### API Gateway
 - ease to define, publish, deploy, maintain, monitor, and secure APIs at any scale
 - Benefits:
   - Resiliency and preformance at any scale
   - caching: output
+    - You can add caching to API calls by provisioning an Amazon API Gateway cache and specifying its size in gigabytes
   - secuirty: authorize
   - Metering: meters traffic
+    - throttling and quota limits to protect backend
   - Monitoring: dashboard
   - lifecycle management: version
   - integration with other AWS products: serverless API with Lambda
@@ -1116,7 +1131,7 @@ These core services are also called foundational ser- vices. Examples include re
   - low cost
   - reliable: replicates data across 3 AZ in a region and preserve up to 7d
 - Kinesis Data Firehose
-  - to load streaming data into data stores and analytics tols
+  - to load streaming data into data stores and analytics tools
   - auto scale, can batch, compress,a nd encrypt the data before loading it
   - Benefits:
     - eay to use
@@ -1167,7 +1182,7 @@ These core services are also called foundational ser- vices. Examples include re
     - Path pattern matching
     - headers
     - query strings/cookies
-    - signed URL or Signed cookies: valid for a limited period of time
+    - Signed URL or Signed cookies: valid for a limited period of time
     - protocol policy: HTTP, HTTPS
     - TTL(time to live): in sec
     - Gzip compression
@@ -1192,6 +1207,8 @@ These core services are also called foundational ser- vices. Examples include re
   - Latency-based: resource with best latency
   - Failover: one resource takes all traffic
   - Geo DNS: based on Users'location, ustomize localized content
+#### AWS shield
+- AWS Shield Advanced also gives you 24x7 access to the AWS DDoS Response Team (DRT) and protection against DDoS related spikes in your Amazon Elastic Compute Cloud (EC2), Elastic Load Balancing(ELB), Amazon CloudFront, and Amazon Route 53 charges
 #### Web app Firewall
 - use cases
   - Vulnerability protection
@@ -1213,12 +1230,17 @@ These core services are also called foundational ser- vices. Examples include re
   - trigger action designated in web ACL
 - WAF resources can be managed with API, propaged globally in 1m
 - 1 minute metrixs are availabe in CloudWatch
-  
+
+#### Amazon MQ
+- standard API
+- If you're using messaging with existing applications and want to move your messaging service to the cloud quickly and easily, it is recommended that you consider Amazon MQ. 
+
 #### SQS
 - CAP
 - mesage queue: a form of asynchronous service to service communication
 - MQ provides a buffer to temp store message and endpoints
 - redundant across AZ in each region
+- messages in the SQS queue will continue to exist even after the EC2 instance has processed it, until you delete that message. 
 - message retained up to 14d, max size 256k
 - types:
   - standard
@@ -1437,6 +1459,7 @@ These core services are also called foundational ser- vices. Examples include re
 #### Aurora
 - MySQL and PostgreSQL compatible
 - auto repliacted across 6 storage nodes in 3 AZ, no cost, sync
+- use endpoint to connect cluster
 - no standby DB
 - uses a quorum system for reads and writes to ensure that you data is available in multiple storage data
 #### Redshift
@@ -1465,6 +1488,7 @@ These core services are also called foundational ser- vices. Examples include re
     - can communicate with each other, and S3
     - in own VPC, interconnected network, you can't access
     - further divided into slices(a slice is allocated aportion of a node's CPU, memory and storage)
+- In Amazon Redshift, you use workload management (WLM) to define the number of query queues that are available, and how queries are routed to those queues for processing. WLM is part of parameter group configuration. A cluster uses the WLM configuration that is specified in its associated parameter group.
 - sizeing
   - compression
   - data mirroring is already included
@@ -1570,7 +1594,8 @@ These core services are also called foundational ser- vices. Examples include re
 - engine
   - Memcached: meultithreaded
   - Redis: replication, stateful
-- does npt directly communicate with your DB tier
+    - Using Redis AUTH command can improve data security by requiring the user to enter a password before they are granted permission to execute Redis commands on a password-protected Redis server.
+- does not directly communicate with your DB tier, with APP
 - choose AZ(Preferred Zone) the cluster lives in
 
 #### tips
