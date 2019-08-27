@@ -1,9 +1,12 @@
 
 ## EC2, VPC, RDS, Kinesis, ACL, SG, serverless
+### 1 S3, EC2, RDS
 [EC2](https://tutorialsdojo.com/aws-cheat-sheet-amazon-elastic-compute-cloud-amazon-ec2/)
 [RDS](https://tutorialsdojo.com/amazon-relational-database-service-amazon-rds/)
 [DynamoDB](https://tutorialsdojo.com/amazon-dynamodb/)
 
+### 2 VPC, Route53, IAM, Security
+[IAM](https://tutorialsdojo.com/aws-cheat-sheet-aws-identity-and-access-management-iam/)
 
 - VPC(Virtual Private Cloud) - Networking Services, dedicated to a single AWS account.
 
@@ -518,6 +521,10 @@ These core services are also called foundational ser- vices. Examples include re
 
 ### Storage
 
+#### Quick
+- Glacier: only vault owener has access, encrypted at rest by default, support SSL
+- Storage gateway: integrate on-demand storage with Cloud storage; SSL and SSE in S3 by default
+
 - Object storage: docu/img/video with flat structure metadata
   - immured/ unstructured data
   - app manage storage inquiry
@@ -537,6 +544,7 @@ These core services are also called foundational ser- vices. Examples include re
   - Low cost
   - Easy to manage
   - Easy integration
+    - event notifications: use SNS, SQS or Lambda
 - Uses cases:
   - Backup
   - Tape replacement
@@ -573,6 +581,7 @@ These core services are also called foundational ser- vices. Examples include re
     - SSE-KMS: separate permission, audit trail
 - Access control
   - ARN(Amazon resurce name): uniquely identify AWS resources, URI
+  - original access indentity: from public access to url
   - IAM policy to a group, user, role; finegrained control
   - Bucket policy: condition, resource based, finegrained control
   - ACL(access contril list) apply to bucket level and object level; coarse-grained control
@@ -633,8 +642,13 @@ These core services are also called foundational ser- vices. Examples include re
     - IOPS, small/random workload, transactional
   - EBS HDD-backed: throughput-intensive workload like log processing/mapreduce
     - Throughput, large/sequential workload, infreq access
+    - Cold HDD volumes provide low-cost magnetic storage that defines performance in terms of throughput rather than IOPS. 
 - for ensuring consistent snapshot, recommend to detach EBS from EC2 when issue snapshot
-
+- When creating snapshots of EBS volumes that are configured in a RAID array, it is critical that there is no data I/O to or from the volumes when the snapshots are created. flush cache also
+- Amazon EBS encryption uses **256-bit** Advanced Encryption Standard algorithms (AES-256)
+- mazon Data Lifecycle Manager (Amazon DLM): 
+  - backup plan
+  - no extra cost
 #### EFS
 - auto availble in multi-AZ
 - NFS protocol
@@ -650,6 +664,8 @@ These core services are also called foundational ser- vices. Examples include re
     - cached: locally cache
     - stored: stored all locall and async backup to S3
   - tape gateway
+  - All data transferred between any type of gateway appliance and AWS storage is encrypted using SSL. 
+  - By default, all data stored by AWS Storage Gateway in S3 is encrypted server-side with Amazon S3-Managed Encryption Keys (SSE-S3). 
 - Snowball
   - NAS(newwork-attached storage)
   - Snowball edge: 100TB
@@ -660,6 +676,13 @@ These core services are also called foundational ser- vices. Examples include re
 
 
 ### VPC
+
+####  Quick
+- Subnet: 1AZ, 5IP reserved
+- NACL: apply ASAP from lowest rule num to high
+- private connectivity: hardware/software VPN, AWS direct conect, CloudHub(multi-sites), small Bastion
+
+#### VPC
 - private space in the cloud, manage IP namespace
 - max VPC size: /16
 - once create a VPC, can't alter the size(CIDR block), have to migrate
@@ -670,7 +693,7 @@ These core services are also called foundational ser- vices. Examples include re
   - private, public, VPN-only
   - a subnet tied to only one AZ
   - CIDR blocks can't overlap in subnets
-  - for any subnet, AWS reserves first 4 IP and last IP
+  - 5: for any subnet, AWS reserves first 4 IP and last IP
 - Route Table
   - each subnet must have a route table; but multiple subnets can have same route table
   - IPv4 and IPv6 treated separeately
@@ -757,10 +780,12 @@ These core services are also called foundational ser- vices. Examples include re
 - Virtual private gateway: AWS side, VPN concentrator
 - Customer gateway
 - private connectivity types:@@@
-  - AWS hardware VPN: IPsec(Internet Protocol Seurity)
+  - AWS hardware VPN: IPsec(Internet Protocol Security)
+    - set up an Internet-routable IP address (static) of the customer gateway's external interface.
   - AWS Direct Connect: dedicated private connection
   - VPN CloudHub: multiple sites, simple hub-and spoke model
   - Software VPN: an EC2 ruing VPN app
+- The best way to implement a Bastion host is to create a small EC2 instance(as jump server, no need much compute) which should only have a security group from a particular IP address for maximum security. 
 #### Flow logs
 - IP traffice in and out from NI in VPC
 #### Default VPC
@@ -809,7 +834,9 @@ These core services are also called foundational ser- vices. Examples include re
   - better same instance type, enhanced neworking type
   - can't span AZ
   - unique name per AWS account
-  
+- To log in to your instance, you must create a key pair, specify the name of the key pair when you launch the instance, and provide the private key when you connect to the instance.   
+   - public and private keys are known as a key pair
+   - SSH/RDP(windows)
 - Storage
   - (Redundant Array of Inexpensive disk, data storage virtualization)RAID0: throughput of i/o multiplied by num of disk; RAID1: data mirroring
   - EBS, persists independently for the life span of EC2 
@@ -817,6 +844,7 @@ These core services are also called foundational ser- vices. Examples include re
     - Provisioned IOPS
     - Magnetic: dev
   - instance store(for some EC2,  directly attached, block-device storage): ephemeral storage, always be deleted when stop(instances store backed can't stop) or terminate, though the instacne is EBS-backed; persist when reboot
+    
 - lab
   - select preconfig AMI(Amazon Machine Image)
   - config VPC, subnet, SG
@@ -909,10 +937,11 @@ These core services are also called foundational ser- vices. Examples include re
 - Security Credential
   - types
     - IAM usernam and password
-    - E-mail addresss and password
+    - E-mail addresss and password: root account
     - Access key
-    - Key pair
+    - Key pair: public/private key
     - Multifactor authentication
+      - MFA for IAM user, AWS account, AWS service APIs
   - temp SC
     - short term: < a few hr
     - AES STS(Security Token Service)
@@ -1077,6 +1106,12 @@ These core services are also called foundational ser- vices. Examples include re
 
 ### APP
 
+#### Quickie
+- Lambda: async/sync, stateless, <=5m
+- SQS: 14d messag rention, consumers should delete msg
+- OpsWork: Chef, Puppet, Stacks(3 tools)
+
+
 #### Lambda
 - event-driven
 - serverless
@@ -1087,8 +1122,10 @@ These core services are also called foundational ser- vices. Examples include re
   - API Gateway event
   - S3, CloudWatch
 - Lambda function is stateleess
+- sync/async invocation
+- deployment config: Canary, linear(time), all-at-once
 - support Java, Node.js, Python, C#
-- max execution duration per req is 5m
+- max execution duration per req is **5m**
 - soft limit of 1000 concurrent executions
 - steps:
   - upload code in ZIP
@@ -1382,6 +1419,10 @@ These core services are also called foundational ser- vices. Examples include re
 
 ## DB
 ### RDS
+
+#### Quick
+- RDS multi-AZ, standby, auto failover(CNAME)
+
 - hosting and managing relational database
 - benetifs:
   - no infra management
@@ -1402,7 +1443,8 @@ These core services are also called foundational ser- vices. Examples include re
   - you choose AZ for primary DB, RDS then choose a standby instance and storage in anohter AZ, all same config
   - active/passive DB
   - RDS auto does the DNS failover
-  - cross-region replica
+    - Amazon RDS simply flips the canonical name record (CNAME) for your DB instance to point at the standby
+  - can do cross-region replica
   - no standby for Aurora, as it has sync read replica
 - Scaling
   - chaneg instance type
