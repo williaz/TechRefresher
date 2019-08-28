@@ -689,7 +689,15 @@ These core services are also called foundational ser- vices. Examples include re
 
 ####  Quick
 - Subnet: 1 AZ, 5 IP reserved
+  - By default, instacne launched in nondefault subnets don't have the IPv4 , and default subnets have
+- EC2 can't access Internet
+  - Does it have an EIP or public IP address?
+  - Is the route table properly configured?
 - NACL: apply ASAP from lowest rule num to high
+- cannot VPC peering:
+  - Overlapping CIDR Blocks
+  - Transitive Peering
+  - Edge to Edge Routing Through a Gateway or Private Connection
 - NI: Attach: hot(running), warm(stopped), cold(during launch)
 - private connectivity: hardware/software VPN, AWS direct conect, CloudHub(multi-sites), small Bastion
 
@@ -818,6 +826,11 @@ These core services are also called foundational ser- vices. Examples include re
 
 #### Quick
 - soft limit: 20 EC2 per region
+- placement group(same AZ): cluster(low latency), spread(diff racks, can Multi-AZ), partition(diff racks)
+- store-backed EC2 can only be rebooted or terminated and its data will be erased if the EC2 instance is terminated.
+- If the instance is stopped, AWS usually moves the instance to a new host computer.
+- The revoke-security-group-ingress command removes one or more ingress rules from a security group. 
+- billing: you will not billed if it is preparing to stop however, you will still be billed if it is just preparing to hibernate.
 #### intro
 - benefits:
   - Time to market: instant deploy
@@ -1127,12 +1140,18 @@ These core services are also called foundational ser- vices. Examples include re
 #### Quick
 - Lambda: async/sync, stateless, <=5m
 - API Gateway: caching, throttle
+- serverless: API Gateway, Lambda, DynamoDB
 - SQS: 14d message rentation, consumers should delete msg
+- Kinesis
+  - Kinesis data stream is an ordered sequence of data records meant to be written to and read from in real-time
+    - Data retention in shards: 1d(default) - 7d
+  - Kinesis Data Firehose: load streaming data into data stores and analytics tools
 - Route 53: Routing: weighted, failover, latency(resource), Geo DNS(user geo, ELB can't across region)
 - Route 53: record: A(IPv4), AAAA(IPv6), CNAME(subdomain), Alias(domain/subdomain)
 - Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access
 - OpsWork: Chef, Puppet, Stacks(3 tools)
 - Snowball: 50T/80T; Snowabll Edge: 100T
+- AppSync with DynamoDB to make it easy for you to build collaborative apps that keep shared data updated in real time.
 - Perfect Forward Secrecy: against the eavesdropping of encrypted data, through the use of a unique random session key. 
   - CloudFront and ELB
 
@@ -1451,7 +1470,7 @@ These core services are also called foundational ser- vices. Examples include re
 - read replica: async, not support Oracle/SQL server
 - auto backup: Aurora continuosly, others per day
 - Auroa: no standby, as auto & free storage replica 
-- DynamoDB: docu/key-value, session, Stream & DAX(accelorater)
+- DynamoDB: docu/key-value, session, Stream & DAX(accelorater), auto scaling
 #### intro
 - hosting and managing relational database
 - benetifs:
