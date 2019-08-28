@@ -520,12 +520,20 @@ These core services are also called foundational ser- vices. Examples include re
   - Device Farm: tst on real 
   - Mobile Analytics
 
+##### Scope
+- global: Route 53
+- regional: S3/EFS/AMI/ASG/ELB
+- AZ: EBS
+
+
 ### Storage
 
 #### Quick
+
+- SSD: IOS, small/random/transactional(DB); HDD: Throughput, large load, cold(less cost)
 - Glacier: only vault owener has access, encrypted at rest by default, support SSL
 - Storage gateway: integrate on-demand storage with Cloud storage; SSL and SSE in S3 by default
-
+#### Intro
 - Object storage: docu/img/video with flat structure metadata
   - immured/ unstructured data
   - app manage storage inquiry
@@ -680,12 +688,12 @@ These core services are also called foundational ser- vices. Examples include re
 ### VPC
 
 ####  Quick
-- Subnet: 1AZ, 5IP reserved
+- Subnet: 1 AZ, 5 IP reserved
 - NACL: apply ASAP from lowest rule num to high
 - NI: Attach: hot(running), warm(stopped), cold(during launch)
 - private connectivity: hardware/software VPN, AWS direct conect, CloudHub(multi-sites), small Bastion
 
-#### VPC
+#### intro
 - private space in the cloud, manage IP namespace
 - max VPC size: /16
 - once create a VPC, can't alter the size(CIDR block), have to migrate
@@ -711,7 +719,7 @@ These core services are also called foundational ser- vices. Examples include re
   - igw-
 
 - Network Address Translation
-  - NAT device used for IP{v4 traffic only
+  - NAT device used for IPv4 traffic only
   - enable private subnet instance to connect to the Internet, but internet can't initiate a connection to it
   - stateful
   - NAT instance
@@ -722,7 +730,7 @@ These core services are also called foundational ser- vices. Examples include re
     - better availablity and bandwidth
 - Egress-only Internet gateway
   - IPv6 version of NAT gateway
-  - stateful @@
+  - stateful 
 - Bring Your Own IP Addresses (BYOIP): 
   - You can bring part or all of your public IPv4 address range from your on-premises network to your AWS account. 
   - The ROA authorizes Amazon to advertise an address range under a specific AS number
@@ -735,7 +743,7 @@ These core services are also called foundational ser- vices. Examples include re
 - Elastic IP address
   - static IP address
   - regional, limited to 5 per region
-  - EIP is associated with the instacne during the stop@@ and start of EC2, will detached when explicitly terminate EC2.
+  - EIP is associated with the instacne during the stop and start of EC2, will detached when explicitly terminate EC2.
   - map EIP to EC2, as launch a new EC2, get a new IP
   - support only IPv4
   - no charge as long as EIP is assoicate to a runing EC2
@@ -748,7 +756,7 @@ These core services are also called foundational ser- vices. Examples include re
     - inbound in the same SG
     - can't delete but can change
 - NACL
-  - optional, sunet level
+  - optional, subnet level
   - stateless, can allow/deny
   - default NACL, allow all i/o
   - each subnet must be assigned with one and only one ACL
@@ -758,7 +766,7 @@ These core services are also called foundational ser- vices. Examples include re
   - route the traffic across VPC using a private IPv4/6 address
   - NO transitive peering 
   - within same region, can across accounts
-  - AWS internal infrastructure(hardware) => no signle point failure
+  - AWS internal infrastructure(hardware) => no single point failure
   - steps:
     - accept peering connection, no CIDR block overlapo
     - add a route in route table
@@ -790,7 +798,7 @@ These core services are also called foundational ser- vices. Examples include re
   - Software VPN: an EC2 ruing VPN app
 - The best way to implement a Bastion host is to create a small EC2 instance(as jump server, no need much compute) which should only have a security group from a particular IP address for maximum security. 
 #### Flow logs
-- IP traffice in and out from NI in VPC
+- IP traffic in and out from NI in VPC
 #### Default VPC
 - a VPC created in each region by default
 
@@ -810,7 +818,7 @@ These core services are also called foundational ser- vices. Examples include re
 
 #### Quick
 - soft limit: 20 EC2 per region
-
+#### intro
 - benefits:
   - Time to market: instant deploy
   - Scalability: pike
@@ -889,7 +897,7 @@ These core services are also called foundational ser- vices. Examples include re
     - terminated/shut down: data gone
     - when use an instance with instance store, you can't detach an store vlolume form one instance and reattach to another
   - EBS-backed AMI
-    - data laways persis
+    - data laways persist
     - (by default, delete root volume when terminate)
   - can convet Linux AMI from store-backed to EBS backed; but no for windows
 - Lifecycle
@@ -988,7 +996,7 @@ These core services are also called foundational ser- vices. Examples include re
   - use IAM user: lock down root user
   - create strong password policy, expired after 90d
   - Rotate SC regularly: deactivate unused SC 
-  - enable MFA: or critical account
+  - enable MFA: for critical account
   - manage permission with groups: job function
   - grant the least privileges
   - use IAM role: no share SC
@@ -1018,6 +1026,9 @@ These core services are also called foundational ser- vices. Examples include re
 
 
 ### Auto Scaling
+- only new instance follow updated launch config
+- default 300s cooldown
+#### intro
 - Benefit
   - Dynamic scaling
   - best user experience
@@ -1111,12 +1122,13 @@ These core services are also called foundational ser- vices. Examples include re
       - evenly distribute to EC2 across AZ
       - NLB only rout to EC2 in its AZ, flow hash on IP
 
-### APP
+### Services
 
-#### Quickie
+#### Quick
 - Lambda: async/sync, stateless, <=5m
-- SQS: 14d messag rention, consumers should delete msg
-- Route 53: Routing: weighted, failedover, latency(resource), Geo DNS(user geo, ELB can't across region)
+- API Gateway: caching, throttle
+- SQS: 14d message rentation, consumers should delete msg
+- Route 53: Routing: weighted, failover, latency(resource), Geo DNS(user geo, ELB can't across region)
 - Route 53: record: A(IPv4), AAAA(IPv6), CNAME(subdomain), Alias(domain/subdomain)
 - Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access
 - OpsWork: Chef, Puppet, Stacks(3 tools)
@@ -1191,7 +1203,7 @@ These core services are also called foundational ser- vices. Examples include re
     - pay only for what you use
 - Kinesis Data Analytics
   - process and analyze real-time, steaming data
-  - running SQL queries conitnuously on data
+  - running SQL queries continuously on data
   - transformation
   - Benefits:
     - real-time processing
@@ -1394,8 +1406,8 @@ These core services are also called foundational ser- vices. Examples include re
 
 #### CloudTrail
 - logs all API calls, including console activities and command line instructions
-- diff accounts can send yheir trails to a central account
-- can enable in al region
+- diff accounts can send their trails to a central account
+- can enable in all region
 - by default, log sent to S3 is encrypted
 #### AWS Config
 - record cinfig changes
@@ -1435,8 +1447,12 @@ These core services are also called foundational ser- vices. Examples include re
 ### RDS
 
 #### Quick
-- RDS multi-AZ, standby, auto failover(CNAME)
-
+- RDS multi-AZ: standby, sync auto failover(CNAME)
+- read replica: async, not support Oracle/SQL server
+- auto backup: Aurora continuosly, others per day
+- Auroa: no standby, as auto & free storage replica 
+- DynamoDB: docu/key-value, session, Stream & DAX(accelorater)
+#### intro
 - hosting and managing relational database
 - benetifs:
   - no infra management
@@ -1493,13 +1509,13 @@ These core services are also called foundational ser- vices. Examples include re
     - can encrypt only during data base creation
     - once enctypt, can't remove
     - when create a read replica, bot master and read replica must be encrypted; so for master-standby @@@with 1
-    - can't copy snapshot of encrypted DB, as KMS is regional
+    - can't copy snapshot of encrypted DB to other region, as KMS is regional
     - can migrate an encrypted from MySQL to Aurora MySQl
     
  - backup
    - Aurora: conitnuously back up to S3
    - others: one backup per day
-   - multiple copies of backup in eac AZ where instance deployed
+   - multiple copies of backup in each AZ where instance deployed
    - store to any class of server
    - custom restore time
  - Snapshot
@@ -1549,7 +1565,7 @@ These core services are also called foundational ser- vices. Examples include re
   - compression
   - data mirroring is already included
 - VPC
-  - vps is manndatory for new 
+  - vpc is manndatory for new 
   - can choose a cluster subnet group(contains some subnets)
   - enhanced VPC routing: enable to traffic through you VPC, otherwise through Internet
 - Encryption
