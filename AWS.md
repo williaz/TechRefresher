@@ -9,10 +9,12 @@ keywords, 7
 ### 2 VPC, Route53, IAM, Security
 - [IAM](https://tutorialsdojo.com/aws-cheat-sheet-aws-identity-and-access-management-iam/)
 
+
+### 3 others
+- [CloudWatch](https://tutorialsdojo.com/aws-cheat-sheet-amazon-cloudwatch/)
+
+## Cloud
 - VPC(Virtual Private Cloud) - Networking Services, dedicated to a single AWS account.
-
-
-
 
 - Region, Availability Zone(AZ), Edge location
   - Region: physical locatoion, contains 2+ AZ
@@ -531,11 +533,15 @@ These core services are also called foundational ser- vices. Examples include re
 #### Quick
 
 - SSD: IOS, small/random/transactional(DB); HDD: Throughput, large load, cold(less cost)
-- Glacier: only vault owener has access, encrypted at rest by default, support SSL
+- Glacier: only vault owener has access, obj no modify(upload, download, delete), encrypted at rest by default, support SSL
   - tier: Expedited(need provisioned retrieval capacity), Standard, or Bulk(5–12 hr)
-- Amazon S3 Transfer Acceleration: CloudFront
+- S3 Transfer Acceleration: CloudFront
+- server access logs for S3 provide you visibility into object-level operations
+- S3 static hosting: <bucket-name>.s3-website-<AWS-region>.amazonaws.com
 - lifecycle: transition action(move)/Expiration action(delete)
-- Storage gateway: integrate on-demand storage with Cloud storage; SSL and SSE in S3 by default
+- By default, all Amazon S3 resources such as buckets, objects, and related subresources are private
+- Object upload: need set permission to make it public
+- Storage gateway: extend to cloud storage; integrate on-demand storage with Cloud storage; SSL and SSE in S3 by default
 - auto replica in same region without enabled Cross-region replication (CRR) 
 - Multipart upload: consider it when obj > 100M
 - max 5G PUT
@@ -706,11 +712,13 @@ These core services are also called foundational ser- vices. Examples include re
 - SG: only allow, stateful
 - Internet Gateway: one per VPC
 - route table: associate subnet, (EC2->IGW)
+- If EC2  does not autoget a DNS hostname, DNS resolution and DNS hostnames attributes are disabled in the non-default VPC
 - cannot VPC peering:
   - Overlapping CIDR Blocks
   - Transitive Peering
   - Edge to Edge Routing Through a Gateway or Private Connection
 - NI: Attach: hot(running), warm(stopped), cold(during launch)
+- EIP cannot be changed once associate with NAT Gateway
 - endpoint: connect servicesin AWS private network  
   - interface: ENI(SG), most
   - Gateway(route table, target): S3, DynamoDB
@@ -1169,12 +1177,19 @@ These core services are also called foundational ser- vices. Examples include re
 - Route 53: record: A(IPv4), AAAA(IPv6), CNAME(subdomain), Alias(domain/subdomain)
 - Route 53: Active-Active Failover uses All; Active-Passive Failover set Primary/Secondary
 - CloudFront:  Origin Access Identity (OAI) uses CloudFront URL only, not S3; Signed url/cookie
+- CloudWatch: does not monitor EC2 memory usage as well as disk space utilization, 
+  - detailed monitoring just provides higher frequency of metrics (1-minute frequency
+  - Alarm-Action => EC2, OK, ALARM, INSUFFICIENT_DATA
+  - Event-change-> notification in real time
+  - In RDS, the Enhanced Monitoring metric: RDS child processes, RDS processes, OS processes
+  - Agent: system level metrics
 - EMR: auto provide log analysis, can access its EC2 OS
 - SWF: deciser -> decision task --state--> deciser
+- Amazon MQ: industry API, supports JMS, NMS, AMQP, STOMP, MQTT, and WebSocket. 
 - Beanstalk: quickly deploy and manage applications without caring infra
 - Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access
 - OpsWork: Chef, Puppet, Stacks(3 tools)
-- CloudFormation: stack template, free
+- CloudFormation: JSON/YAML text file, stack template, free
 - Snowball: 50T/80T; Snowabll Edge: 100T
 - AppSync: sotre and sync data across mobile and wab apps in real time; GraphQL; intg DynamoDB/Lambda; offline sync
 - Perfect Forward Secrecy: against the eavesdropping of encrypted data, through the use of a unique random session key. 
