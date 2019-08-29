@@ -522,8 +522,8 @@ These core services are also called foundational ser- vices. Examples include re
 
 ##### Scope
 - global: Route 53
-- regional: S3/EFS/AMI/ASG/ELB
-- AZ: EBS
+- regional: S3/EFS/AMI/ASG/ELB/VPC, target group(ELB)
+- AZ: EBS, subnet
 
 
 ### Storage
@@ -532,7 +532,15 @@ These core services are also called foundational ser- vices. Examples include re
 
 - SSD: IOS, small/random/transactional(DB); HDD: Throughput, large load, cold(less cost)
 - Glacier: only vault owener has access, encrypted at rest by default, support SSL
+  - tier: Expedited(need provisioned retrieval capacity), Standard, or Bulk(5–12 hr)
+- Amazon S3 Transfer Acceleration: CloudFront
+- lifecycle: transition action(move)/Expiration action(delete)
 - Storage gateway: integrate on-demand storage with Cloud storage; SSL and SSE in S3 by default
+- auto replica in same region without enabled Cross-region replication (CRR) 
+- Multipart upload: consider it when obj > 100M
+- max 5G PUT
+- eventual consistency for read-after-write: parallel requests may result in old data
+- no need key prefix partition unless > 3000 w rps/5500 r rps
 #### Intro
 - Object storage: docu/img/video with flat structure metadata
   - immured/ unstructured data
@@ -693,12 +701,19 @@ These core services are also called foundational ser- vices. Examples include re
 - EC2 can't access Internet
   - Does it have an EIP or public IP address?
   - Is the route table properly configured?
-- NACL: apply ASAP from lowest rule num to high
+- req --(NACL)--> subnet --(SG)--> EC2
+- NACL: apply ASAP from lowest rule num to high, stateless(evalute both i/o), allow/deny; 1 per subnet; last rule * deny
+- SG: only allow, stateful
+- Internet Gateway: one per VPC
+- route table: associate subnet, (EC2->IGW)
 - cannot VPC peering:
   - Overlapping CIDR Blocks
   - Transitive Peering
   - Edge to Edge Routing Through a Gateway or Private Connection
 - NI: Attach: hot(running), warm(stopped), cold(during launch)
+- endpoint: connect servicesin AWS private network  
+  - interface: ENI(SG), most
+  - Gateway(route table, target): S3, DynamoDB
 - private connectivity: hardware/software VPN, AWS direct conect, CloudHub(multi-sites), small Bastion
 
 #### intro
@@ -718,7 +733,7 @@ These core services are also called foundational ser- vices. Examples include re
   - IPv4 and IPv6 treated separeately
   - auto created the main route table for the VPC, better keep i with only the local route
   - destionation specifies the IP ranges that can be directed to the target
-  - target is where the traffic is directed 
+  - target is where the traffic is directed, the road
   - all subnets that are not explicitly associated with a more specific route table will use Main route table by default.
   
 - Internet Gateway (IG)
@@ -796,7 +811,7 @@ These core services are also called foundational ser- vices. Examples include re
   - can't modify
   - new instance apply new DHCP, running instance ick up when DHCP lease is renewed
 #### Connecting to a VPC
-- Virtual private gateway: AWS side, VPN concentrator
+- Virtual private gateway: AWS side, VPN concentrator, VPC level
 - Customer gateway
 - private connectivity types:@@@
   - AWS hardware VPN: IPsec(Internet Protocol Security)
@@ -1040,7 +1055,10 @@ These core services are also called foundational ser- vices. Examples include re
 
 ### Auto Scaling
 - only new instance follow updated launch config
+- launch config: only one per ASG, can't modify => create new
 - default 300s cooldown
+- ELB: cross-zone LB for multi-AZ in a target group
+- SNI Custom SSL: allows multiple domains to serve SSL traffic over the same IP address; Server Name Indication
 #### intro
 - Benefit
   - Dynamic scaling
@@ -1138,9 +1156,10 @@ These core services are also called foundational ser- vices. Examples include re
 ### Services
 
 #### Quick
-- Lambda: async/sync, stateless, <=5m
+- Lambda: async/sync, stateless, <=5m, auto scaling(if in VPC, make sure sufficient ENI, else EC2ThrottledException). 
 - API Gateway: caching, throttle
 - serverless: API Gateway, Lambda, DynamoDB
+- SQS: FIFIO(exactly one processing, FIFO order)standard(at least 1, general insertion order)
 - SQS: 14d message rentation, consumers should delete msg
 - Kinesis
   - Kinesis data stream is an ordered sequence of data records meant to be written to and read from in real-time
@@ -1148,12 +1167,24 @@ These core services are also called foundational ser- vices. Examples include re
   - Kinesis Data Firehose: load streaming data into data stores and analytics tools
 - Route 53: Routing: weighted, failover, latency(resource), Geo DNS(user geo, ELB can't across region)
 - Route 53: record: A(IPv4), AAAA(IPv6), CNAME(subdomain), Alias(domain/subdomain)
+- Route 53: Active-Active Failover uses All; Active-Passive Failover set Primary/Secondary
+- CloudFront:  Origin Access Identity (OAI) uses CloudFront URL only, not S3; Signed url/cookie
+- EMR: auto provide log analysis, can access its EC2 OS
+- SWF: deciser -> decision task --state--> deciser
+- Beanstalk: quickly deploy and manage applications without caring infra
 - Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access
 - OpsWork: Chef, Puppet, Stacks(3 tools)
+- CloudFormation: stack template, free
 - Snowball: 50T/80T; Snowabll Edge: 100T
-- AppSync with DynamoDB to make it easy for you to build collaborative apps that keep shared data updated in real time.
+- AppSync: sotre and sync data across mobile and wab apps in real time; GraphQL; intg DynamoDB/Lambda; offline sync
 - Perfect Forward Secrecy: against the eavesdropping of encrypted data, through the use of a unique random session key. 
   - CloudFront and ELB
+- CodeCommit: GitHub
+- CodeBuild: Jenkins
+- ECR: docker registry
+- Glue: ETL
+- workspace: VDI
+
 
 #### Lambda
 - event-driven
@@ -1207,7 +1238,7 @@ These core services are also called foundational ser- vices. Examples include re
   - secure: VPC endpoint
   - easy to use: data stream producer is any app to put data into DC(data ingestion)
   - parallel processing: concurrently
-  - elasticL dynamically adjust throughput
+  - elastic dynamically adjust throughput
   - low cost
   - reliable: replicates data across 3 AZ in a region and preserve up to 7d
 - Kinesis Data Firehose
@@ -1315,6 +1346,7 @@ These core services are also called foundational ser- vices. Examples include re
 
 #### Amazon MQ
 - standard API
+- queue(SQS)/topic(SNS)
 - If you're using messaging with existing applications and want to move your messaging service to the cloud quickly and easily, it is recommended that you consider Amazon MQ. 
 
 #### SQS
@@ -1327,7 +1359,7 @@ These core services are also called foundational ser- vices. Examples include re
 - types:
   - standard
     - default, unlimited transactions per sec
-    - at least onece message delivery
+    - at least once message delivery
     - generally in insertion order
   - FIFO
     - exactly once processing
@@ -1429,7 +1461,7 @@ These core services are also called foundational ser- vices. Examples include re
 - can enable in all region
 - by default, log sent to S3 is encrypted
 #### AWS Config
-- record cinfig changes
+- record config changes
 - config rule: represents desired config for a resource to assess your overall compliance and risk status
 - continuous monitoring
 - continous assessment
