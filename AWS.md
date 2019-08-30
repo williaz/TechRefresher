@@ -1199,6 +1199,8 @@ These core services are also called foundational ser- vices. Examples include re
 - Amazon MQ: industry API, supports JMS, NMS, AMQP, STOMP, MQTT, and WebSocket. 
 - Beanstalk: quickly deploy and manage applications without caring infra
 - Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access, with MFA
+- web identity federationfor sign in via external identity provider (IdP, FB, GOOG)
+- SAML-Based Federation for AD (Security Assertion Markup Language, Active Directory)
 - OpsWork: Chef, Puppet, Stacks(3 tools)
 - for certificate from a third-party CA(authority), import it into ACM(Manager) or upload it to the IAM certificate store.
 - CloudFormation: JSON/YAML text file, stack template, free
@@ -1522,7 +1524,6 @@ These core services are also called foundational ser- vices. Examples include re
 
 
 ## DB
-### RDS
 
 #### Quick
 - RDS multi-AZ: standby, sync auto failover(CNAME)
@@ -1531,7 +1532,14 @@ These core services are also called foundational ser- vices. Examples include re
 - auto backup: Aurora continuosly, others per day
 - Auroa: no standby, as auto & free sync storage replica in 6 AZ
 - DynamoDB: docu/key-value, session, Stream & DAX(accelorater), auto scaling, Unit(r/w): 4/1 K/sec, 3 replica(eventual C)
+  - Global table: multi-master DB, multi-region
 - redshift: columnar, EC2 cluster(in VPC, enhanced VPC routing), auto backup to S3
+- IAM DB authentication to authenticate DB, using authentication token 
+  - SSL, EC2 with profile credential
+
+### RDS
+
+
 #### intro
 - hosting and managing relational database
 - benetifs:
