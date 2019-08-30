@@ -523,7 +523,7 @@ These core services are also called foundational ser- vices. Examples include re
   - Mobile Analytics
 
 ##### Scope
-- global: Route 53
+- global: Route 53, IAM, ARN
 - regional: S3/EFS/AMI/ASG/ELB/VPC, target group(ELB)
 - AZ: EBS, subnet
 
@@ -533,6 +533,8 @@ These core services are also called foundational ser- vices. Examples include re
 #### Quick
 
 - SSD: IOS, small/random/transactional(DB); HDD: Throughput, large load, cold(less cost)
+   - 50:1: The maximum ratio of provisioned IOPS to requested volume size (in GiB)
+- EBS: lowest-latency to EC2
 - Glacier: only vault owener has access, obj no modify(upload, download, delete), encrypted at rest by default, support SSL
   - tier: Expedited(need provisioned retrieval capacity), Standard, or Bulk(5–12 hr)
 - S3 Transfer Acceleration: CloudFront
@@ -854,6 +856,8 @@ These core services are also called foundational ser- vices. Examples include re
 - If the instance is stopped, AWS usually moves the instance to a new host computer.
 - The revoke-security-group-ingress command removes one or more ingress rules from a security group. 
 - billing: you will not billed if it is preparing to stop however, you will still be billed if it is just preparing to hibernate.
+- http://host/latest/meta-data/; user-data
+- can choose Spot instances terminated(default), stopped, or hibernated upon interruption.
 #### intro
 - benefits:
   - Time to market: instant deploy
@@ -1066,6 +1070,7 @@ These core services are also called foundational ser- vices. Examples include re
 - launch config: only one per ASG, can't modify => create new
 - default 300s cooldown
 - ELB: cross-zone LB for multi-AZ in a target group
+- connection draining: for LB complete in-flight requests for de-registering or unhealthy EC2; timeout(300s default)
 - SNI Custom SSL: allows multiple domains to serve SSL traffic over the same IP address; Server Name Indication
 #### intro
 - Benefit
@@ -1165,7 +1170,7 @@ These core services are also called foundational ser- vices. Examples include re
 
 #### Quick
 - Lambda: async/sync, stateless, <=5m, auto scaling(if in VPC, make sure sufficient ENI, else EC2ThrottledException). 
-- API Gateway: caching, throttle
+- API Gateway: caching, throttle, AWS X-Ray to trace and analyze requests through it
 - serverless: API Gateway, Lambda, DynamoDB
 - SQS: FIFIO(exactly one processing, FIFO order)standard(at least 1, general insertion order)
 - SQS: 14d message rentation, consumers should delete msg
@@ -1177,18 +1182,23 @@ These core services are also called foundational ser- vices. Examples include re
 - Route 53: record: A(IPv4), AAAA(IPv6), CNAME(subdomain), Alias(domain/subdomain)
 - Route 53: Active-Active Failover uses All; Active-Passive Failover set Primary/Secondary
 - CloudFront:  Origin Access Identity (OAI) uses CloudFront URL only, not S3; Signed url/cookie
+  - public DNS for origin
 - CloudWatch: does not monitor EC2 memory usage as well as disk space utilization, 
-  - detailed monitoring just provides higher frequency of metrics (1-minute frequency
+  - detailed monitoring just provides higher frequency of metrics (1-minute frequency)
   - Alarm-Action => EC2, OK, ALARM, INSUFFICIENT_DATA
   - Event-change-> notification in real time
   - In RDS, the Enhanced Monitoring metric: RDS child processes, RDS processes, OS processes
   - Agent: system level metrics
 - EMR: auto provide log analysis, can access its EC2 OS
+- S3 select: SQL filter get; Athena: interactive SQL on S3, serverless; Redshift Spectrum: auto scale
 - SWF: deciser -> decision task --state--> deciser
+  - fully-managed state tracker and task coordinator
+- Step Functions provides serverless orchestration, SWF not
 - Amazon MQ: industry API, supports JMS, NMS, AMQP, STOMP, MQTT, and WebSocket. 
 - Beanstalk: quickly deploy and manage applications without caring infra
-- Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access
+- Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access, with MFA
 - OpsWork: Chef, Puppet, Stacks(3 tools)
+- for certificate from a third-party CA(authority), import it into ACM(Manager) or upload it to the IAM certificate store.
 - CloudFormation: JSON/YAML text file, stack template, free
 - Snowball: 50T/80T; Snowabll Edge: 100T
 - AppSync: sotre and sync data across mobile and wab apps in real time; GraphQL; intg DynamoDB/Lambda; offline sync
@@ -1514,10 +1524,12 @@ These core services are also called foundational ser- vices. Examples include re
 
 #### Quick
 - RDS multi-AZ: standby, sync auto failover(CNAME)
+  - enhanced monitoring: 1s
 - read replica: async, not support Oracle/SQL server
 - auto backup: Aurora continuosly, others per day
-- Auroa: no standby, as auto & free storage replica 
-- DynamoDB: docu/key-value, session, Stream & DAX(accelorater), auto scaling
+- Auroa: no standby, as auto & free sync storage replica in 6 AZ
+- DynamoDB: docu/key-value, session, Stream & DAX(accelorater), auto scaling, Unit(r/w): 4/1 K/sec, 3 replica(eventual C)
+- redshift: columnar, EC2 cluster(in VPC, enhanced VPC routing), auto backup to S3
 #### intro
 - hosting and managing relational database
 - benetifs:
