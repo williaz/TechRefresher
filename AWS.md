@@ -721,6 +721,7 @@ These core services are also called foundational ser- vices. Examples include re
   - Edge to Edge Routing Through a Gateway or Private Connection
 - NI: Attach: hot(running), warm(stopped), cold(during launch)
 - EIP cannot be changed once associate with NAT Gateway
+- NAT Gateway: public subnet to host it, EIP to associate it, private subnet to direct to it
 - endpoint: connect servicesin AWS private network  
   - interface: ENI(SG), most
   - Gateway(route table, target): S3, DynamoDB
@@ -1193,6 +1194,7 @@ These core services are also called foundational ser- vices. Examples include re
 - S3 select: SQL filter get; Athena: interactive SQL on S3, serverless; Redshift Spectrum: auto scale
 - SWF: deciser -> decision task --state--> deciser
   - fully-managed state tracker and task coordinator
+  - never duplicate
 - Step Functions provides serverless orchestration, SWF not
 - Amazon MQ: industry API, supports JMS, NMS, AMQP, STOMP, MQTT, and WebSocket. 
 - Beanstalk: quickly deploy and manage applications without caring infra
