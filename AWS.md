@@ -13,6 +13,149 @@ keywords, 7
 ### 3 others
 - [CloudWatch](https://tutorialsdojo.com/aws-cheat-sheet-amazon-cloudwatch/)
 
+
+### Quick Tips
+
+##### Scope
+- global: Route 53, IAM, ARN
+- regional: S3/EFS/AMI/ASG(fleet)/ELB/VPC, target group(ELB)
+- AZ: EBS, subnet
+
+#### Storage
+
+- SSD: IOS, small/random/transactional(DB); HDD: Throughput, large load, cold(less cost)
+   - 50:1: The maximum ratio of provisioned IOPS to requested volume size (in GiB)
+- EBS: lowest-latency to EC2
+- Glacier: only vault owener has access, obj no modify(upload, download, delete), encrypted at rest by default, support SSL
+  - tier: Expedited(need provisioned retrieval capacity), Standard, or Bulk(5–12 hr)
+- S3 Transfer Acceleration: CloudFront
+- Multipart: upload in parallel to improve throughput
+- server access logs for S3 provide you visibility into object-level operations
+- S3 static hosting: <bucket-name>.s3-website-<AWS-region>.amazonaws.com
+- lifecycle: transition action(move)/Expiration action(delete)
+- By default, all Amazon S3 resources such as buckets, objects, and related subresources are private
+- Object upload: need set permission to make it public
+- Storage gateway: extend to cloud storage; integrate on-demand storage with Cloud storage; SSL and SSE in S3 by default
+- auto replica in same region without enabled Cross-region replication (CRR) 
+- Multipart upload: consider it when obj > 100M
+- max 5G PUT
+- eventual consistency for read-after-write: parallel requests may result in old data
+- no need key prefix partition unless > 3000 w rps/5500 r rps
+
+####  VPC
+- Subnet: 1 AZ, 5 IP reserved
+  - By default, instacne launched in nondefault subnets don't have the IPv4 , and default subnets have
+- EC2 can't access Internet
+  - Does it have an EIP or public IP address?
+  - Is the route table properly configured?
+- req --(NACL)--> subnet --(SG)--> EC2
+- NACL: apply ASAP from lowest rule num to high, stateless(evalute both i/o), allow/deny; 1 per subnet; last rule * deny
+- SG: only allow, stateful
+- Internet Gateway: one per VPC
+- route table: associate subnet, (EC2->IGW)
+- If EC2  does not autoget a DNS hostname, DNS resolution and DNS hostnames attributes are disabled in the non-default VPC
+- cannot VPC peering:
+  - Overlapping CIDR Blocks
+  - Transitive Peering
+  - Edge to Edge Routing Through a Gateway or Private Connection
+- NI: Attach: hot(running), warm(stopped), cold(during launch)
+- EIP cannot be changed once associate with NAT Gateway
+- NAT Gateway: public subnet to host it, EIP to associate it, private subnet to direct to it
+- endpoint: connect servicesin AWS private network  
+  - interface: ENI(SG), most
+  - Gateway(route table, target): S3, DynamoDB
+- private connectivity: hardware/software VPN, AWS direct conect, CloudHub(multi-sites), small Bastion
+- VPC does not support multicast or broadcast networking. => virtual overlay multicast
+#### EC2
+- soft limit: 20 EC2 per region
+- placement group(same AZ): cluster(low latency), spread(diff racks, can Multi-AZ), partition(diff racks)
+- store-backed EC2 can only be rebooted or terminated and its data will be erased if the EC2 instance is terminated.
+- If the instance is stopped, AWS usually moves the instance to a new host computer.
+- The revoke-security-group-ingress command removes one or more ingress rules from a security group. 
+- billing: you will not billed if it is preparing to stop however, you will still be billed if it is just preparing to hibernate.
+- http://host/latest/meta-data/; user-data
+- can choose Spot instances terminated(default), stopped, or hibernated upon interruption.
+- Scheduled Reserved Instances (Scheduled Instances) for capacity reservations in period
+- Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies. no charge
+- Remote Desktop Protocol, on TCP port 3389 and UDP port 3389.
+
+#### HA
+- only new instance follow updated launch config
+- launch config: only one per ASG, can't modify => create new
+- Insufficient capacity error: Restarting to migrate hardware that has capacity for all the requested instances
+- default 300s cooldown
+- ELB: cross-zone LB for multi-AZ in a target group
+- connection draining: for LB complete in-flight requests for de-registering or unhealthy EC2; timeout(300s default)
+- SNI Custom SSL: allows multiple domains to serve SSL traffic over the same IP address; Server Name Indication
+
+#### APP
+- Lambda: async/sync, stateless, <=5m, auto scaling(if in VPC, make sure sufficient ENI, else EC2ThrottledException). 
+- API Gateway: caching, throttle, AWS X-Ray to trace and analyze requests through it
+- serverless: API Gateway, Lambda, DynamoDB
+- SQS: FIFIO(exactly one processing, FIFO order)standard(at least 1, general insertion order)
+- SQS: 14d message rentation, consumers should delete msg
+- Kinesis
+  - Kinesis data stream is an ordered sequence of data records meant to be written to and read from in real-time
+    - Data retention in shards: 1d(default) - 7d
+  - Kinesis Data Firehose: load streaming data into data stores and analytics tools
+- Route 53: Routing: weighted, failover, latency(resource), Geo DNS(user geo, ELB can't across region)
+- Route 53: record: A(IPv4), AAAA(IPv6), CNAME(subdomain), Alias(domain/subdomain)
+- Route 53: Active-Active Failover uses All; Active-Passive Failover set Primary/Secondary
+- CloudFront:  Origin Access Identity (OAI) uses CloudFront URL only, not S3; Signed url/cookie
+  - public DNS for origin
+  - versioned object
+- CloudWatch: does not monitor EC2 memory usage as well as disk space utilization, 
+  - detailed monitoring just provides higher frequency of metrics (1-minute frequency)
+  - Alarm-Action => EC2, OK, ALARM, INSUFFICIENT_DATA
+  - Event-change-> notification in real time
+  - In RDS, the Enhanced Monitoring metric: RDS child processes, RDS processes, OS processes
+  - Agent: system level metrics
+- EMR: auto provide log analysis, can access its EC2 OS
+- S3 select: SQL filter get; Athena: interactive SQL on S3, serverless; Redshift Spectrum: auto scale
+- SWF: deciser -> decision task --state--> deciser
+  - fully-managed state tracker and task coordinator
+  - never duplicate
+- Step Functions provides serverless orchestration, SWF not
+- Amazon MQ: industry API, supports JMS, NMS, AMQP, STOMP, MQTT, and WebSocket. 
+- Beanstalk: quickly deploy and manage applications without caring infra
+- Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access, with MFA
+- web identity federationfor sign in via external identity provider (IdP, FB, GOOG), OpenID Connect (OIDC)-compatible IdP
+- SAML-Based Federation for AD (Security Assertion Markup Language, Active Directory)
+- OpsWork: Chef, Puppet, Stacks(3 tools)
+- IAM
+  - for certificate from a third-party CA(authority), import it into ACM(Manager) or upload it to the IAM certificate store.
+  - when use AWS Management Console to create a user, you must choose to at least include a console password or access keys. 
+  - sign-in page: https://My_AWS_Account_ID.signin.aws.amazon.com/console/
+- CloudFormation: JSON/YAML text file, stack template, free
+- Snowball: 50T/80T; Snowabll Edge: 100T
+- AppSync: sotre and sync data across mobile and wab apps in real time; GraphQL; intg DynamoDB/Lambda; offline sync
+- Perfect Forward Secrecy: against the eavesdropping of encrypted data, through the use of a unique random session key. 
+  - CloudFront and ELB
+- CodeCommit: GitHub
+- CodeBuild: Jenkins
+- ECR: docker registry
+- Glue: ETL
+- workspace: VDI
+#### DB
+- RDS multi-AZ: standby, sync auto failover(CNAME), VPC(>= 2AZ)
+  - enhanced monitoring: 1s
+- read replica: async, not support Oracle/SQL server
+- auto backup: Aurora continuosly, others per day
+- Auroa: no standby, as auto & free sync storage replica in 6 AZ
+- DynamoDB: docu/key-value, session, Stream & DAX(accelorater), auto scaling, Unit(r/w): 4/1 K/sec, 3 replica(eventual C)
+  - Global table: multi-master DB, multi-region
+- redshift: columnar, EC2 cluster(in VPC, enhanced VPC routing), auto backup to S3
+- IAM DB authentication to authenticate DB, using authentication token; (MySql, PostgreSQL)
+- Enhanced monitoring for OS
+- Set the rds.force_ssl parameter to true to force connections to use SSL; false(default), static(reboot to apply)
+  - SSL, EC2 with profile credential
+- ElastiCache: sub-millisecond latency caching
+- Redis: AUTH to require password before executing commands, --auth-token
+- InnoDB as recommended storage engine for MySQL. if need  intense, full-text search, use MyISAM
+
+
+
+
 ## Cloud
 - VPC(Virtual Private Cloud) - Networking Services, dedicated to a single AWS account.
 
@@ -522,33 +665,12 @@ These core services are also called foundational ser- vices. Examples include re
   - Device Farm: tst on real 
   - Mobile Analytics
 
-##### Scope
-- global: Route 53, IAM, ARN
-- regional: S3/EFS/AMI/ASG/ELB/VPC, target group(ELB)
-- AZ: EBS, subnet
+
 
 
 ### Storage
 
-#### Quick
-
-- SSD: IOS, small/random/transactional(DB); HDD: Throughput, large load, cold(less cost)
-   - 50:1: The maximum ratio of provisioned IOPS to requested volume size (in GiB)
-- EBS: lowest-latency to EC2
-- Glacier: only vault owener has access, obj no modify(upload, download, delete), encrypted at rest by default, support SSL
-  - tier: Expedited(need provisioned retrieval capacity), Standard, or Bulk(5–12 hr)
-- S3 Transfer Acceleration: CloudFront
-- server access logs for S3 provide you visibility into object-level operations
-- S3 static hosting: <bucket-name>.s3-website-<AWS-region>.amazonaws.com
-- lifecycle: transition action(move)/Expiration action(delete)
-- By default, all Amazon S3 resources such as buckets, objects, and related subresources are private
-- Object upload: need set permission to make it public
-- Storage gateway: extend to cloud storage; integrate on-demand storage with Cloud storage; SSL and SSE in S3 by default
-- auto replica in same region without enabled Cross-region replication (CRR) 
-- Multipart upload: consider it when obj > 100M
-- max 5G PUT
-- eventual consistency for read-after-write: parallel requests may result in old data
-- no need key prefix partition unless > 3000 w rps/5500 r rps
+  
 #### Intro
 - Object storage: docu/img/video with flat structure metadata
   - immured/ unstructured data
@@ -703,29 +825,6 @@ These core services are also called foundational ser- vices. Examples include re
 
 ### VPC
 
-####  Quick
-- Subnet: 1 AZ, 5 IP reserved
-  - By default, instacne launched in nondefault subnets don't have the IPv4 , and default subnets have
-- EC2 can't access Internet
-  - Does it have an EIP or public IP address?
-  - Is the route table properly configured?
-- req --(NACL)--> subnet --(SG)--> EC2
-- NACL: apply ASAP from lowest rule num to high, stateless(evalute both i/o), allow/deny; 1 per subnet; last rule * deny
-- SG: only allow, stateful
-- Internet Gateway: one per VPC
-- route table: associate subnet, (EC2->IGW)
-- If EC2  does not autoget a DNS hostname, DNS resolution and DNS hostnames attributes are disabled in the non-default VPC
-- cannot VPC peering:
-  - Overlapping CIDR Blocks
-  - Transitive Peering
-  - Edge to Edge Routing Through a Gateway or Private Connection
-- NI: Attach: hot(running), warm(stopped), cold(during launch)
-- EIP cannot be changed once associate with NAT Gateway
-- NAT Gateway: public subnet to host it, EIP to associate it, private subnet to direct to it
-- endpoint: connect servicesin AWS private network  
-  - interface: ENI(SG), most
-  - Gateway(route table, target): S3, DynamoDB
-- private connectivity: hardware/software VPN, AWS direct conect, CloudHub(multi-sites), small Bastion
 
 #### intro
 - private space in the cloud, manage IP namespace
@@ -850,15 +949,7 @@ These core services are also called foundational ser- vices. Examples include re
 
 ### EC2
 
-#### Quick
-- soft limit: 20 EC2 per region
-- placement group(same AZ): cluster(low latency), spread(diff racks, can Multi-AZ), partition(diff racks)
-- store-backed EC2 can only be rebooted or terminated and its data will be erased if the EC2 instance is terminated.
-- If the instance is stopped, AWS usually moves the instance to a new host computer.
-- The revoke-security-group-ingress command removes one or more ingress rules from a security group. 
-- billing: you will not billed if it is preparing to stop however, you will still be billed if it is just preparing to hibernate.
-- http://host/latest/meta-data/; user-data
-- can choose Spot instances terminated(default), stopped, or hibernated upon interruption.
+
 #### intro
 - benefits:
   - Time to market: instant deploy
@@ -1067,12 +1158,7 @@ These core services are also called foundational ser- vices. Examples include re
 
 
 ### Auto Scaling
-- only new instance follow updated launch config
-- launch config: only one per ASG, can't modify => create new
-- default 300s cooldown
-- ELB: cross-zone LB for multi-AZ in a target group
-- connection draining: for LB complete in-flight requests for de-registering or unhealthy EC2; timeout(300s default)
-- SNI Custom SSL: allows multiple domains to serve SSL traffic over the same IP address; Server Name Indication
+
 #### intro
 - Benefit
   - Dynamic scaling
@@ -1168,51 +1254,6 @@ These core services are also called foundational ser- vices. Examples include re
       - NLB only rout to EC2 in its AZ, flow hash on IP
 
 ### Services
-
-#### Quick
-- Lambda: async/sync, stateless, <=5m, auto scaling(if in VPC, make sure sufficient ENI, else EC2ThrottledException). 
-- API Gateway: caching, throttle, AWS X-Ray to trace and analyze requests through it
-- serverless: API Gateway, Lambda, DynamoDB
-- SQS: FIFIO(exactly one processing, FIFO order)standard(at least 1, general insertion order)
-- SQS: 14d message rentation, consumers should delete msg
-- Kinesis
-  - Kinesis data stream is an ordered sequence of data records meant to be written to and read from in real-time
-    - Data retention in shards: 1d(default) - 7d
-  - Kinesis Data Firehose: load streaming data into data stores and analytics tools
-- Route 53: Routing: weighted, failover, latency(resource), Geo DNS(user geo, ELB can't across region)
-- Route 53: record: A(IPv4), AAAA(IPv6), CNAME(subdomain), Alias(domain/subdomain)
-- Route 53: Active-Active Failover uses All; Active-Passive Failover set Primary/Secondary
-- CloudFront:  Origin Access Identity (OAI) uses CloudFront URL only, not S3; Signed url/cookie
-  - public DNS for origin
-- CloudWatch: does not monitor EC2 memory usage as well as disk space utilization, 
-  - detailed monitoring just provides higher frequency of metrics (1-minute frequency)
-  - Alarm-Action => EC2, OK, ALARM, INSUFFICIENT_DATA
-  - Event-change-> notification in real time
-  - In RDS, the Enhanced Monitoring metric: RDS child processes, RDS processes, OS processes
-  - Agent: system level metrics
-- EMR: auto provide log analysis, can access its EC2 OS
-- S3 select: SQL filter get; Athena: interactive SQL on S3, serverless; Redshift Spectrum: auto scale
-- SWF: deciser -> decision task --state--> deciser
-  - fully-managed state tracker and task coordinator
-  - never duplicate
-- Step Functions provides serverless orchestration, SWF not
-- Amazon MQ: industry API, supports JMS, NMS, AMQP, STOMP, MQTT, and WebSocket. 
-- Beanstalk: quickly deploy and manage applications without caring infra
-- Cognito: return ID, provides temporary, limited-privilege credentials to app for WS resources access, with MFA
-- web identity federationfor sign in via external identity provider (IdP, FB, GOOG)
-- SAML-Based Federation for AD (Security Assertion Markup Language, Active Directory)
-- OpsWork: Chef, Puppet, Stacks(3 tools)
-- for certificate from a third-party CA(authority), import it into ACM(Manager) or upload it to the IAM certificate store.
-- CloudFormation: JSON/YAML text file, stack template, free
-- Snowball: 50T/80T; Snowabll Edge: 100T
-- AppSync: sotre and sync data across mobile and wab apps in real time; GraphQL; intg DynamoDB/Lambda; offline sync
-- Perfect Forward Secrecy: against the eavesdropping of encrypted data, through the use of a unique random session key. 
-  - CloudFront and ELB
-- CodeCommit: GitHub
-- CodeBuild: Jenkins
-- ECR: docker registry
-- Glue: ETL
-- workspace: VDI
 
 
 #### Lambda
@@ -1525,17 +1566,6 @@ These core services are also called foundational ser- vices. Examples include re
 
 ## DB
 
-#### Quick
-- RDS multi-AZ: standby, sync auto failover(CNAME)
-  - enhanced monitoring: 1s
-- read replica: async, not support Oracle/SQL server
-- auto backup: Aurora continuosly, others per day
-- Auroa: no standby, as auto & free sync storage replica in 6 AZ
-- DynamoDB: docu/key-value, session, Stream & DAX(accelorater), auto scaling, Unit(r/w): 4/1 K/sec, 3 replica(eventual C)
-  - Global table: multi-master DB, multi-region
-- redshift: columnar, EC2 cluster(in VPC, enhanced VPC routing), auto backup to S3
-- IAM DB authentication to authenticate DB, using authentication token 
-  - SSL, EC2 with profile credential
 
 ### RDS
 
