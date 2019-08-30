@@ -89,7 +89,7 @@ keywords, 7
 - SNI Custom SSL: allows multiple domains to serve SSL traffic over the same IP address; Server Name Indication
 
 #### APP
-- Lambda: async/sync, stateless, <=5m, auto scaling(if in VPC, make sure sufficient ENI, else EC2ThrottledException). 
+- Lambda: async/sync, stateless, <=15m, auto scaling(if in VPC, make sure sufficient ENI, else EC2ThrottledException). 
 - API Gateway: caching, throttle, AWS X-Ray to trace and analyze requests through it
 - serverless: API Gateway, Lambda, DynamoDB
 - SQS: FIFIO(exactly one processing, FIFO order)standard(at least 1, general insertion order)
