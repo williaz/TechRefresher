@@ -84,7 +84,7 @@ keywords, 7
 - launch config: only one per ASG, can't modify => create new
 - Insufficient capacity error: Restarting to migrate hardware that has capacity for all the requested instances
 - default 300s cooldown
-- ELB: cross-zone LB for multi-AZ in a target group
+- ELB: auto deployed cross AZ; cross-zone LB for multi-AZ in a target group
 - connection draining: for LB complete in-flight requests for de-registering or unhealthy EC2; timeout(300s default)
 - SNI Custom SSL: allows multiple domains to serve SSL traffic over the same IP address; Server Name Indication
 
@@ -142,7 +142,8 @@ keywords, 7
 - read replica: async, not support Oracle/SQL server
 - auto backup: Aurora continuosly, others per day
 - Auroa: no standby, as auto & free sync storage replica in 6 AZ
-- DynamoDB: docu/key-value, session, Stream & DAX(accelorater), auto scaling, Unit(r/w): 4/1 K/sec, 3 replica(eventual C)
+- DynamoDB: docu/key-value, session, Stream & DAX(accelorater, cache), indexed, auto scaling, 
+  - Unit(r/w): 4/1 K/sec, 3 replica(eventual C)
   - Global table: multi-master DB, multi-region
 - redshift: columnar, EC2 cluster(in VPC, enhanced VPC routing), auto backup to S3
 - IAM DB authentication to authenticate DB, using authentication token; (MySql, PostgreSQL)
