@@ -1,8 +1,33 @@
 ### 1. CONTAINER, DEPENDENCY, AND IOC
 - What is dependency injection and what are the advantages?
+  - container controls the relationships between diff parts of an app, instead of by themselves
+  - Benefits:
+    - decoupling
+    - cohesion
+    - testable
+    - reusable
+    - maintainable
+    - standardize
+    - reduce boilerplate
 - What is a pattern? What is an anti-pattern. Is dependency injection a pattern?
+  - Pattern: template, best practice; general, reusable solution to a commonly occuring problem
+  - Anti-pattern: attempt to solve problem, but reduce the producitve and efficiency of the code
+  - yes
 - What is an interface and what are the advantages of making use of them in Java?
-  - Why are they recommended for Spring beans
+  - a reference type, contains
+    - constants and nested types like enum
+    - method signatures(no impl)
+    - default method
+    - static methods(with impl)
+  - benefits:
+    - decouple contact and impl
+    - modularization
+    - Polymorphism, handle a gouple of objects
+    - ease to test
+- Why are interfaces recommended for Spring beans
+  - ease to test, switch bean imp
+  - can use JDK dynamic proxying
+  - hide impl
 - What is meant by “application-context?
 - What is the concept of a “container” and what is its lifecycle?
 - How are you going to create a new instance of an ApplicationContext?
