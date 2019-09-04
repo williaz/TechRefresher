@@ -69,10 +69,17 @@ on the bean. BeanPostProcessor interface
 9. Application shut down is initialized.
 10. The Spring container is closed.
 11. Destruction callbacks are invoked on the singleton Spring beans in the container.
-  ```
+```
 - [ ] How are you going to create a new instance of an ApplicationContext?
   - Non-Web
-  ```java
+  
+
+
+
+    
+
+```java
+
 /* Creates an empty application context. */
 public AnnotationConfigApplicationContext()
 /*
@@ -98,11 +105,15 @@ public AnnotationConfigApplicationContext(String... basePackages)
 AnnotationConfigApplicationContext theParentApplicationContext =
 new AnnotationConfigApplicationContext(
 "se.ivankrizsan.spring.examples.configuration");
-  ```
+
+```
+
   - Web
     - Servlet2: a web.xml file located in WEB-INF and a Spring XML configuration file,
       - The Spring ContextLoaderListener creates the **root** Spring web application context of a web application.
       - The dispatcher servlet will read a Spring XML configuration file named **[dispatcher servlet name]- servlet.xml** located in the WEB-INF directory and create a Spring application context that is a **child** to the Spring application root context created by the ContextLoaderlistener.
+  
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="WebApp_ID" version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
