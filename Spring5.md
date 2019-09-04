@@ -1,5 +1,5 @@
 ### 1. CONTAINER, DEPENDENCY, AND IOC
-- What is dependency injection and what are the advantages?
+- [x] What is dependency injection and what are the advantages?
   - container controls the relationships between diff parts of an app, instead of by themselves
   - Benefits:
     - decoupling
@@ -9,11 +9,11 @@
     - maintainable
     - standardize
     - reduce boilerplate
-- What is a pattern? What is an anti-pattern. Is dependency injection a pattern?
+- [x] What is a pattern? What is an anti-pattern. Is dependency injection a pattern?
   - Pattern: template, best practice; general, reusable solution to a commonly occuring problem
   - Anti-pattern: attempt to solve problem, but reduce the producitve and efficiency of the code
   - yes
-- What is an interface and what are the advantages of making use of them in Java?
+- [x] What is an interface and what are the advantages of making use of them in Java?
   - a reference type, contains
     - constants and nested types like enum
     - method signatures(no impl)
@@ -24,14 +24,187 @@
     - modularization
     - Polymorphism, handle a gouple of objects
     - ease to test
-- Why are interfaces recommended for Spring beans
+- [x] Why are interfaces recommended for Spring beans
   - ease to test, switch bean imp
   - can use JDK dynamic proxying
   - hide impl
-- What is meant by “application-context?
-- What is the concept of a “container” and what is its lifecycle?
-- How are you going to create a new instance of an ApplicationContext?
-- Can you describe the lifecycle of a Spring Bean in an ApplicationContext?
+- [x] What is meant by “application-context?
+  - represents the Spring IoC container
+  - Object implements ApplicationContext, used for
+    - Instantiating beans in the application context.
+    - Configuring the beans in the application context.
+    - Assembling the beans in the application context.
+    - Managing the life-cycle of Spring beans.
+  - Acts as
+    - bean factory
+    - hierarcgical bean factory
+    - resource loader: load file resources in a generic fashion
+    - event publisher: to listeners
+    - message source: resolve message and supports i18n
+    - an environment: resolve properties, maintains profiles
+  - can be more than one application context in a Spring app, arranged in parent-child hierarchy
+  - common impl:
+    - AnnotationConfigApplicationContext: standalone
+    - AnnotationConfigWebApplicationContext
+    - ClassPathXmlApplicationContext
+    - FileSystemXmlApplicationContext
+    - XmlWebApplicationContext
+- [x] What is the concept of a “container” and what is its lifecycle?
+  - As an environment for Spring beans, managing their lifecycle and supplying services
+  - Lifecycle:
+```text
+1. Spring container is created as the application is started.
+2. The container reads configuration data.
+3. Bean definitions are created from the configuration data.
+4. Bean factory post-processors processes the bean definitions.
+BeanFactoryPostProcessor interface
+5. Spring beans are instantiated by the container using the bean definitions.
+6. Spring beans are configured and assembled.
+Property values and dependencies are injected into the beans by the container.
+7. Bean post-processors processes the beans in the container and any initialization callbacks
+are invoked on the beans.
+Bean post-processors are called both before and after any initialization callbacks are invoked
+on the bean. BeanPostProcessor interface 
+8. The application runs.
+9. Application shut down is initialized.
+10. The Spring container is closed.
+11. Destruction callbacks are invoked on the singleton Spring beans in the container.
+  ```
+- [ ] How are you going to create a new instance of an ApplicationContext?
+  - Non-Web
+  ```java
+/* Creates an empty application context. */
+public AnnotationConfigApplicationContext()
+/*
+* Creates an application context that uses the supplied bean factory.
+* Whether the application context is empty depends on the supplied bean factory.
+*/
+public AnnotationConfigApplicationContext(DefaultListableBeanFactory beanFactory)
+/*
+* Creates an application context populated with the beans from the supplied
+* classes annotated with @Configuration.
+*/
+public AnnotationConfigApplicationContext(Class<?>... annotatedClasses)
+// a @Configuration class
+AnnotationConfigApplicationContext theApplicationContext =
+new AnnotationConfigApplicationContext(MyConfiguration.class);
+/*
+* Creates an application context populated with the beans from the
+* classes annotated with @Configuration found in the supplied package and its
+* sub-packages.
+*/
+public AnnotationConfigApplicationContext(String... basePackages)
+// all @Configuration classes in the package
+AnnotationConfigApplicationContext theParentApplicationContext =
+new AnnotationConfigApplicationContext(
+"se.ivankrizsan.spring.examples.configuration");
+  ```
+  - Web
+    - Servlet2: a web.xml file located in WEB-INF and a Spring XML configuration file,
+      - The Spring ContextLoaderListener creates the **root** Spring web application context of a web application.
+      - The dispatcher servlet will read a Spring XML configuration file named **[dispatcher servlet name]- servlet.xml** located in the WEB-INF directory and create a Spring application context that is a **child** to the Spring application root context created by the ContextLoaderlistener.
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="WebApp_ID" version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+   <display-name>SpringWebServlet2</display-name>
+   <context-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>/WEB-INF/springwebservlet2-config.xml</param-value>
+   </context-param>
+   <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+   </listener>
+   <servlet>
+      <servlet-name>SpringDispatcherServlet</servlet-name>
+      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
+   <servlet-mapping>
+      <servlet-name>SpringDispatcherServlet</servlet-name>
+      <url-pattern>/</url-pattern>
+   </servlet-mapping>
+</web-app>
+
+```
+    - Servlet3: the web.xml file has become optional and a class implementing the WebApplicationInitializer can be used to create a Spring application context
+      - Impl class:
+        - AbstractContextLoaderInitializer: registers a ContextLoaderListener in the servlet context
+        - AbstractDispatcherServletInitializer: DispatcherServlet
+        - AbstractAnnotationConfigDispatcherServletInitializer: Java-config
+        - AbstractReactiveWebInitializer: Spring reactive web app
+      - XmlWebApplicationContext
+```java
+public class MyXmlWebApplicationInitializer implements WebApplicationInitializer {
+    @Override
+    public void onStartup(final ServletContext inServletContext) {
+        /* Create Spring web application context using XML configuration. */
+        final XmlWebApplicationContext theXmlWebApplicationContext =
+            new XmlWebApplicationContext();
+        theXmlWebApplicationContext
+            .setConfigLocation("/WEB-INF/applicationContext.xml");
+        theXmlWebApplicationContext.setServletContext(inServletContext);
+        theXmlWebApplicationContext.refresh();
+        theXmlWebApplicationContext.start();
+        /*
+         * Create and register the DispatcherServlet.
+         * This is not strictly necessary if the application does not need
+         * to receive web requests.
+         */
+        final DispatcherServlet theDispatcherServlet =
+            new DispatcherServlet(theXmlWebApplicationContext);
+        ServletRegistration.Dynamic theServletRegistration =
+            inServletContext.addServlet("app", theDispatcherServlet);
+        theServletRegistration.setLoadOnStartup(1);
+        theServletRegistration.addMapping("/app/*");
+    }
+}
+```
+      - AnnotationConfigWebApplicationContext
+```java
+public class MyJavaConfigWebApplicationInitializer implements WebApplicationInitializer {
+    @Override
+    public void onStartup(ServletContext inServletContext) {
+        /* Create Spring web application context using Java configuration. */
+        final AnnotationConfigWebApplicationContext
+        theAnnotationConfigWebApplicationContext =
+            new AnnotationConfigWebApplicationContext();
+        theAnnotationConfigWebApplicationContext.setServletContext(inServletContext);
+        theAnnotationConfigWebApplicationContext.register(
+            ApplicationConfiguration.class);
+        theAnnotationConfigWebApplicationContext.refresh();
+        /* Create and register the DispatcherServlet. */
+        final DispatcherServlet theDispatcherServlet =
+            new DispatcherServlet(theAnnotationConfigWebApplicationContext);
+        ServletRegistration.Dynamic theServletRegistration =
+            inServletContext.addServlet("app", theDispatcherServlet);
+        theServletRegistration.setLoadOnStartup(1);
+        theServletRegistration.addMapping("/app-java/*");
+    }
+}
+```
+- [ ] Can you describe the lifecycle of a Spring Bean in an ApplicationContext?
+  - Spring bean configuration is read and metadata in the form of a BeanDefinition object is created for each bean.
+  - All instances of BeanFactoryPostProcessor are invoked in sequence and are allowed an opportunity to alter the bean metadata.
+  - For each bean in the container:
+    - An instance of the bean is created using the bean metadata.
+    - Properties and dependencies of the bean are set.
+    - Any instances of BeanPostProcessor are given a chance to process the new bean instance before and after initialization.
+      - Any methods in the bean implementation class annotated with @PostConstruct are invoked.
+        - This processing is performed by a BeanPostProcessor.
+      - Any afterPropertiesSet method in a bean implementation class implementing the InitializingBean interface is invoked.
+        - This processing is performed by a BeanPostProcessor. If the same initialization method has already been invoked, it will not be invoked again.
+      - Any custom bean initialization method is invoked.
+        - Bean initialization methods can be specified either in the value of the init-method attribute in the corresponding <bean> element in a Spring XML configuration or in the initMethod property of the @Bean annotation.
+        - This processing is performed by a BeanPostProcessor. If the same initialization method has already been invoked, it will not be invoked again.
+     - The bean is ready for use.
+  - When the Spring application context is to shut down, the beans in it will receive destruction callbacks in this order:
+    - Any methods in the bean implementation class annotated with @PreDestroy are invoked.
+    - Any destroy method in a bean implementation class implementing the DisposableBean interface is invoked.
+      -  If the same destruction method has already been invoked, it will not be invoked again.
+    - Any custom bean destruction method is invoked.
+      - Bean destruction methods can be specified either in the value of the destroy-method attribute in the corresponding <bean> element in a Spring XML configuration or in the destroyMethod property of the @Bean annotation.
+      - If the same destruction method has already been invoked, it will not be invoked again.
+  
 - How are you going to create an ApplicationContext in an integration test test?
 - What is the preferred way to close an application context? Does Spring Boot do this for
 - you?
