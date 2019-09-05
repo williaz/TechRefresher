@@ -72,11 +72,6 @@ on the bean. BeanPostProcessor interface
 ```
 - [ ] How are you going to create a new instance of an ApplicationContext?
   - Non-Web
-  
-
-
-
-    
 
 ```java
 
@@ -216,9 +211,21 @@ public class MyJavaConfigWebApplicationInitializer implements WebApplicationInit
       - Bean destruction methods can be specified either in the value of the destroy-method attribute in the corresponding <bean> element in a Spring XML configuration or in the destroyMethod property of the @Bean annotation.
       - If the same destruction method has already been invoked, it will not be invoked again.
   
-- How are you going to create an ApplicationContext in an integration test test?
-- What is the preferred way to close an application context? Does Spring Boot do this for
-- you?
+- [ ] How are you going to create an ApplicationContext in an integration test test?
+
+- @RunWith (JUnit 4) or @ExtendWith (JUnit 5) is used to annotate the test-class.
+- @ContextConfiguration for xml/Java config class
+```java
+//Junit4
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes=MyConfiguration.class)
+
+//Junit 5
+@SpringJUnitConfig(classes=MyConfiguration.class)
+
+```
+
+- What is the preferred way to close an application context? Does Spring Boot do this for you?
 - Can you describe:
   - Dependency injection using Java configuration?
   - Dependency injection using annotations (@Component, @Autowired)?
