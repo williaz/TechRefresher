@@ -15,6 +15,7 @@
   - yes
 - [x] What is an interface and what are the advantages of making use of them in Java?
   - a reference type, contains
+  
     - constants and nested types like enum
     - method signatures(no impl)
     - default method
@@ -231,7 +232,7 @@ public class MyJavaConfigWebApplicationInitializer implements WebApplicationInit
 @WebAppConfiguration
 ```
 
-- [ ] What is the preferred way to close an application context? Does Spring Boot do this for you?
+- [x] What is the preferred way to close an application context? Does Spring Boot do this for you?
           
 - Standalone app
   - Registering a shutdown-hook by calling registerShutdownHook() and implements AbstractApplicationContext
@@ -243,15 +244,74 @@ public class MyJavaConfigWebApplicationInitializer implements WebApplicationInit
   - it will receive ServletContextEvent when web container stops
 - Boot
   - auto register a shutdown-hook
+          
   - same as web
           
-- Can you describe:
+- [x] Can you describe:
+  - DI for type ny config
+    - define bean's Dependencies using constructor arg, setter, or factory method
+    - IoC injects dependencies
   - Dependency injection using Java configuration?
   - Dependency injection using annotations (@Component, @Autowired)?
+    - @Component(@Service, @Repository, @Controller) allow Spring beans to be automatically detected at component scanning
+    - @Autowired annotation can be applied to constructors, methods, parameters and properties of a class.
+      - need annotate if have multiple constructors
   - Component scanning, Stereotypes and Meta-Annotations?
+    - @ComponentScan for searching annotated classess and registering bean in IoC
+      - @Configuration annotation is annotated with the @Component
+      - Using the basePackageClasses property, a base package to be scanned is specified by setting
+a class located in the base package. Prefered
+```Java
+@ComponentScan(
+basePackages = "se.ivankrizsan.spring.corespringlab.service",
+basePackageClasses = CalculatorService.class,
+excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern =
+".*Repository"),
+includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes =
+MyService.class)
+)
+```
+    - Stereotype annotations for role info: @RestController, @Configuration, @Component
+    - Meta-Annotations: define @
+```Java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Controller
+@ResponseBody
+public @interface RestController {
+```
   - Scopes for Spring beans? What is the default scope?
-- Are beans lazily or eagerly instantiated by default? How do you alter this behavior?
-- What is a property source? How would you use @PropertySource?
+```
+singleton: Single bean instance per Spring container.
+prototype: Each time a bean is requested, a new instance is created.
+Only in web-aware Spring application contexts:
+request: Single bean instance per HTTP request.
+session: Single bean instance per HTTP session.
+application: Single bean instance per ServletContext.
+websocket: Single bean instance per WebSocket.
+```
+- [x] Are beans lazily or eagerly instantiated by default? How do you alter this behavior?
+  - Singleton: eagerly initialized as the app context created
+  - prototype: Lazily, except when it's a dependecny of a singleton bean
+  - use @Lazy(boolean param, default is true)
+    - on method with @Bean
+    - on @Configuration class: apply on all beans declared inside
+    - on @Component class: apply on the bean
+    - also can use with @Autowire/@Inject to control injection
+- [x] What is a property source? How would you use @PropertySource?
+  -  A PropertySource is a simple abstraction over any source of key-value pairs
+     - JVM sys prop: System.getProperties()
+     - Sys env: System.getenv()
+     - JNDI prop
+     - Servlet config init param
+     - Servlet context inti param
+     - prop files: .properites file or XML
+  - @PropertySource annotation can be used to add a property source, to apply on @Configuration class
+```java
+@Configuration
+@PropertySource("classpath:testproperties.properties")
+```
 - What is a BeanFactoryPostProcessor and what is it used for? When is it invoked?
   - Why would you define a static @Bean method?
   - What is a ProperySourcesPlaceholderConfigurer used for?
