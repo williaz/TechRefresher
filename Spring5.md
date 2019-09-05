@@ -221,11 +221,30 @@ public class MyJavaConfigWebApplicationInitializer implements WebApplicationInit
 @ContextConfiguration(classes=MyConfiguration.class)
 
 //Junit 5
+/* The @SpringJUnitConfig annotation is a combination of the JUnit 5
+* @ExtendWith(SpringExtension.class) annotation and the Spring
+* @ContextConfiguration annotation.
+*/
 @SpringJUnitConfig(classes=MyConfiguration.class)
 
+// add for creating web type's          
+@WebAppConfiguration
 ```
 
-- What is the preferred way to close an application context? Does Spring Boot do this for you?
+- [ ] What is the preferred way to close an application context? Does Spring Boot do this for you?
+          
+- Standalone app
+  - Registering a shutdown-hook by calling registerShutdownHook() and implements AbstractApplicationContext
+    - context would be closed when JVM shut down normally
+    - Recommanded
+  - Calling close(); close immediately
+- Web
+  - taken care of by the ContextLoaderListener, which implements ServletContextListener;
+  - it will receive ServletContextEvent when web container stops
+- Boot
+  - auto register a shutdown-hook
+  - same as web
+          
 - Can you describe:
   - Dependency injection using Java configuration?
   - Dependency injection using annotations (@Component, @Autowired)?
