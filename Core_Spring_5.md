@@ -1,3 +1,141 @@
+- [x] What is a BeanFactoryPostProcessor and what is it used for? When is it invoked?
+- An interface with a method to modify bean meta-data at a container extension point(after prop and dep of bean are set)
+- lifecycle: bean def -> BeanFactoryPostProcessor -> bean constructed -> prop and dep injected -> BeanPostProcessor -> bean init method -> bean ready for use
+- ex:
+  - DeprecatedBeanWarner
+  - PropertySourcesPlaceholderConfigurer
+    - @Value, properties-file
+  - PropertyOverrideConfigurer
+```java
+@Bean
+public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
+return new PropertySourcesPlaceholderConfigurer();
+}
+```
+- use @Order to order bean def method
+- impl own with Ordered interface
+  - [x] Why would you define a static @Bean method?
+  - bean like that need to be instantiated prior to the instantiation of any beans used it
+  - [x] What is a ProperySourcesPlaceholderConfigurer used for?
+  - **resolves property placeholders**, on the ${PROPERTY_NAME} format, in Spring bean properties with  **@Value** annotation.
+  - Using property placeholders, Spring bean configuration can be **externalized** into property files
+- [x] What is a BeanPostProcessor and how is it different to a BeanFactoryPostProcessor? What do they do?
+When are they called?
+- both allow for def of container extensions
+  - operate on beans; 
+  - can use Order interface(ower earlier)
+  - static method
+- A BeanPostProcessor is an interface that defines **callback** methods called after bean instaniated to modify or replace(AOP) **bean instance** (BeanFactoryPostProcessor modify bean definitions.)
+- BeanPostProcessor-s can be **registered programmatically** using the addBeanPostProcessor method as defined in the ConfigurableBeanFactory interface.
+  - AutowiredAnnotationBeanPostProcessor: @Autowired
+  - PersistenceExceptionTranslationPostProcessor: @Repository
+  - [x] What is an initialization method and how is it declared on a Spring bean?
+  - perform any initialization that depend on the properties of the bean to have been set
+  - 1. afterPropertiesSet of InitializingBean(No Recommanded as coupled with Spring)
+  - 2. Annotate the initialization method with the @PostConstruct
+  - 3. Use the initMethod element init() of the @Bean annotation.
+```java
+public class ExampleBean {
+
+    public void init() {
+        // do some initialization work
+    }
+    
+    public void cleanup() {
+        // do some destruction work (like releasing pooled connections)
+    }
+}
+```
+  - [x] What is a destroy method, how is it declared and when is it called?
+  - invoked immediately before the bean is to be taken out of use
+  - 1. destroy() method of DisposableBean interface (X)
+  - 2. Annotate the initialization method with the @PreDestroy
+  - 3. Use the destroyMethod element cleanup() of the @Bean annotation
+  - By default, beans defined using Java config that have a public close or shutdown method are automatically enlisted with a destruction callback. If you have a public close or shutdown method and you do not wish for it to be called when the container shuts down, simply add @Bean(destroyMethod="") to your bean definition to disable the default (inferred) mode.
+    - do that by default for a resource that you acquire via JNDI as its lifecycle is managed outside the application. In particular, make sure to always do it for a DataSource 
+   - [x] Consider how you enable JSR-250 annotations like @PostConstruct and @PreDestroy? When/how will they get called?
+   - The CommonAnnotationBeanPostProcessor support, among other annotations, the @PostConstruct and @PreDestroy JSR-250 annotations.
+   - uses annotation-based context, a default CommonAnnotationBeanPostProcessor is automatically registered
+   - [x] How else can you define an initialization or destruction method for a Spring bean?
+   - init(), destory()
+
+- [x] What does component-scanning do?
+- search for bean defs
+- [] What is the behavior of the annotation @Autowired with regards to field injection, constructor injection and method injection?
+- Autowiring is a mechanism which enables more or less automatic dependency resolution primarily based on types.
+  - search bean with type match -> @Primary -> @Qualifier -> name of field -> exception
+- @Autowired(@Inject)
+  - AutowiredAnnotationBeanPostProcessor.
+    - the @Autowired annotation cannot be used in neither BeanPostProcessor-s nor in BeanFactoryPostProcessor-s.
+  - on array/Collection: collect all beans
+  - on map: bean name as key
+    - annotate the @Bean methods with the @Order or @Priority annotations for ordering
+    - an empty array, collection or map will not be injected unless marked as optional => null
+  - any visibility
+```java 
+public class MovieRecommender {
+
+    @Autowired
+    private MovieCatalog[] movieCatalogs;
+
+    // ...
+    
+    @Autowired
+    public void setMovieFinder(Optional<MovieFinder> movieFinder) {
+        ...
+    }
+    
+    @Autowired
+    public void setMovieFinder(@Nullable MovieFinder movieFinder) {
+        ...
+    }
+}
+
+
+```
+- [ ] What do you have to do, if you would like to inject something into a private field? Ho does this impact testing?
+- Using the annotations @Autowired or @Value to annotate private fields in a class in order to
+perform injection of dependencies or values is perfectly feasible if the source-code can be modified.
+- use constructor-parameter dependency injection, where the reference or
+value of the private field is assigned a value in the constructor using a constructor-parameter.
+- TestinG:  replace the reference injected with a mock bean by using a test configuration that replaces the
+original bean.
+  - @TestPropertySource: To customize property values in a test
+  - ReflectionTestUtils class
+- How does the @Qualifier annotation complement the use of @Autowired?
+- What is a proxy object and what are the two different types of proxies Spring can create?
+  - What are the limitations of these proxies (per type)?
+  - What is the power of a proxy object and where are the disadvantages?
+- What are the advantages of Java Config? What are the limitations?
+- What does the @Bean annotation do?
+- What is the default bean id if you only use @Bean? How can you override this?
+- Why are you not allowed to annotate a final class with @Configuration
+  - How do @Configuration annotated classes support singleton beans?
+  - Why can’t @Bean methods be final either?
+- How do you configure profiles?, What are possible use cases where they might be useful?
+- Can you use @Bean together with @Profile?
+- Can you use @Component together with @Profile?
+- How many profiles can you have?
+- How do you inject scalar/literal values into Spring beans?
+- What is @Value used for?
+- What is Spring Expression Language (SpEL for short)?
+- What is the Environment abstraction in Spring?
+- Where can properties in the environment come from – there are many sources for
+- properties – check the documentation if not sure. Spring Boot adds even more.
+- What can you reference using SpEL?
+- What is the difference between $ and # in @Value expressions?
+
+
+
+
+
+
+
+
+
+
+
+
 [todo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "TODO logo"
 
 ## Agenda:
