@@ -166,7 +166,9 @@ public class MyXmlWebApplicationInitializer implements WebApplicationInitializer
     }
 }
 ```
+
       - AnnotationConfigWebApplicationContext
+
 ```java
 public class MyJavaConfigWebApplicationInitializer implements WebApplicationInitializer {
     @Override
@@ -189,6 +191,8 @@ public class MyJavaConfigWebApplicationInitializer implements WebApplicationInit
     }
 }
 ```
+
+
 - [ ] Can you describe the lifecycle of a Spring Bean in an ApplicationContext?
   - Spring bean configuration is read and metadata in the form of a BeanDefinition object is created for each bean.
   - All instances of BeanFactoryPostProcessor are invoked in sequence and are allowed an opportunity to alter the bean metadata.
@@ -201,6 +205,7 @@ public class MyJavaConfigWebApplicationInitializer implements WebApplicationInit
       - Any afterPropertiesSet method in a bean implementation class implementing the InitializingBean interface is invoked.
         - This processing is performed by a BeanPostProcessor. If the same initialization method has already been invoked, it will not be invoked again.
       - Any custom bean initialization method is invoked.
+
         - Bean initialization methods can be specified either in the value of the init-method attribute in the corresponding <bean> element in a Spring XML configuration or in the initMethod property of the @Bean annotation.
         - This processing is performed by a BeanPostProcessor. If the same initialization method has already been invoked, it will not be invoked again.
      - The bean is ready for use.
@@ -213,7 +218,7 @@ public class MyJavaConfigWebApplicationInitializer implements WebApplicationInit
       - If the same destruction method has already been invoked, it will not be invoked again.
   
 - [ ] How are you going to create an ApplicationContext in an integration test test?
-
+          
 - @RunWith (JUnit 4) or @ExtendWith (JUnit 5) is used to annotate the test-class.
 - @ContextConfiguration for xml/Java config class
 ```java
@@ -312,44 +317,7 @@ websocket: Single bean instance per WebSocket.
 @Configuration
 @PropertySource("classpath:testproperties.properties")
 ```
-- What is a BeanFactoryPostProcessor and what is it used for? When is it invoked?
-  - Why would you define a static @Bean method?
-  - What is a ProperySourcesPlaceholderConfigurer used for?
-- What is a BeanPostProcessor and how is it different to a BeanFactoryPostProcessor? What do they do?
-When are they called?
-  - What is an initialization method and how is it declared on a Spring bean?
-  - What is a destroy method, how is it declared and when is it called?
-    - Consider how you enable JSR-250 annotations like @PostConstruct and
-    - @PreDestroy? When/how will they get called?
-    - How else can you define an initialization or destruction method for a Spring bean?
 
-- What does component-scanning do?
-- What is the behavior of the annotation @Autowired with regards to field injection,
-- constructor injection and method injection?
-- What do you have to do, if you would like to inject something into a private field? Ho does
-- this impact testing?
-- How does the @Qualifier annotation complement the use of @Autowired?
-- What is a proxy object and what are the two different types of proxies Spring can create?
-  - What are the limitations of these proxies (per type)?
-  - What is the power of a proxy object and where are the disadvantages?
-- What are the advantages of Java Config? What are the limitations?
-- What does the @Bean annotation do?
-- What is the default bean id if you only use @Bean? How can you override this?
-- Why are you not allowed to annotate a final class with @Configuration
-  - How do @Configuration annotated classes support singleton beans?
-  - Why can’t @Bean methods be final either?
-- How do you configure profiles?, What are possible use cases where they might be useful?
-- Can you use @Bean together with @Profile?
-- Can you use @Component together with @Profile?
-- How many profiles can you have?
-- How do you inject scalar/literal values into Spring beans?
-- What is @Value used for?
-- What is Spring Expression Language (SpEL for short)?
-- What is the Environment abstraction in Spring?
-- Where can properties in the environment come from – there are many sources for
-- properties – check the documentation if not sure. Spring Boot adds even more.
-- What can you reference using SpEL?
-- What is the difference between $ and # in @Value expressions?
 ### 2.ASPECT ORIENTED PROGRAMMING
 - What is the concept of AOP? Which problem does it solve? What is a cross cutting concern?
   - Name three typical cross cutting concerns.
