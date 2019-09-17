@@ -93,7 +93,7 @@ public class MovieRecommender {
 
 
 ```
-- [ ] What do you have to do, if you would like to inject something into a private field? Ho does this impact testing?
+- [ ] What do you have to do, if you would like to inject something into a private field? How does this impact testing?
 - Using the annotations @Autowired or @Value to annotate private fields in a class in order to
 perform injection of dependencies or values is perfectly feasible if the source-code can be modified.
 - use constructor-parameter dependency injection, where the reference or
@@ -102,13 +102,55 @@ value of the private field is assigned a value in the constructor using a constr
 original bean.
   - @TestPropertySource: To customize property values in a test
   - ReflectionTestUtils class
-- How does the @Qualifier annotation complement the use of @Autowired?
-- What is a proxy object and what are the two different types of proxies Spring can create?
-  - What are the limitations of these proxies (per type)?
-  - What is the power of a proxy object and where are the disadvantages?
-- What are the advantages of Java Config? What are the limitations?
-- What does the @Bean annotation do?
-- What is the default bean id if you only use @Bean? How can you override this?
+- [x] How does the @Qualifier annotation complement the use of @Autowired?
+- @Qualifer when multiple beans of the same type
+  - at Injection points: with @Autowired to select bean
+  - at Bean def: with @BEan to supply a name
+  - at Annotation def: crate custom @
+- [ ] What is a proxy object and what are the two different types of proxies Spring can create?
+- Decorator design pattern
+  - same methods(at least same public) => proxy is indistinguishable from the object it proxies
+  - as a reference to the org object +. when org obj is requested, proxy is supplied
+  - invoke method on proxy
+- Spring Proxy
+  - JDK Dynamic Proxy(default)
+    - Creates a proxy object that **implements all the interfaces** implemented by the proxied object.
+    - Does not support self-invocations
+      - Self-invocation is where one method of the object invokes another method on the same object.
+  - CGLIB Proxy
+    - Creates a **subclass** of the class of the object to be proxied.
+    - no final class/method, no self-invocations
+  - [x] What are the limitations of these proxies (per type)?
+  - [x] What is the power of a proxy object and where are the disadvantages?
+  - power:
+    - add behavior to existing beans: transaction, logging
+    - sepearte concerns
+  - disadv:
+    - proxy may chose not invoke the proxy obj
+    - take care of order if multiple layers
+    - Can only throw checked exceptions as declared on the original method.@@
+      - Any recoverable errors in proxy objects that are not covered by checked exceptions declared on the original method may need to result in unchecked exceptions.
+    - overhead: external resources
+    - object identity issue: obj != proxy
+- [x] What are the advantages of Java Config? What are the limitations?
+- @Configuration class
+  - regualr Java refactoring tool
+  - type- check from IDE
+  - Can be used with arbitrary classes: Java, Groovy, Kotlin, Scala etc
+  - Separation of concerns: bean impl vs bean config
+- limitation:
+  - Configuration classes cannot be final.
+  - subclassed by the Spring container using CGLIB
+- [x] What does the @Bean annotation do?
+- tells IoC the method annotated with the @Bean annotation will instantiate, configure and initialize an object that is to be managed by IoC.
+- @Bean(name = "myFoo")
+- @Scope("prototype")
+- initMethod, destringMethod: @Bean(initMethod = "init") @Bean(destroyMethod = "cleanup")
+- bean aliasing: multi-names: @Bean(name = { "dataSource", "subsystemA-dataSource", "subsystemB-dataSource" })
+- default bean name is the name of the method
+
+- [x] What is the default bean id if you only use @Bean? How can you override this?
+- bean default name: method name; @Qualifier or name attr
 - Why are you not allowed to annotate a final class with @Configuration
   - How do @Configuration annotated classes support singleton beans?
   - Why can’t @Bean methods be final either?
