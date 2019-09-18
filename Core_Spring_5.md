@@ -151,23 +151,76 @@ original bean.
 
 - [x] What is the default bean id if you only use @Bean? How can you override this?
 - bean default name: method name; @Qualifier or name attr
-- Why are you not allowed to annotate a final class with @Configuration
-  - How do @Configuration annotated classes support singleton beans?
-  - Why can’t @Bean methods be final either?
-- How do you configure profiles?, What are possible use cases where they might be useful?
-- Can you use @Bean together with @Profile?
-- Can you use @Component together with @Profile?
-- How many profiles can you have?
-- How do you inject scalar/literal values into Spring beans?
-- What is @Value used for?
-- What is Spring Expression Language (SpEL for short)?
-- What is the Environment abstraction in Spring?
-- Where can properties in the environment come from – there are many sources for
-- properties – check the documentation if not sure. Spring Boot adds even more.
-- What can you reference using SpEL?
-- What is the difference between $ and # in @Value expressions?
+- [x] Why are you not allowed to annotate a final class with @Configuration
+- CGLIB, need subclass config class
+  - [x] How do @Configuration annotated classes support singleton beans?
+  - proxy of config class intercepts bean creation method, if existed, return directly; else trigger config class @Bean method
+  - [x] Why can’t @Bean methods be final either?
+  - proxy class need override it
+- [x] How do you configure profiles?, What are possible use cases where they might be useful?
+- profile: register bean depends on conditions
+  - env
+  - performance monitoring
+  - app customization
+```java
+@Profile("!prod")
 
+@Profile({"dev", "qa"})
+```
+- apply on @Configuration; @Component; @Bean
+- Beans that do not belong to any profile will always be created and registered regardless of which profile(s) are active.
+- Activating Profile
+  - programmatic for IoC
+  - spring.profiles.active
+  - test: @ActiveProfiles on class
+  - There is a default profile named “default” that will be active if no other profile is activated
+```java
+final AnnotationConfigApplicationContext theApplicationContext =
+new AnnotationConfigApplicationContext();
+theApplicationContext.getEnvironment().setActiveProfiles("dev1", "dev2");
+theApplicationContext.scan("se.ivankrizsan.spring");
+theApplicationContext.refresh();
 
+java -Dspring.profiles.active=dev1,dev2 -jar myApp.jar
+```
+  
+- [x] Can you use @Bean together with @Profile?
+- [x] Can you use @Component together with @Profile?
+- [x] How many profiles can you have?
+- The Spring framework (in the class ActiveProfilesUtils) use an integer to iterate over an array of active profiles, which implies a maximum number of 2^32 – 1 profiles. 
+
+- [x] How do you inject scalar/literal values into Spring beans?
+- @Value: env, prop, beans
+  - @Value("${personservice.retry-count}")
+  - SpEL: @Value("#{ T(java.lang.Math).random() * 50.0 }")
+- on field, method, method param, def of @
+
+- [x] What is @Value used for?
+- [x] What is Spring Expression Language (SpEL for short)?[SpEL](https://docs.spring.io/spring/docs/5.0.3.RELEASE/spring-framework-reference/core.html#expressions)
+- supports querying and manipulating an object graph at runtime
+- referencing bean: @mySuperComponent.injectedValue
+- create map: {1 : "one", 2 : "two", 3 : "three", 4 : "four"}
+- access variables: #num, #countMap\['xyz']
+- Method invocation: #javaObject.firstAndLastName()
+
+- [x] What is the Environment abstraction in Spring?
+- The Environment is a part of the application container. The Environment contains profiles and properties(JVM, Sys; Servlet, ServletContext, JNDI)
+- ApplicationContext interface extends the EnvironmentCapable interface, which contain one single method namely the getEnvironment method,
+- [x] Where can properties in the environment come from – there are many sources for properties – check the documentation if not sure. Spring Boot adds even more.
+- [x] What can you reference using SpEL?
+- static method/field: T(se.ivankrizsan.spring.MyBeanClass).myStaticMethod()
+- bean's method/field: @mySuperComponent.toString()
+- Properties and methods in Java objects with references stored in SpEL variables: #javaObject.firstName
+- (JVM) System properties:@systemProperties\['os.name']
+- System environment properties: @systemEnvironment\['KOTLIN_HOME']
+- Spring application environment: @environment\['defaultProfiles']\[0]
+
+- [x] What is the difference between $ and # in @Value expressions?
+- $
+  - can only be used in @Value
+  - refering property name in the application’s environment
+  - evaluated by the PropertySourcesPlaceholderConfigurer
+- # SpEL
 
 
 
