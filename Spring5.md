@@ -317,6 +317,229 @@ websocket: Single bean instance per WebSocket.
 @Configuration
 @PropertySource("classpath:testproperties.properties")
 ```
+- [x] What is a BeanFactoryPostProcessor and what is it used for? When is it invoked?
+- An interface with a method to modify bean meta-data at a container extension point(after prop and dep of bean are set)
+- lifecycle: bean def -> BeanFactoryPostProcessor -> bean constructed -> prop and dep injected -> BeanPostProcessor -> bean init method -> bean ready for use
+- ex:
+  - DeprecatedBeanWarner
+  - PropertySourcesPlaceholderConfigurer
+    - @Value, properties-file
+  - PropertyOverrideConfigurer
+```java
+@Bean
+public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
+return new PropertySourcesPlaceholderConfigurer();
+}
+```
+- use @Order to order bean def method
+- impl own with Ordered interface
+  - [x] Why would you define a static @Bean method?
+  - bean like that need to be instantiated prior to the instantiation of any beans used it
+  - [x] What is a ProperySourcesPlaceholderConfigurer used for?
+  - **resolves property placeholders**, on the ${PROPERTY_NAME} format, in Spring bean properties with  **@Value** annotation.
+  - Using property placeholders, Spring bean configuration can be **externalized** into property files
+- [x] What is a BeanPostProcessor and how is it different to a BeanFactoryPostProcessor? What do they do?
+When are they called?
+- both allow for def of container extensions
+  - operate on beans; 
+  - can use Order interface(ower earlier)
+  - static method
+- A BeanPostProcessor is an interface that defines **callback** methods called after bean instaniated to modify or replace(AOP) **bean instance** (BeanFactoryPostProcessor modify bean definitions.)
+- BeanPostProcessor-s can be **registered programmatically** using the addBeanPostProcessor method as defined in the ConfigurableBeanFactory interface.
+  - AutowiredAnnotationBeanPostProcessor: @Autowired
+  - PersistenceExceptionTranslationPostProcessor: @Repository
+  - [x] What is an initialization method and how is it declared on a Spring bean?
+  - perform any initialization that depend on the properties of the bean to have been set
+  - 1. afterPropertiesSet of InitializingBean(No Recommanded as coupled with Spring)
+  - 2. Annotate the initialization method with the @PostConstruct
+  - 3. Use the initMethod element init() of the @Bean annotation.
+```java
+public class ExampleBean {
+
+    public void init() {
+        // do some initialization work
+    }
+    
+    public void cleanup() {
+        // do some destruction work (like releasing pooled connections)
+    }
+}
+```
+  - [x] What is a destroy method, how is it declared and when is it called?
+  - invoked immediately before the bean is to be taken out of use
+  - 1. destroy() method of DisposableBean interface (X)
+  - 2. Annotate the initialization method with the @PreDestroy
+  - 3. Use the destroyMethod element cleanup() of the @Bean annotation
+  - By default, beans defined using Java config that have a public close or shutdown method are automatically enlisted with a destruction callback. If you have a public close or shutdown method and you do not wish for it to be called when the container shuts down, simply add @Bean(destroyMethod="") to your bean definition to disable the default (inferred) mode.
+    - do that by default for a resource that you acquire via JNDI as its lifecycle is managed outside the application. In particular, make sure to always do it for a DataSource 
+   - [x] Consider how you enable JSR-250 annotations like @PostConstruct and @PreDestroy? When/how will they get called?
+   - The CommonAnnotationBeanPostProcessor support, among other annotations, the @PostConstruct and @PreDestroy JSR-250 annotations.
+   - uses annotation-based context, a default CommonAnnotationBeanPostProcessor is automatically registered
+   - [x] How else can you define an initialization or destruction method for a Spring bean?
+   - init(), destory()
+
+- [x] What does component-scanning do?
+- search for bean defs
+- [] What is the behavior of the annotation @Autowired with regards to field injection, constructor injection and method injection?
+- Autowiring is a mechanism which enables more or less automatic dependency resolution primarily based on types.
+  - search bean with type match -> @Primary -> @Qualifier -> name of field -> exception
+- @Autowired(@Inject)
+  - AutowiredAnnotationBeanPostProcessor.
+    - the @Autowired annotation cannot be used in neither BeanPostProcessor-s nor in BeanFactoryPostProcessor-s.
+  - on array/Collection: collect all beans
+  - on map: bean name as key
+    - annotate the @Bean methods with the @Order or @Priority annotations for ordering
+    - an empty array, collection or map will not be injected unless marked as optional => null
+  - any visibility
+```java 
+public class MovieRecommender {
+
+    @Autowired
+    private MovieCatalog[] movieCatalogs;
+
+    // ...
+    
+    @Autowired
+    public void setMovieFinder(Optional<MovieFinder> movieFinder) {
+        ...
+    }
+    
+    @Autowired
+    public void setMovieFinder(@Nullable MovieFinder movieFinder) {
+        ...
+    }
+}
+
+
+```
+- [ ] What do you have to do, if you would like to inject something into a private field? How does this impact testing?
+- Using the annotations @Autowired or @Value to annotate private fields in a class in order to
+perform injection of dependencies or values is perfectly feasible if the source-code can be modified.
+- use constructor-parameter dependency injection, where the reference or
+value of the private field is assigned a value in the constructor using a constructor-parameter.
+- TestinG:  replace the reference injected with a mock bean by using a test configuration that replaces the
+original bean.
+  - @TestPropertySource: To customize property values in a test
+  - ReflectionTestUtils class
+- [x] How does the @Qualifier annotation complement the use of @Autowired?
+- @Qualifer when multiple beans of the same type
+  - at Injection points: with @Autowired to select bean
+  - at Bean def: with @BEan to supply a name
+  - at Annotation def: crate custom @
+- [ ] What is a proxy object and what are the two different types of proxies Spring can create?
+- Decorator design pattern
+  - same methods(at least same public) => proxy is indistinguishable from the object it proxies
+  - as a reference to the org object +. when org obj is requested, proxy is supplied
+  - invoke method on proxy
+- Spring Proxy
+  - JDK Dynamic Proxy(default)
+    - Creates a proxy object that **implements all the interfaces** implemented by the proxied object.
+    - Does not support self-invocations
+      - Self-invocation is where one method of the object invokes another method on the same object.
+  - CGLIB Proxy
+    - Creates a **subclass** of the class of the object to be proxied.
+    - no final class/method, no self-invocations
+  - [x] What are the limitations of these proxies (per type)?
+  - [x] What is the power of a proxy object and where are the disadvantages?
+  - power:
+    - add behavior to existing beans: transaction, logging
+    - sepearte concerns
+  - disadv:
+    - proxy may chose not invoke the proxy obj
+    - take care of order if multiple layers
+    - Can only throw checked exceptions as declared on the original method.@@
+      - Any recoverable errors in proxy objects that are not covered by checked exceptions declared on the original method may need to result in unchecked exceptions.
+    - overhead: external resources
+    - object identity issue: obj != proxy
+- [x] What are the advantages of Java Config? What are the limitations?
+- @Configuration class
+  - regualr Java refactoring tool
+  - type- check from IDE
+  - Can be used with arbitrary classes: Java, Groovy, Kotlin, Scala etc
+  - Separation of concerns: bean impl vs bean config
+- limitation:
+  - Configuration classes cannot be final.
+  - subclassed by the Spring container using CGLIB
+- [x] What does the @Bean annotation do?
+- tells IoC the method annotated with the @Bean annotation will instantiate, configure and initialize an object that is to be managed by IoC.
+- @Bean(name = "myFoo")
+- @Scope("prototype")
+- initMethod, destringMethod: @Bean(initMethod = "init") @Bean(destroyMethod = "cleanup")
+- bean aliasing: multi-names: @Bean(name = { "dataSource", "subsystemA-dataSource", "subsystemB-dataSource" })
+- default bean name is the name of the method
+
+- [x] What is the default bean id if you only use @Bean? How can you override this?
+- bean default name: method name; @Qualifier or name attr
+- [x] Why are you not allowed to annotate a final class with @Configuration
+- CGLIB, need subclass config class
+  - [x] How do @Configuration annotated classes support singleton beans?
+  - proxy of config class intercepts bean creation method, if existed, return directly; else trigger config class @Bean method
+  - [x] Why can’t @Bean methods be final either?
+  - proxy class need override it
+- [x] How do you configure profiles?, What are possible use cases where they might be useful?
+- profile: register bean depends on conditions
+  - env
+  - performance monitoring
+  - app customization
+```java
+@Profile("!prod")
+
+@Profile({"dev", "qa"})
+```
+- apply on @Configuration; @Component; @Bean
+- Beans that do not belong to any profile will always be created and registered regardless of which profile(s) are active.
+- Activating Profile
+  - programmatic for IoC
+  - spring.profiles.active
+  - test: @ActiveProfiles on class
+  - There is a default profile named “default” that will be active if no other profile is activated
+```java
+final AnnotationConfigApplicationContext theApplicationContext =
+new AnnotationConfigApplicationContext();
+theApplicationContext.getEnvironment().setActiveProfiles("dev1", "dev2");
+theApplicationContext.scan("se.ivankrizsan.spring");
+theApplicationContext.refresh();
+
+java -Dspring.profiles.active=dev1,dev2 -jar myApp.jar
+```
+  
+- [x] Can you use @Bean together with @Profile?
+- [x] Can you use @Component together with @Profile?
+- [x] How many profiles can you have?
+- The Spring framework (in the class ActiveProfilesUtils) use an integer to iterate over an array of active profiles, which implies a maximum number of 2^32 – 1 profiles. 
+
+- [x] How do you inject scalar/literal values into Spring beans?
+- @Value: env, prop, beans
+  - @Value("${personservice.retry-count}")
+  - SpEL: @Value("#{ T(java.lang.Math).random() * 50.0 }")
+- on field, method, method param, def of @
+
+- [x] What is @Value used for?
+- [x] What is Spring Expression Language (SpEL for short)?[SpEL](https://docs.spring.io/spring/docs/5.0.3.RELEASE/spring-framework-reference/core.html#expressions)
+- supports querying and manipulating an object graph at runtime
+- referencing bean: @mySuperComponent.injectedValue
+- create map: {1 : "one", 2 : "two", 3 : "three", 4 : "four"}
+- access variables: #num, #countMap\['xyz']
+- Method invocation: #javaObject.firstAndLastName()
+
+- [x] What is the Environment abstraction in Spring?
+- The Environment is a part of the application container. The Environment contains profiles and properties(JVM, Sys; Servlet, ServletContext, JNDI)
+- ApplicationContext interface extends the EnvironmentCapable interface, which contain one single method namely the getEnvironment method,
+- [x] Where can properties in the environment come from – there are many sources for properties – check the documentation if not sure. Spring Boot adds even more.
+- [x] What can you reference using SpEL?
+- static method/field: T(se.ivankrizsan.spring.MyBeanClass).myStaticMethod()
+- bean's method/field: @mySuperComponent.toString()
+- Properties and methods in Java objects with references stored in SpEL variables: #javaObject.firstName
+- (JVM) System properties:@systemProperties\['os.name']
+- System environment properties: @systemEnvironment\['KOTLIN_HOME']
+- Spring application environment: @environment\['defaultProfiles']\[0]
+
+- [x] What is the difference between $ and # in @Value expressions?
+- $
+  - can only be used in @Value
+  - refering property name in the application’s environment
+  - evaluated by the PropertySourcesPlaceholderConfigurer
+- # SpEL
 
 ### 2.ASPECT ORIENTED PROGRAMMING
 - What is the concept of AOP? Which problem does it solve? What is a cross cutting concern?
