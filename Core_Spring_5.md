@@ -1,3 +1,102 @@
+### 6.SECURITY
+Please note that @Secured and the Spring Security JSP tag library may be referenced in the exam but are not
+in the main course notes. @Secured is in the advanced section.
+- [x] What are authentication and authorization? Which must come first?
+- Authentication: confrim info is true => verify user
+  - Spring security authen process:
+    - combine user and password in UsernamePasswordAuthenticationToken instance
+    - token is passed to an instance of AuthenticationManager for validation
+    - AuthenticationManager returns a fully populated Authentication instance on successful authentication.
+    - security context is established by calling SecurityContextHolder.getContext().setAuthentication(…), passing in the returned authentication object.
+- Authorization: permission, access to resource
+- authen first
+
+- [x] Is security a cross cutting concern? How is it implemented internally?
+- yes
+- Spring AOP proxy that inherits from the AbstractSecurityInterceptor
+  - Applied to method invocation authorization on objects secured with Spring Security
+- Web: servlet filters.
+  - The DelegatingFilterProxy delegates to a FilterChainProxy. 
+  - The FilterChainProxy is defined as a Spring bean and takes one or more SecurityFilterChain instances as constructor parameter(s).
+  - A SecurityFilterChain associates a request URL pattern with a list of (security) filters
+- Spring Security Core Components
+  - SecurityContextHolder: Contains and provides access to the SecurityContext of the application. Default behavior is to **associate the SecurityContext** with the current thread.
+  - SecurityContext: Default and only implementation in Spring Security **holds an Authentication** object.
+  - Authentication: Represents token for authentication request or authenticated **principal**, contains its **granted authorities**
+  - GrantedAuthority: Represents **an authority** granted to an authenticated principal.
+  - UserDetails: user info, create Authentication
+  - UserDetailsService: retrieves information about the user in a UserDetails
+```
+SecurityContextHolder, to provide access to the SecurityContext.
+SecurityContext, to hold the Authentication and possibly request-specific security information.
+Authentication, to represent the principal in a Spring Security-specific manner.
+GrantedAuthority, to reflect the application-wide permissions granted to a principal.
+UserDetails, to provide the necessary information to build an Authentication object from your application’s DAOs or other source of security data.
+UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
+```
+
+- [] What is the delegating filter proxy?
+- DelegatingFilterProxy class implements the javax.servlet.Filter interface 
+  - servlet filter
+  - delegate filtering to a bean
+    - The servlet filter bean lifecycle methods init and destroy will by default not be called.
+      - to enable: targetFilterLifecycle property to true
+
+- [x] What is the security filter chain?
+- a SecurityFilterChain associates a request URL pattern with a list of (security) filters
+- implements the SecurityFilterChain interface, only impl: DefaultSecurityFilterChain class
+  - order matters
+- request matcher
+  - RequestMatcher interface
+  - MvcRequestMatcher and AntPathRequestMatcher.
+  - URL pattern
+- Filters
+  - DefaultSecurityFilterChain constructor takes args as request matcher first then optional filter with below order
+
+    - ChannelProcessingFilter, because it might need to redirect to a different protocol
+    - SecurityContextPersistenceFilter, so a SecurityContext can be set up in the SecurityContextHolder at the beginning of a web request, and any changes to the SecurityContext can be copied to the HttpSession when the web request ends (ready for use with the next web request)
+    - ConcurrentSessionFilter, because it uses the SecurityContextHolder functionality and needs to update the SessionRegistry to reflect ongoing requests from the principal
+    - Authentication processing mechanisms - UsernamePasswordAuthenticationFilter, CasAuthenticationFilter, BasicAuthenticationFilter etc - so that the SecurityContextHolder can be modified to contain a valid Authentication request token
+    - The SecurityContextHolderAwareRequestFilter, if you are using it to install a Spring Security aware HttpServletRequestWrapper into your servlet container
+    - The JaasApiIntegrationFilter, if a JaasAuthenticationToken is in the SecurityContextHolder this will process the FilterChain as the Subject in the JaasAuthenticationToken
+    - RememberMeAuthenticationFilter, so that if no earlier authentication processing mechanism updated the SecurityContextHolder, and the request presents a cookie that enables remember-me services to take place, a suitable remembered Authentication object will be put there
+    - AnonymousAuthenticationFilter, so that if no earlier authentication processing mechanism updated the SecurityContextHolder, an anonymous Authentication object will be put there
+     - ExceptionTranslationFilter, to catch any Spring Security exceptions so that either an HTTP error response can be returned or an appropriate AuthenticationEntryPoint can be launched
+     - FilterSecurityInterceptor, to protect web URIs and raise exceptions when access is denied
+
+
+- What is a security context?
+- Why do you need the intercept-url?
+- In which order do you have to write multiple intercept-url's?
+- What does the ** pattern in an antMatcher or mvcMatcher do?
+- Why is an mvcMatcher more secure than an antMatcher?
+- Does Spring Security support password hashing? What is salting?
+- Why do you need method security? What type of object is typically secured at the method level (think of
+its purpose not its Java type).
+- What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
+  - What does Spring’s @Secured do?
+  - How are these annotations implemented?
+  - In which security annotation are you allowed to use SpEL?
+- Is it enough to hide sections of my output (e.g. JSP-Page or Mustache template)?
+  - Spring security offers a security tag library for JSP, would you recognize it if you saw it in an
+example?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 - [x] What is a BeanFactoryPostProcessor and what is it used for? When is it invoked?
 - An interface with a method to modify bean meta-data at a container extension point(after prop and dep of bean are set)
 - lifecycle: bean def -> BeanFactoryPostProcessor -> bean constructed -> prop and dep injected -> BeanPostProcessor -> bean init method -> bean ready for use
