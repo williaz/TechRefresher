@@ -65,21 +65,140 @@ UserDetailsService, to create a UserDetails when passed in a String-based userna
      - FilterSecurityInterceptor, to protect web URIs and raise exceptions when access is denied
 
 
-- What is a security context?
-- Why do you need the intercept-url?
-- In which order do you have to write multiple intercept-url's?
-- What does the ** pattern in an antMatcher or mvcMatcher do?
+- [x] What is a security context?
+- SecurityContextHolder
+  - store SecurityContext
+  - mode:
+    - Threadlocal
+    - Inheritable thread local
+    - global
+- SecurityContext
+  - min security info
+  - set/get Authentication
+- Authentication
+  - collection of authorities
+  - credentials(user/password)
+  - details
+  - principal
+  - Auth flag
+```java
+Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+if (principal instanceof UserDetails) {
+String username = ((UserDetails)principal).getUsername();
+} else {
+String username = principal.toString();
+}
+```
+- [x] Why do you need the intercept-url?
+- URL pattern & access
+  - access: role
+  - filters
+  - method: HTTP verb
+  - pattern: URL path
+  - request-matcher-ref: RequestMatcher
+  - requirs-channel
+    - http, https, any(default)
+```java
+<intercept-url pattern="/services/users*" access="ROLE_ADMIN" />
+
+protected void configure(final HttpSecurity inHttpSecurity) throws Exception {
+inHttpSecurity
+.authorizeRequests()
+.antMatchers("/services/users/**").hasRole("ADMIN")
+.anyRequest().authenticated()
+.and()
+.formLogin();
+...
+```
+
+
+- [x] In which order do you have to write multiple intercept-url's?
+- once match, stop evaluation
+- more specific earlierm, more general patterns later
+
+- [x] What does the ** pattern in an antMatcher or mvcMatcher do?
+- \*: mathc any path in this level
+- \*\*: match any path start from this level
+- ** or ** match any request
+
 - Why is an mvcMatcher more secure than an antMatcher?
-- Does Spring Security support password hashing? What is salting?
-- Why do you need method security? What type of object is typically secured at the method level (think of
-its purpose not its Java type).
-- What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
-  - What does Spring’s @Secured do?
-  - How are these annotations implemented?
-  - In which security annotation are you allowed to use SpEL?
-- Is it enough to hide sections of my output (e.g. JSP-Page or Mustache template)?
-  - Spring security offers a security tag library for JSP, would you recognize it if you saw it in an
+- antMatchers("/services") only matches the exact “/services” URL
+- mvcMatchers("/services") matches “/services” but also “/services/”, “/services.html” and “/services.abc”.
+  - more forgiving, same matching rule as @RequestMapping, newer
+
+
+- [x] Does Spring Security support password hashing? What is salting?
+- Password Hashing
+  - process of calculating a hash-value for a password
+  - store hash in DB, and compare with encoded user password
+  - PasswordEncoder
+- salting
+  - a seq of random bytes as input with password, store with password
+  - to avoid same hash for certain word
+
+- [x] Why do you need method security? What type of object is typically secured at the method level (think of its purpose not its Java type).
+- Security on the method level needs to be explicitly enabled
+  - @EnableGlobalMethodSecurity
+  - @EnableReactiveMethodSecurity
+- additioanl security level for web, or only layer without web interface
+- commly applied to services layer
+  
+- [x] What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
+- on method or on class
+- @PreAuthorize
+  - evaluate access using SpEL before invocation
+  - @EnableGlobalMethodSecurity(prePostEnabled=true)
+- @RoleAllowed
+  - role-based secuity
+  - @EnableGlobalMethodSecurity(jsr250Enabled=true)
+  
+  - [x] What does Spring’s @Secured do?
+  - legancy
+  - not support SPEL
+  - more than role-based
+  - @EnableGlobalMethodSecurity(securedEnabled=true)
+  
+  - [x] How are these annotations implemented?
+  - AOP
+  - [x] In which security annotation are you allowed to use SpEL?
+  - support SpEL: @PreAutorize, @PostAuthorize, @PreFilter, @PostFilter
+  - Not support: @Secured, @RoleAllowed
+  
+  
+- [x] Is it enough to hide sections of my output (e.g. JSP-Page or Mustache template)?
+- it depends on what information is to be hidden and what the consequences are if the information is displayed to the wrong person(s).
+  - [x] Spring security offers a security tag library for JSP, would you recognize it if you saw it in an
 example?
+  - require to make security tag available: ```<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>```
+```jsp
+<sec:authorize access="hasRole('aadministrator')">
+Hello, I know you are an administrator!
+</sec:authorize>
+
+<sec:authorize url="/resources/users">
+Hello, I know you are an administrator!
+</sec:authorize>
+
+<sec:authentication property="principal.username" />
+
+<sec:accesscontrollist hasPermission="5, 7" domainObject="${order}">
+
+<form action="login" method="post">
+<sec:csrfInput />
+<div><label>User Name: <input type="text" name="username"/> </label></div>
+<div><label>Password : <input type="password" name="password"/> </label></div>
+<div><input type="submit" value="Sign In"/></div>
+</form>
+
+
+
+<sec:csrfMetaTags />
+<script type="text/javascript" language="javascript">
+var csrfParameter = $("meta[name='_csrf_parameter']").attr("content");
+var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+var csrfToken = $("meta[name='_csrf']").attr("content");
+```
 
 
 
@@ -319,7 +438,7 @@ java -Dspring.profiles.active=dev1,dev2 -jar myApp.jar
   - can only be used in @Value
   - refering property name in the application’s environment
   - evaluated by the PropertySourcesPlaceholderConfigurer
-- # SpEL
+- \# SpEL
 
 
 
