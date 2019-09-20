@@ -659,25 +659,205 @@ form-handling annotations for this exam)
 ### 6.SECURITY
 Please note that @Secured and the Spring Security JSP tag library may be referenced in the exam but are not
 in the main course notes. @Secured is in the advanced section.
-- What are authentication and authorization? Which must come first?
-- Is security a cross cutting concern? How is it implemented internally?
-- What is the delegating filter proxy?
-- What is the security filter chain?
-- What is a security context?
-- Why do you need the intercept-url?
-- In which order do you have to write multiple intercept-url's?
-- What does the ** pattern in an antMatcher or mvcMatcher do?
+- [x] What are authentication and authorization? Which must come first?
+- Authentication: confrim info is true => verify user
+  - Spring security authen process:
+    - combine user and password in UsernamePasswordAuthenticationToken instance
+    - token is passed to an instance of AuthenticationManager for validation
+    - AuthenticationManager returns a fully populated Authentication instance on successful authentication.
+    - security context is established by calling SecurityContextHolder.getContext().setAuthentication(…), passing in the returned authentication object.
+- Authorization: permission, access to resource
+- authen first
+
+- [x] Is security a cross cutting concern? How is it implemented internally?
+- yes
+- Spring AOP proxy that inherits from the AbstractSecurityInterceptor
+  - Applied to method invocation authorization on objects secured with Spring Security
+- Web: servlet filters.
+  - The DelegatingFilterProxy delegates to a FilterChainProxy. 
+  - The FilterChainProxy is defined as a Spring bean and takes one or more SecurityFilterChain instances as constructor parameter(s).
+  - A SecurityFilterChain associates a request URL pattern with a list of (security) filters
+- Spring Security Core Components
+  - SecurityContextHolder: Contains and provides access to the SecurityContext of the application. Default behavior is to **associate the SecurityContext** with the current thread.
+  - SecurityContext: Default and only implementation in Spring Security **holds an Authentication** object.
+  - Authentication: Represents token for authentication request or authenticated **principal**, contains its **granted authorities**
+  - GrantedAuthority: Represents **an authority** granted to an authenticated principal.
+  - UserDetails: user info, create Authentication
+  - UserDetailsService: retrieves information about the user in a UserDetails
+```
+SecurityContextHolder, to provide access to the SecurityContext.
+SecurityContext, to hold the Authentication and possibly request-specific security information.
+Authentication, to represent the principal in a Spring Security-specific manner.
+GrantedAuthority, to reflect the application-wide permissions granted to a principal.
+UserDetails, to provide the necessary information to build an Authentication object from your application’s DAOs or other source of security data.
+UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
+```
+
+- [] What is the delegating filter proxy?
+- DelegatingFilterProxy class implements the javax.servlet.Filter interface 
+  - servlet filter
+  - delegate filtering to a bean
+    - The servlet filter bean lifecycle methods init and destroy will by default not be called.
+      - to enable: targetFilterLifecycle property to true
+
+- [x] What is the security filter chain?
+- a SecurityFilterChain associates a request URL pattern with a list of (security) filters
+- implements the SecurityFilterChain interface, only impl: DefaultSecurityFilterChain class
+  - order matters
+- request matcher
+  - RequestMatcher interface
+  - MvcRequestMatcher and AntPathRequestMatcher.
+  - URL pattern
+- Filters
+  - DefaultSecurityFilterChain constructor takes args as request matcher first then optional filter with below order
+
+    - ChannelProcessingFilter, because it might need to redirect to a different protocol
+    - SecurityContextPersistenceFilter, so a SecurityContext can be set up in the SecurityContextHolder at the beginning of a web request, and any changes to the SecurityContext can be copied to the HttpSession when the web request ends (ready for use with the next web request)
+    - ConcurrentSessionFilter, because it uses the SecurityContextHolder functionality and needs to update the SessionRegistry to reflect ongoing requests from the principal
+    - Authentication processing mechanisms - UsernamePasswordAuthenticationFilter, CasAuthenticationFilter, BasicAuthenticationFilter etc - so that the SecurityContextHolder can be modified to contain a valid Authentication request token
+    - The SecurityContextHolderAwareRequestFilter, if you are using it to install a Spring Security aware HttpServletRequestWrapper into your servlet container
+    - The JaasApiIntegrationFilter, if a JaasAuthenticationToken is in the SecurityContextHolder this will process the FilterChain as the Subject in the JaasAuthenticationToken
+    - RememberMeAuthenticationFilter, so that if no earlier authentication processing mechanism updated the SecurityContextHolder, and the request presents a cookie that enables remember-me services to take place, a suitable remembered Authentication object will be put there
+    - AnonymousAuthenticationFilter, so that if no earlier authentication processing mechanism updated the SecurityContextHolder, an anonymous Authentication object will be put there
+     - ExceptionTranslationFilter, to catch any Spring Security exceptions so that either an HTTP error response can be returned or an appropriate AuthenticationEntryPoint can be launched
+     - FilterSecurityInterceptor, to protect web URIs and raise exceptions when access is denied
+
+
+- [x] What is a security context?
+- SecurityContextHolder
+  - store SecurityContext
+  - mode:
+    - Threadlocal
+    - Inheritable thread local
+    - global
+- SecurityContext
+  - min security info
+  - set/get Authentication
+- Authentication
+  - collection of authorities
+  - credentials(user/password)
+  - details
+  - principal
+  - Auth flag
+```java
+Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+if (principal instanceof UserDetails) {
+String username = ((UserDetails)principal).getUsername();
+} else {
+String username = principal.toString();
+}
+```
+- [x] Why do you need the intercept-url?
+- URL pattern & access
+  - access: role
+  - filters
+  - method: HTTP verb
+  - pattern: URL path
+  - request-matcher-ref: RequestMatcher
+  - requirs-channel
+    - http, https, any(default)
+```java
+<intercept-url pattern="/services/users*" access="ROLE_ADMIN" />
+
+protected void configure(final HttpSecurity inHttpSecurity) throws Exception {
+inHttpSecurity
+.authorizeRequests()
+.antMatchers("/services/users/**").hasRole("ADMIN")
+.anyRequest().authenticated()
+.and()
+.formLogin();
+...
+```
+
+
+- [x] In which order do you have to write multiple intercept-url's?
+- once match, stop evaluation
+- more specific earlierm, more general patterns later
+
+- [x] What does the ** pattern in an antMatcher or mvcMatcher do?
+- \*: mathc any path in this level
+- \*\*: match any path start from this level
+- ** or ** match any request
+
 - Why is an mvcMatcher more secure than an antMatcher?
-- Does Spring Security support password hashing? What is salting?
-- Why do you need method security? What type of object is typically secured at the method level (think of
-its purpose not its Java type).
-- What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
-  - What does Spring’s @Secured do?
-  - How are these annotations implemented?
-  - In which security annotation are you allowed to use SpEL?
-- Is it enough to hide sections of my output (e.g. JSP-Page or Mustache template)?
-  - Spring security offers a security tag library for JSP, would you recognize it if you saw it in an
+- antMatchers("/services") only matches the exact “/services” URL
+- mvcMatchers("/services") matches “/services” but also “/services/”, “/services.html” and “/services.abc”.
+  - more forgiving, same matching rule as @RequestMapping, newer
+
+
+- [x] Does Spring Security support password hashing? What is salting?
+- Password Hashing
+  - process of calculating a hash-value for a password
+  - store hash in DB, and compare with encoded user password
+  - PasswordEncoder
+- salting
+  - a seq of random bytes as input with password, store with password
+  - to avoid same hash for certain word
+
+- [x] Why do you need method security? What type of object is typically secured at the method level (think of its purpose not its Java type).
+- Security on the method level needs to be explicitly enabled
+  - @EnableGlobalMethodSecurity
+  - @EnableReactiveMethodSecurity
+- additioanl security level for web, or only layer without web interface
+- commly applied to services layer
+  
+- [x] What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
+- on method or on class
+- @PreAuthorize
+  - evaluate access using SpEL before invocation
+  - @EnableGlobalMethodSecurity(prePostEnabled=true)
+- @RoleAllowed
+  - role-based secuity
+  - @EnableGlobalMethodSecurity(jsr250Enabled=true)
+  
+  - [x] What does Spring’s @Secured do?
+  - legancy
+  - not support SPEL
+  - more than role-based
+  - @EnableGlobalMethodSecurity(securedEnabled=true)
+  
+  - [x] How are these annotations implemented?
+  - AOP
+  - [x] In which security annotation are you allowed to use SpEL?
+  - support SpEL: @PreAutorize, @PostAuthorize, @PreFilter, @PostFilter
+  - Not support: @Secured, @RoleAllowed
+  
+  
+- [x] Is it enough to hide sections of my output (e.g. JSP-Page or Mustache template)?
+- it depends on what information is to be hidden and what the consequences are if the information is displayed to the wrong person(s).
+  - [x] Spring security offers a security tag library for JSP, would you recognize it if you saw it in an
 example?
+  - require to make security tag available: ```<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>```
+```jsp
+<sec:authorize access="hasRole('aadministrator')">
+Hello, I know you are an administrator!
+</sec:authorize>
+
+<sec:authorize url="/resources/users">
+Hello, I know you are an administrator!
+</sec:authorize>
+
+<sec:authentication property="principal.username" />
+
+<sec:accesscontrollist hasPermission="5, 7" domainObject="${order}">
+
+<form action="login" method="post">
+<sec:csrfInput />
+<div><label>User Name: <input type="text" name="username"/> </label></div>
+<div><label>Password : <input type="password" name="password"/> </label></div>
+<div><input type="submit" value="Sign In"/></div>
+</form>
+
+
+
+<sec:csrfMetaTags />
+<script type="text/javascript" language="javascript">
+var csrfParameter = $("meta[name='_csrf_parameter']").attr("content");
+var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+var csrfToken = $("meta[name='_csrf']").attr("content");
+```
+
 
 ### 7.REST
 - What does REST stand for?
