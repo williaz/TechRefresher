@@ -1,3 +1,56 @@
+
+### 7.REST
+- [x] What does REST stand for?
+- REST stands for REpresentational State Transfer and is an **architectural** style which allows clients to **access and manipulate** textual representations of web resources given a set of constraints.
+- 6 Constraints to gain desirable **non-functional** properties, such as performance, scalability, simplicity, modifiability, visibility, portability, and reliability
+  - Client-server architecture: scalability
+  - Statelessness: no client context being stored on the server => state DB
+  - Cacheability: clients and intermediaries can cache responses
+  - Layered system: client won't tell diff => proxy, LB, security
+  - Code on demand (optional): dynamic web page
+  - Uniform interface: 
+    - URI
+    - self-descriptive: MIME
+    - Hypermedia as the engine of application state
+- [x] What is a resource?
+- Any information is a resource as long as we can name it
+- [x] What does CRUD mean?
+- Create, Read, Update and Delete
+- [x] Is REST secure? What can you do to secure it?
+- no by itself, but can add security layer
+- HTTPS for in transit
+- [x] What are safe REST operations?
+- safe = no change or side-effect
+- GET, HEAD, OPTIONS, TRACE
+
+- [x] What are idempotent\['yidin po] operations? Why is idempotency important?
+- same effect for same request
+- Methods PUT and DELETE are defined to be idempotent, meaning that multiple identical requests should have the same effect as a single request
+- plus safe operations
+
+- Is REST scalable and/or interoperable?
+- Which HTTP methods does REST use?
+- What is an HttpMessageConverter?
+- Is REST normally stateless?
+- What does @RequestMapping do?
+- Is @Controller a stereotype? Is @RestController a stereotype?
+  - What is a stereotype annotation? What does that mean?
+- What is the difference between @Controller and @RestController?
+- When do you need @ResponseBody?
+- What does @PathVariable do?
+- What are the HTTP status return codes for a successful GET, POST, PUT or DELETE operation?
+- When do you need @ResponseStatus?
+- Where do you need @ResponseBody? What about @RequestBody? Try not to get these muddled up!
+- If you saw example Controller code, would you understand what it is doing? Could you tell if it was
+annotated correctly?
+- Do you need Spring MVC in your classpath?
+- What Spring Boot starter would you use for a Spring REST application?
+- What are the advantages of the RestTemplate?
+- If you saw an example using RestTemplate would you understand what it is doing?
+
+
+
+
 ### 6.SECURITY
 Please note that @Secured and the Spring Security JSP tag library may be referenced in the exam but are not
 in the main course notes. @Secured is in the advanced section.
