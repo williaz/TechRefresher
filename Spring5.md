@@ -860,31 +860,133 @@ var csrfToken = $("meta[name='_csrf']").attr("content");
 
 
 ### 7.REST
-- What does REST stand for?
-- What is a resource?
-- What does CRUD mean?
-- Is REST secure? What can you do to secure it?
-- What are safe REST operations?
-- What are idempotent operations? Why is idempotency important?
-- Is REST scalable and/or interoperable?
-- Which HTTP methods does REST use?
-- What is an HttpMessageConverter?
-- Is REST normally stateless?
-- What does @RequestMapping do?
-- Is @Controller a stereotype? Is @RestController a stereotype?
-  - What is a stereotype annotation? What does that mean?
-- What is the difference between @Controller and @RestController?
-- When do you need @ResponseBody?
-- What does @PathVariable do?
-- What are the HTTP status return codes for a successful GET, POST, PUT or DELETE operation?
+- [x] What does REST stand for?
+- REST stands for REpresentational State Transfer and is an **architectural** style which allows clients to **access and manipulate** textual representations of web resources given a set of constraints.
+- 6 Constraints to gain desirable **non-functional** properties, such as performance, scalability, simplicity, modifiability, visibility, portability, and reliability
+  - Client-server architecture: scalability
+  - Statelessness: no client context being stored on the server => state DB
+  - Cacheability: clients and intermediaries can cache responses
+  - Layered system: client won't tell diff => proxy, LB, security
+  - Code on demand (optional): dynamic web page
+  - Uniform interface: 
+    - URI
+    - self-descriptive: MIME
+    - Hypermedia as the engine of application state
+- [x] What is a resource?
+- Any information is a resource as long as we can name it
+- [x] What does CRUD mean?
+- Create, Read, Update and Delete
+- [x] Is REST secure? What can you do to secure it?
+- no by itself, but can add security layer
+- HTTPS for in transit
+- [x] What are safe REST operations?
+- safe = no change or side-effect
+- GET, HEAD, OPTIONS, TRACE
+
+- [x] What are idempotent\['yidin po] operations? Why is idempotency important?
+- same effect for same request
+- Methods PUT and DELETE are defined to be idempotent, meaning that multiple identical requests should have the same effect as a single request
+- plus safe operations
+
+- [x] Is REST scalable and/or interoperable?
+- stateless, cacheability, layered: cluster, LB
+- diff format, URI, fixed set of vrb
+
+- [x] Which HTTP methods does REST use?
+- POST, GET, PUT, DELETE
+- [x] What is an HttpMessageConverter?
+- convert HttpInputMessage to an Object, convert obj to HttpOutputMessage
+- impl:
+  - AtomFeedHttpMessageConverter: Converts to/from Atom feeds.
+  - ByteArrayHttpMessageConverter: Converts to/from byte arrays.
+  - FormHttpMessageConverter: Converts to/from HTML forms.
+  - Jaxb2RootElementHttpMessageConverter: Reads classes annotated with the JAXB2 annotations @XmlRootElement and @XmlType and writes classes annotated with @XmlRootElement.
+  - MappingJackson2HttpMessageConverter: Converts to/from JSON using Jackson 2.x.
+  
+- [x] Is REST normally stateless?
+- client hold state, server no retain
+- [x] What does @RequestMapping do?
+- mark method to handle requests that match the config
+- web req:
+  - @GetMapping, @PostMapping, @PutMapping, @DeleteMapping, @PatchMapping
+- config param in @
+  - consumes: MIME
+  - headers
+  - method
+  - params
+  - path
+  - produces
+
+- [x] Is @Controller a stereotype? Is @RestController a stereotype?
+- yes
+  - [x] What is a stereotype annotation? What does that mean?
+  - mark as a role
+  - @Component, @Controller, @Indexed, @Repository, @Service
+- [x] What is the difference between @Controller and @RestController?
+- @RestController = @Controller + @ResponseBody(apply to all methods in the class)
+- [x] When do you need @ResponseBody?
+- indicates a method return value should be bound to the web response body
+- on class or handler method
+- [x] What does @PathVariable do?
+- bound a method parameter to a URI template variable
+
+- [x] What are the HTTP status return codes for a successful GET, POST, PUT or DELETE operation?
+- 1xx: Informational. The request has been received and processing of it continues.
+- 2xx: Successful. The request has been successfully received, understood and accepted.
+- 3xx: Redirection. Further action is needed to complete the request.
+- 4xx: Client error. The request is incorrect or cannot be processed.
+- 5xx: Server error. The server failed to process what appears to be a valid request.
+
 - When do you need @ResponseStatus?
-- Where do you need @ResponseBody? What about @RequestBody? Try not to get these muddled up!
-- If you saw example Controller code, would you understand what it is doing? Could you tell if it was
+- Marks a method or exception class with the status code() and reason() that should be returned. will override
+- as use HttpServletResponse.sendError, error page involved, not suitable for REST <= preferable to use a ResponseEntity as a return type 
+- can on class also
+
+- [x] Where do you need @ResponseBody? What about @RequestBody? Try not to get these muddled up!
+- @ResponseBody: It is used when the web response body is to contain the result produced by the controller method(s).
+- @RequestBody: bound a method parameter to the body of the web request
+- [x] If you saw example Controller code, would you understand what it is doing? Could you tell if it was
 annotated correctly?
-- Do you need Spring MVC in your classpath?
-- What Spring Boot starter would you use for a Spring REST application?
-- What are the advantages of the RestTemplate?
+
+
+- [x] Do you need Spring MVC in your classpath?
+- yes, as @RestController, @ResponseBody, @RequestBody, @PathVariable in spring-web module
+- [x] What Spring Boot starter would you use for a Spring REST application?
+- Spring Boot Web Starter
+- https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-starters/spring-boot-starter-web/pom.xml
+- [x] What are the advantages of the RestTemplate?
+- Template Method (Behavior) design pattern
+  - template method in superclass, outline the steps
+  - subclass overrides step functions
+- The RestTemplate implements a **synchronous** HTTP client that **simplifies** sending requests and also **enforces** RESTful principles
+- adv:
+  - URI template
+  - auto encode URI: space with %20
+  - auto detect MIME
+  - auto conversion betweeen obj and HTTP message
+  - easy register ResponseErrorHandler
+  - Provides methods for conveniently sending common HTTP request types
+    - delete, getForObject, getForEntity, headForHeaders, postForObject and put
+  - provides methods that allow for increased detail when sending requests.
+    - execute()
 - If you saw an example using RestTemplate would you understand what it is doing?
+```java
+restTemplate.getForObject("http://example.com/hotel list", String.class);
+// Results in request to "http://example.com/hotel%20list"
+
+String uriTemplate = "http://example.com/hotels/{hotel}";
+URI uri = UriComponentsBuilder.fromUriString(uriTemplate).build(42);
+
+RequestEntity<Void> requestEntity = RequestEntity.get(uri)
+        .header(("MyRequestHeader", "MyValue")
+        .build();
+
+ResponseEntity<String> response = template.exchange(requestEntity, String.class);
+
+String responseHeader = response.getHeaders().getFirst("MyResponseHeader");
+String body = response.getBody();
+```
+
 ### 8.TESTING
 - Do you use Spring in a unit test?
 - What type of tests typically use Spring?
