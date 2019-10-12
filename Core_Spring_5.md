@@ -1,3 +1,67 @@
+### Design pattern
+- DI: IoC
+- MVC
+- Template: JDBC/REST template; abstract skeleton - subclass impl steps
+- Front controller: DispatcherServlet; centralizing matters
+
+
+### 5.SPRING MVC AND THE WEB LAYER
+- [x] MVC is an abbreviation for a design pattern. What does it stand for and what is the idea behind it?
+- Model-View-Controller, which is a design pattern used to separate concerns of an application
+  - Model: The model holds the current data and business logic of the application.
+  - View: The view is responsible for presenting the data of the application to the user. The user interacts with the view.
+  - Controller: a mediator between the model and the view
+- Adv:
+  - Reuse of model and controllers with different views.
+  - Reduced coupling between the model, view and controller.
+  - Separation of concerns: in turn result in increased maintainability and extensibility
+- [x] Do you need spring-mvc.jar in your classpath or is it part of spring-core?
+- Spring Web MVC is spring-webmvc
+- Spring WebFlux is spring-webflux
+
+- [x] What is the DispatcherServlet and what is it used for?
+- implement the front controller design pattern(allows for centralizing matters, like security and error handling)
+- Receives **requests** and delegates them to registered handlers.
+  - **1 per app**
+- Resolves **views** by mapping view-names to View instances.
+- Resolves exceptions that occur during handler mapping or execution.
+  - error view
+
+- [] Is the DispatcherServlet instantiated via an application context?
+- no, It is instantiated before any application context is created.
+
+- [x] What is a web application context? What extra scopes does it offer?
+- WebApplicationContext interface 
+  - extends the ApplicationContext
+  - add a method for retrieving the standard Servlet API ServletContext for the web application
+- extra scope:
+  - request
+  - session
+  - application: per ServletContext
+
+- [x] What is the @Controller annotation used for?
+- Indicates "Controller" class
+- @Component: enable autodetect through classpath scanning
+
+- How is an incoming request mapped to a controller and mapped to a method?
+- What is the difference between @RequestMapping and @GetMapping?
+- What is @RequestParam used for?
+- What are the differences between @RequestParam and @PathVariable?
+- What are some of the parameter types for a controller method?
+  - What other annotations might you use on a controller method parameter? (You can ignore
+form-handling annotations for this exam)
+- What are some of the valid return types of a controller method?
+- What is a View and what's the idea behind supporting different types of View?
+- How is the right View chosen when it comes to the rendering phase?
+- What is the Model?
+- Why do you have access to the model in your View? Where does it come from?
+- What is the purpose of the session scope?
+- What is the default scope in the web context?
+- Why are controllers testable artifacts?
+- What does a ViewResolver do?
+
+
+
 
 ### 7.REST
 - [x] What does REST stand for?
