@@ -1,3 +1,11 @@
+### Keys
+- IoC, ApplicationContext
+- bean lifecycle
+- http request flow
+- dispatcher servlet
+- REST constraints
+
+
 ### 1. CONTAINER, DEPENDENCY, AND IOC
 - [x] What is dependency injection and what are the advantages?
   - container controls the relationships between diff parts of an app, instead of by themselves
@@ -539,7 +547,7 @@ java -Dspring.profiles.active=dev1,dev2 -jar myApp.jar
   - can only be used in @Value
   - refering property name in the application’s environment
   - evaluated by the PropertySourcesPlaceholderConfigurer
-- # SpEL
+- \# SpEL
 
 ### 2.ASPECT ORIENTED PROGRAMMING
 - What is the concept of AOP? Which problem does it solve? What is a cross cutting concern?
@@ -632,29 +640,142 @@ Remember: Unless a question explicitly references Spring Boot (like those in thi
 can assume Spring Boot is not involved in any question.
 
 ### 5.SPRING MVC AND THE WEB LAYER
-- MVC is an abbreviation for a design pattern. What does it stand for and what is the idea
-- behind it?
-- Do you need spring-mvc.jar in your classpath or is it part of spring-core?
-- What is the DispatcherServlet and what is it used for?
-- Is the DispatcherServlet instantiated via an application context?
-- What is a web application context? What extra scopes does it offer?
-- What is the @Controller annotation used for?
-- How is an incoming request mapped to a controller and mapped to a method?
-- What is the difference between @RequestMapping and @GetMapping?
-- What is @RequestParam used for?
-- What are the differences between @RequestParam and @PathVariable?
-- What are some of the parameter types for a controller method?
-  - What other annotations might you use on a controller method parameter? (You can ignore
-form-handling annotations for this exam)
-- What are some of the valid return types of a controller method?
-- What is a View and what's the idea behind supporting different types of View?
-- How is the right View chosen when it comes to the rendering phase?
-- What is the Model?
-- Why do you have access to the model in your View? Where does it come from?
-- What is the purpose of the session scope?
-- What is the default scope in the web context?
-- Why are controllers testable artifacts?
-- What does a ViewResolver do?
+- [x] MVC is an abbreviation for a design pattern. What does it stand for and what is the idea behind it?
+- Model-View-Controller, which is a design pattern used to separate concerns of an application
+  - Model: The model holds the current data and business logic of the application.
+  - View: The view is responsible for presenting the data of the application to the user. The user interacts with the view.
+  - Controller: a mediator between the model and the view
+- Adv:
+  - Reuse of model and controllers with different views.
+  - Reduced coupling between the model, view and controller.
+  - Separation of concerns: in turn result in increased maintainability and extensibility
+- [x] Do you need spring-mvc.jar in your classpath or is it part of spring-core?
+- Spring Web MVC is spring-webmvc
+- Spring WebFlux is spring-webflux
+
+- [x] What is the DispatcherServlet and what is it used for?
+- implement the front controller design pattern(allows for centralizing matters, like security and error handling)
+- Receives **requests** and delegates them to registered handlers.
+  - **1 per app**
+- Resolves **views** by mapping view-names to View instances.
+- Resolves exceptions that occur during handler mapping or execution.
+  - error view
+
+- [ ] Is the DispatcherServlet instantiated via an application context?
+- no, It is instantiated before any application context is created.
+
+- [x] What is a web application context? What extra scopes does it offer?
+- WebApplicationContext interface 
+  - extends the ApplicationContext
+  - add a method for retrieving the standard Servlet API ServletContext for the web application
+- extra scope:
+  - request
+  - session
+  - application: per ServletContext
+
+- [x] What is the @Controller annotation used for?
+- Indicates "Controller" class
+- @Component: enable autodetect through classpath scanning
+
+- [x] How is an incoming request mapped to a controller and mapped to a method?
+- The DispatcherServlet of the application receives the request.
+- The DispatcherServlet maps the request to a method in a controller.
+  - The DispatcherServlet holds a list of classes implementing the HandlerMapping interface.
+- The DispatcherServlet dispatches the request to the controller.
+-  The method in the controller is executed.
+- @ComponentScan, @EnableWebMvc, @Controller, @RequestMapping
+
+- [x] What is the difference between @RequestMapping and @GetMapping?
+- If no method element specified in the @RequestMapping annotation, then requests using any HTTP method will be mapped to the annotated method.
+
+- [x] What is @RequestParam used for?
+- bind request parameters to method parameters.
+- question mark, ampersand
+```java
+@RequestMapping("/greeting")
+public String greeting(@RequestParam(name="name", required=false) String inName) {}
+```
+- [x] What are the differences between @RequestParam and @PathVariable?
+- The values in the @PathVariable annotations match the name of the template variables in
+the URL.
+  - optional if same
+```java
+@RequestMapping("/firstname/{firstName}/lastname/{lastName}")
+public String greetWithFirstAndLastName(
+@PathVariable("firstName") final String inFirstName,
+@PathVariable("lastName") final String inLastName) {
+```
+- @RequestParam maps query string parameters to handler method arguments.
+- @PathVariable maps a part of the URL to handler method arguments.
+
+- [ ] What are some of the parameter types for a controller method?
+- WebRequest, NativeWebRequest
+- javax.servlet.ServletRequest, javax.servlet.ServletResponse
+- javax.servlet.http.HttpSession
+- java.security.Principal
+- HttpMethod
+- java.io.InputStream, java.io.Reader
+- java.io.OutputStream, java.io.Writer
+- HttpEntity<B>
+
+  - [] What other annotations might you use on a controller method parameter? (You can ignore form-handling annotations for this exam)
+  - @MatrixVariable
+  - @RequestHeader
+  - @CookieValue
+  - @RequestPart: "multipart/form-data" 
+  - @ModelAttribute
+  - SessionStatus + class-level @SessionAttributes
+  - @SessionAttribute
+  - @RequestAttribute
+  
+- [x] What are some of the valid return types of a controller method?
+- @ResponseBody
+- HttpEntity<B>, ResponseEntity<B>
+- HttpHeaders
+- String: view name
+- View
+- ModelAndView  
+- @ModelAttribute
+- void: A method with a void return type (or null return value) is considered to have fully handled the response if it also has a ServletResponse, or an OutputStream argument, or an @ResponseStatus annotation. The same is true also if the controller has made a positive ETag or lastModified timestamp check (see Controllers for details).
+- DeferredResult<V>, Callable<V>
+- ResponseBodyEmitter, SseEmitter
+- StreamingResponseBody
+- Reactive types — Reactor, RxJava, or others via ReactiveAdapterRegistry
+- https://docs.spring.io/spring/docs/5.0.7.RELEASE/spring-framework-reference/web.html#mvc-ann-arguments
+  
+- [ ] What is a View and what's the idea behind supporting different types of View?
+- Present model data in different **formats**.(bar/pie chart)
+- Adapt the view to different **platforms**.(web/mobile)
+- Use a view-**technology** that is familiar to developers
+
+- [ ] How is the right View chosen when it comes to the rendering phase?
+- dispatcher servlet holds a list of **view resolvers**, it will use them to resolve the view name available from the ModelAndView during the request-processing process
+
+- [x] What is the Model?
+- Model interface from the Spring framework is a collection of key-value pairs
+- contains information for rendering the view
+
+- [x] Why do you have access to the model in your View? Where does it come from?
+- The model is passed as a parameter to the view when the dispatcher servlet asks the selected view to render itself as part of processing a request. 
+- The dispatcher servlet obtains an instance of ModelAndView as a result of invoking the handle method on a HandlerAdpater when processing a request.
+
+
+- [x] What is the purpose of the session scope?
+- The bean instance will remain the same during all requests the user makes within one
+and the same HTTP session.
+
+- [x] What is the default scope in the web context?
+- singleton
+
+- [x] Why are controllers testable artifacts?
+- plain Java classes
+- Spring MVC Test Framework
+  - Servlet 3.0 API mock objects.
+  - full Spring MVC runtime behavior
+- [x] What does a ViewResolver do?
+- map a view name to a View.
+
+
 
 ### 6.SECURITY
 Please note that @Secured and the Spring Security JSP tag library may be referenced in the exam but are not
