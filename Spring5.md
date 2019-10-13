@@ -730,7 +730,7 @@ public String greetWithFirstAndLastName(
   
 - [x] What are some of the valid return types of a controller method?
 - @ResponseBody
-- HttpEntity<B>, ResponseEntity<B>
+- HttpEntity\<B>, ResponseEntity\<B>
 - HttpHeaders
 - String: view name
 - View
