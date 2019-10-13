@@ -716,7 +716,7 @@ public String greetWithFirstAndLastName(
 - HttpMethod
 - java.io.InputStream, java.io.Reader
 - java.io.OutputStream, java.io.Writer
-- HttpEntity<B>
+- HttpEntity\<B>
 
   - [] What other annotations might you use on a controller method parameter? (You can ignore form-handling annotations for this exam)
   - @MatrixVariable
