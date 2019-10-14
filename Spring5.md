@@ -29,7 +29,7 @@
     - default method
     - static methods(with impl)
   - benefits:
-    - decouple contact and impl
+    - decouple contract and impl
     - modularization
     - Polymorphism, handle a gouple of objects
     - ease to test
@@ -37,6 +37,7 @@
   - ease to test, switch bean imp
   - can use JDK dynamic proxying
   - hide impl
+#### IoC  
 - [x] What is meant by “application-context?
   - represents the Spring IoC container
   - Object implements ApplicationContext, used for
@@ -225,7 +226,7 @@ public class MyJavaConfigWebApplicationInitializer implements WebApplicationInit
       - Bean destruction methods can be specified either in the value of the destroy-method attribute in the corresponding <bean> element in a Spring XML configuration or in the destroyMethod property of the @Bean annotation.
       - If the same destruction method has already been invoked, it will not be invoked again.
   
-- [ ] How are you going to create an ApplicationContext in an integration test test?
+- [ ] How are you going to create an ApplicationContext in an integration test ?
           
 - @RunWith (JUnit 4) or @ExtendWith (JUnit 5) is used to annotate the test-class.
 - @ContextConfiguration for xml/Java config class
@@ -264,12 +265,12 @@ public class MyJavaConfigWebApplicationInitializer implements WebApplicationInit
   - DI for type ny config
     - define bean's Dependencies using constructor arg, setter, or factory method
     - IoC injects dependencies
-  - Dependency injection using Java configuration?
-  - Dependency injection using annotations (@Component, @Autowired)?
+  - [x] Dependency injection using Java configuration?
+  - [x] Dependency injection using annotations (@Component, @Autowired)?
     - @Component(@Service, @Repository, @Controller) allow Spring beans to be automatically detected at component scanning
     - @Autowired annotation can be applied to constructors, methods, parameters and properties of a class.
       - need annotate if have multiple constructors
-  - Component scanning, Stereotypes and Meta-Annotations?
+  - [x] Component scanning, Stereotypes and Meta-Annotations?
     - @ComponentScan for searching annotated classess and registering bean in IoC
       - @Configuration annotation is annotated with the @Component
       - Using the basePackageClasses property, a base package to be scanned is specified by setting
