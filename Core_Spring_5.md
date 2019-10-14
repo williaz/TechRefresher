@@ -3,6 +3,66 @@
 - MVC
 - Template: JDBC/REST template; abstract skeleton - subclass impl steps
 - Front controller: DispatcherServlet; centralizing matters
+- proxy/decorator: 
+
+### 4.SPRING BOOT
+- [x] What is Spring Boot?
+- easy to create standalone Spring app
+- provides coomon non-functional features: embedded servers, security, metrics, health checks, and externalized configuration
+- auto-config: no XML
+
+- starters: dependecy descriptors: menaged dependencis
+- Autoconfiuration
+- Actuator
+
+- [x] What are the advantages of using Spring Boot?
+- auto-config: reducing boilerplate configuration, no XML config
+- quick getting-started
+- easy customization: prop file
+- executable standalone JAR
+- managed dependencis and Maven plug-ins
+- non-functional features commonly needed in projects
+- Standardize parts of application structure
+
+
+- [x] Why is it “opinionated”?
+- preset by Spring with defaults
+- but allow to customize
+
+- [x] How does it work? How does it know what to configure?
+- Spring Boot detects the dependencies available on the classpath and configures Spring beans
+accordingly.
+- alow for conditional: @ConditionalOnClass, @ConditionalOnBean, @ConditionalOnMissingBean and @ConditionalOnMissingClass
+
+- [x] What things affect what Spring Boot sets up?
+- @Conditional annotations on your auto-configuration class.
+
+
+- [x] How are properties defined? Where is Spring Boot’s default property source?
+- types:
+  - Property file: key-value pairs
+  - YAML files
+  - Env
+  - Command-line args: ```java -jar xx.jar -server.port=8081```
+- src/main/resources/application.properties
+- externalized config to override config
+  - ```--spring.config.location=``` in the command line
+  - auto pick up application.properties in the same directory as the jar file
+
+- Would you recognize common Spring Boot annotations and configuration properties if you saw them in
+the exam?
+- What is the difference between an embedded container and a WAR?
+- What embedded containers does Spring Boot support?
+- What does @EnableAutoConfiguration do?
+- What about @SpringBootApplication?
+- Does Spring Boot do component scanning? Where does it look by default?
+- What is a Spring Boot starter POM? Why is it useful?
+- Spring Boot supports both Java properties and YML files. Would you recognize and
+- understand them if you saw them?
+- Can you control logging with Spring Boot? How?
+Note that the second Spring Boot section (Going Further) is not required for this exam.
+Remember: Unless a question explicitly references Spring Boot (like those in this section) you
+can assume Spring Boot is not involved in any question.
 
 
 ### 5.SPRING MVC AND THE WEB LAYER
