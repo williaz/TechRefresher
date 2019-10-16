@@ -4,6 +4,7 @@
 - Template: JDBC/REST template; abstract skeleton - subclass impl steps
 - Front controller: DispatcherServlet; centralizing matters
 - proxy/decorator: 
+- Facade: SLF4J/ Commons Logging; The Simple Logging Facade for Java or (SLF4J) serves as a simple facade or abstraction for various logging frameworks, e.g. java.util.logging, log4j and logback, allowing the end user to plug in the desired logging framework at deployment time.
 
 ### 4.SPRING BOOT
 - [x] What is Spring Boot?
@@ -49,17 +50,107 @@ accordingly.
   - ```--spring.config.location=``` in the command line
   - auto pick up application.properties in the same directory as the jar file
 
-- Would you recognize common Spring Boot annotations and configuration properties if you saw them in
+- [x] Would you recognize common Spring Boot annotations and configuration properties if you saw them in
 the exam?
-- What is the difference between an embedded container and a WAR?
-- What embedded containers does Spring Boot support?
-- What does @EnableAutoConfiguration do?
-- What about @SpringBootApplication?
-- Does Spring Boot do component scanning? Where does it look by default?
-- What is a Spring Boot starter POM? Why is it useful?
-- Spring Boot supports both Java properties and YML files. Would you recognize and
-- understand them if you saw them?
-- Can you control logging with Spring Boot? How?
+- config prop:
+  - format: spring.xxx.yyy=somevalue; xxx as technology; yyy as prop
+  - https://docs.spring.io/spring-boot/docs/2.0.6.RELEASE/reference/htmlsingle/#common-application-properties
+
+- @SpringBootApplication, @EnableAutoConfiguration
+- @Conditional[yyy] Class of Spring Boot annotations that enable conditional creation of Spring beans. Commonly used in auto-configuration modules.
+- @EnableConfigurationProperties Enables support for Spring beans annotated with @ConfigurationProperties.
+- @ConfigurationProperties Allows for binding a selected group of configuration properties to a class.
+- @EntityScan Specifies which packages to scan when scanning for entity classes.
+- @SpringBootConfiguration Alternative to @Configuration for Spring Boot applications.
+- @OverrideAutoConfiguration Used to override the @EnableAutoConfiguration.
+- @ImportAutoConfiguration Import an apply specified auto-configuration classes.
+
+
+- @ServletComponentScan Enables scanning for servlets, WebFilter filters, WebServlet servlets and WebListener listeners when using an embedded web server.
+- @LocalServerPort Alternative to @Value("${local.server.port}")
+
+
+- @JsonComponent Specialization of the @Component annotation for components that provides a Jackson JSON serializer or deserializer.
+
+- @WebMvcTest Annotation used in Spring MVC tests testing only Spring MVC components.
+- @TestConfiguration Alternative to @Configuration for test configuration classes.
+- @MockBean Used to add a mock bean to the Spring application context.
+- @SpyBean Applies Mockito spies to one or more Spring beans.
+- @SpringBootTest Annotates test classes that run Spring Boot based tests.
+- @TestComponent Component annotation for beans that only are to be used in tests.
+- @AutoConfigureTestEntityManager Enable auto-configuration of a test entity manager in tests.
+- @DataJpaTest Used with @RunWith(SpringRunner.class) in tests that only tests JPA components.
+- @PropertyMapping Maps attributes from a test annotation into a PropertySource.
+- @AutoConfigureRestDocs Enable auto-configuration of Spring REST Docs in tests.
+- @AutoConfigureMockRestServiceServer Enable auto-configuration of a single mock REST service server in tests.
+- @RestClientTest Used with @RunWith(SpringRunner.class) in tests that use a Spring REST client.
+- @AutoConfigureWebClient Enables auto-configuration of web clients in test classes.
+- @AutoConfigureWebTestClient Enables a web test client in WebFlux application tests.
+- @WebFluxTest Used with @RunWith(SpringRunner.class) in tests that only tests Spring WebFlux components.
+- @AutoConfigureMockMvc Enables auto-configuration of MockMvc in testclasses.
+- @WebMvcTest Used with @RunWith(SpringRunner.class) in tests that focuses on Spring MVC components.
+
+
+- @Endpoint Identifies a class as being an actuator endpoint that provides information about the Spring Boot application.
+- @ReadOperation Marks a method in a class annotated with @Endpoint as being a read operation.
+
+
+
+- [x] What is the difference between an embedded container and a WAR?
+- a WAR is a build for an app, will be deployed in web container which may server multiple apps
+- An embedded container is packaged in the application JAR-file and will contain only one single application.
+
+
+- [x] What embedded containers does Spring Boot support?
+- Tomcat, Jetty, Undertow
+
+- [x] What does @EnableAutoConfiguration do?
+- The @EnableAutoConfiguration annotation enables Spring Boot auto-configuration, which attempts to create and configure Spring beans based on the dependencies available on the class-path to allow developers to quickly get started with different technologies in a Spring Boot application and reducing boilerplate code and configuration.
+
+
+- [x] What about @SpringBootApplication?
+- = @Configuration, @EnableAutoConfiguration and @ComponentScan
+
+- [x] Does Spring Boot do component scanning? Where does it look by default?
+- nope unless with @Configuration + @ComponentScan
+- look up basePackages, classes' packages in @ComponentScan
+- look config class's package
+
+- [x] What is a Spring Boot starter POM? Why is it useful?
+- all the dependencies needed to get started with a certain technology have been gathered with proper version management.
+
+- [x] Spring Boot supports both Java properties and YML files. Would you recognize and understand them if you saw them?
+- A Java properties file consists of one or more rows with a key-value pair
+- YML files are files containing properties in the YAML format. YAML stands for YAML Ain’t Markup Language.
+```YML
+# This is a comment.
+se:
+  ivan:
+    username: ivan
+    password: secret
+city: Gothenburg
+```
+
+
+- [x] Can you control logging with Spring Boot? How?
+- Controlling Log Levels
+  - default message level: ERROR, WARN and INFO levels
+  - To enable DEBUG or TRACE logging for the entire application, use the -- debug or --trace flags or set the properties debug=true or trace=true in the application.properties file.
+```
+logging.level.root=WARN
+logging.level.org.wtc.service=DEBUG
+logging.pattern.console=%clr(%d{yyyy-MM-dd HH:mm:ss}){yellow}
+
+# When using the default Logback setup in a Spring Boot applicatio
+logging.pattern.console=# or sys prop CONSOLE_LOG_PATTERN
+logging.pattern.file=# or sys prop FILE_LOG_PATTERN
+```
+- Spring Boot uses the Commons Logging API for logging. suport: Logback, Log4J2
+- Logging config
+  - logback-spring.xml: logback.xml + Boot templating features
+  - log4j2.xml: log4j2.yaml, log4j2.json
+  - logging.properties: Java core logging
+  
 Note that the second Spring Boot section (Going Further) is not required for this exam.
 Remember: Unless a question explicitly references Spring Boot (like those in this section) you
 can assume Spring Boot is not involved in any question.
