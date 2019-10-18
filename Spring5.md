@@ -1164,7 +1164,7 @@ var csrfToken = $("meta[name='_csrf']").attr("content");
   - consumes: MIME
   - headers
   - method
-  - params
+  - params: only mapped if each such parameter is found to have the given value.
   - path
   - produces
 
@@ -1188,7 +1188,7 @@ var csrfToken = $("meta[name='_csrf']").attr("content");
 - 4xx: Client error. The request is incorrect or cannot be processed.
 - 5xx: Server error. The server failed to process what appears to be a valid request.
 
-- When do you need @ResponseStatus?
+- [x] When do you need @ResponseStatus?
 - Marks a method or exception class with the status code() and reason() that should be returned. will override
 - as use HttpServletResponse.sendError, error page involved, not suitable for REST <= preferable to use a ResponseEntity as a return type 
 - can on class also
