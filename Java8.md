@@ -1,3 +1,5 @@
+
+### Building block
 - [x] scope
 - a method parameter: is also local to the method.
 
@@ -134,7 +136,114 @@ robust and simple by not providing pointers or operator overloading. Finally, Ja
 because it runs inside a virtual machine.
 ```
 
+### Operators and statements
+- Arithmetic operators are often encountered in early mathematics and include addition (+), subtraction (-), multiplication (*), division (/), and modulus (%).
+- Numeric Promotion Rules
+  - If two values have different data types, Java will automatically promote one of the values to the **larger** of the two data types.
+  - If one of the values is integral and the other is floating-point, Java will automatically
+promote the integral value to the **floating-point** value’s data type.
+  - Smaller data types, namely byte, short, and char, are first promoted to int any time they’re used with a Java binary arithmetic operator, even if neither of the operands is int.
+    - **unary** operators are excluded from this rule.
+  - After all promotion has occurred and the operands have the same data type, the resulting value will have the same data type as its promoted operands.
+- The literal would need a postfi x L to be considered a long.
+-  **Overflow** is when a number is so large that it will no longer fi t within the data type, so the system “wraps around” to the next lowest value and counts up from there. There’s also an analogous underfl ow, when the number is too low to fi t in the data type.  
+- Compound operators are useful for more than just shorthand—they can also save us from having to explicitly cast a value.
+```java
+long x = 10;
+int y = 5;
+y = y * x; // DOES NOT COMPILE
+y *= x; // fine
+```
+- the result of the assignment is an expression in and of itself, equal to the value of the assignment.
 
+- Exclusive OR is only true if the operands are different.
+- A more common example of where short-circuit operators are used is checking for null objects before performing an operation
+- Comparing two numeric primitive types. If the numeric values are of different data types, the values are automatically promoted as previously described.
+- As of Java 7, only one of the right-hand expressions of the ternary operator will be evaluated at runtime.
+
+- switch
+  - Data types supported by switch statements include the following:
+    - int and Integer
+    - byte and Byte
+    - short and Short
+    - char and Character
+    - int and Integer
+    - String
+    - enum values
+    - **not** support **boolean and long**, and their associated wrapper classes
+  - The values in each **case statement must be compile-time constant values(no func param)** of the same data type as the switch value. This means you can use only literals, enum constants, or final constant variables of the same data type.
+```java
+private int getSortOrder(String firstName, final String lastName) {
+    String middleName = "Patricia";
+    final String suffix = "JR";
+    int id = 0;
+    switch (firstName) {
+        case "Test":
+            return 52;
+        case middleName: // DOES NOT COMPILE
+            id = 5;
+            break;
+        case suffix:
+            id = 0;
+            break;
+        case lastName: // DOES NOT COMPILE
+            id = 8;
+            break;
+        case 5: // DOES NOT COMPILE
+            id = 7;
+            break;
+        case 'J': // DOES NOT COMPILE
+            id = 10;
+            break;
+        case java.time.DayOfWeek.SUNDAY: // DOES NOT COMPILE
+            id = 15;
+            break;
+    }
+    return id;
+}
+
+do {
+   x--;
+} while(x > 10);
+```
+- Unlike a while loop, though, a do-while loop guarantees that the statement or block will be executed at least once.
+
+- For
+  - **2 semicolons** separating the three sections are required, as for( ; ) and for() will not compile
+  - The variables in the initialization block must all be of the **same type**.
+  - The right-hand side of the for-each loop statement must be a built-in Java array or an object whose class implements java.lang.Iterable,
+
+```
+This chapter covered a wide variety of topics, including dozens of Java operators, along
+with numerous control fl ow statements. Many of these operators and statements may have
+been new to you.
+It is important that you understand how to use all of the required Java operators covered
+in this chapter and know how operator precedence infl uences the way a particular expression
+is interpreted. There will likely be numerous questions on the exam that appear to test
+one thing, such as StringBuilder or exception handling, when in fact the answer is related
+to the misuse of a particular operator that causes the application to fail to compile. When
+you see an operator on the exam, always check that the appropriate data types are used and
+that they match each other where applicable.
+For statements, this chapter covered two types of control structures: decision-making
+controls structures, including if-then, if-then-else, and switch statements, as well as
+repetition control structures including for, for-each, while, and do-while. Remember that
+most of these structures require the evaluation of a particular boolean expression either for
+branching decisions or once per repetition. The switch statement is the only one that supports
+a variety of data types, including String variables as of Java 7.
+With a for-each statement you don’t need to explicitly write a boolean expression, since
+the compiler builds them implicitly. For clarity, we referred to an enhanced for loop as a
+for-each loop, but syntactically they are written as a for statement.
+We concluded this chapter by discussing advanced control options and how fl ow can be
+enhanced through nested loops, break statements, and continue statements. Be wary of
+questions on the exam that use nested statements, especially ones with labels, and verify
+they are being used correctly.
+This chapter is especially important because at least one component of this chapter will
+likely appear in every exam question with sample code. Many of the questions on the exam
+focus on proper syntactic use of the structures, as they will be a large source of questions
+that end in “Does not compile.” You should be able to answer all of the review questions
+correctly or fully understand those that you answered incorrectly before moving on to later
+chapters.
+```
 
 
 
