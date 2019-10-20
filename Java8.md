@@ -356,4 +356,183 @@ number of days, months, or years to add or subtract from a LocalDate or LocalDat
 DateTimeFormatter is used to output dates and times in the desired format. The date and
 time classes are all immutable, which means the return value must be used.
 ```
+#### Methods
+- Access
+  - public The method can be called from any class.
+  - private The method can only be called from within the same class.
+  - protected The method can only be called from classes in the **same package** or subclasses.
+  - Default (Package Private) Access The method can only be called from classes in the same
+package.
+- Optional Specifiers
+  - static: Used for class methods.
+  - abstract: Used when not providing a method body. 
+  - final: Used when a method is not allowed to be overridden by a subclass.
+  - synchronized
+  - native: Used when interacting with code written in another language such as C++.
+  - strictfp: Used for making fl oating-point calculations portable.
+  - Java allows the optional specifi ers to appear before the access modifi er.
+- return
+  - a method must have a return type. If no value is returned, the return type is void. You cannot omit the return type.
+- Method Name
+- Parameter List
+- Optional Exception List
+- Method Body
 
+
+- Varargs
+  - A vararg parameter must be the last element in a method’s parameter list. This implies you are only allowed to have one vararg parameter per method.
+  - When calling a method with a vararg parameter, you have a choice. You can pass in an array, or you can list the elements of the array and let Java create it for you. You can even omit the vararg values in the method call and Java will create an array of length zero for you.
+  - Java will create an empty array if no parameters are passed for a vararg. However, it is still possible to pass null explicitly
+
+
+#### Access Modifiers
+- private: Only accessible within the same class
+- default (package private) access: private and other classes in the same package
+- protected: default access and child classes
+- public: protected and classes in the other packages
+
+- Extending means creating a ubclass that has access to any protected or public members of the parent class.
+- protected **also** gives us access to everything that **default access does**.
+
+#### static
+- code VS data
+```
+Each class has a copy of the instance variables. There is only one copy of the code for the
+instance methods. Each instance of the class can call it as many times as it would like.
+However, each call of an instance method (or any method) gets space on the stack for
+method parameters and local variables.
+The same thing happens for static methods. There is one copy of the code. Parameters
+and local variables go on the stack.
+Just remember that only data gets its “own copy.” There is no need to duplicate copies of
+the code itself.
+```
+- You can use an instance of the object/class to call a static method.
+  - the reference may assigned as null, still fine
+- “member” means field or method.
+- static final constants use a different naming convention than other variables. They use all uppercase letters with underscores between “words.”
+- The static initializer runs when the class is fi rst used. The statements in it run and assign any static variables as needed.
+  - Using static and instance initializers can make your code much harder to read. Everything that could be done in an instance initializer could be done in a con structor instead.
+  - There is a common case to use a static initializer: when you need to initialize a static fi eld and the code to do so requires more than one line.
+  
+- static import
+  - Regular imports are for importing classes. Static imports are for importing static members of classes.
+  - Java would give it preference over the imported one and the method we coded would be used.
+  - ```java import static java.util.Arrays.asList;```
+
+- Java is a “pass-by-value” language. This means that a copy of the variable is made and the method receives that copy. Assignments made in the method do not affect the caller.
+
+#### Overloading Methods
+- Method overloading occurs when there are different method signatures with the same name but different type parameters.
+- Java tries to use the most specific parameter list it can find to match func. Order(no two-step conversion):
+  - Exact match by type public String glide(int i, int j) {}
+  - Larger primitive type public String glide(long i, long j) {}
+  - Autoboxed type  public String glide(Integer i, Integer j) {}
+  - Varargs: public String glide(int... nums) {}
+- Note that Java can only accept wider types. An int can be passed to a method taking a long parameter.
+```java
+
+// Java treats varargs as if they were an array.
+public void fly(int[] lengths) { }
+public void fly(int... lengths) { }
+// DOES NOT COMPILE
+```
+#### Constructor
+- default class was added during the compile step
+- Having a private constructor in a class tells the compiler not to provide a default no argument constructor. It also prevents other classes from instantiating the class. This is useful when a class only has static methods or the class wants to control all calls to create new instances of itself.
+- this(): If you choose to call it, the this() call must be the fi rst noncommented statement in the constructor
+- constructor chaining: One common technique to have each constructor add one parameter until getting to the constructor that does all the work. This approach is called constructor chaining.
+- The constructor is part of the initialization process, so it is allowed to assign **final** instance variables in it. By the time the constructor completes, all final instance variables must have been set.
+- Order of Initialization
+  - 1. If there is a superclass, initialize it first 
+  - 2. Static variable declarations and static initializers in the order they appear in the file.
+  - 3. Instance variable declarations and instance initializers in the order they appear in the file.
+  - 4. The constructor.
+
+- **Encapsulation** means we set up the class so only methods in the class with the variables can refer to the instance variables.
+- **immutable** is only measured after the object is constructed. Immutable classes are allowed to have values. They just can't change after instantiation.
+  - defensive copy
+- encapsulation refers to preventing callers from changing the instance variables directly. Immutability refers to preventing callers from changing the instance variables at all.
+
+#### Lambda
+- Functional program ming is a way of writing code more declaratively.
+  - no obj state
+- A lambda expression is a block of code that gets passed around.
+  - code as variable
+  - anonymous method/closures
+  - Deferred execution means that code is specifi ed now but will run later.
+
+##### lambda 
+```
+Parameter types are optional. Braces and the return keyword are optional
+when the body is a single statement. Parentheses are optional when only one parameter is
+specifi ed and the type is implicit.
+```
+
+- the parentheses are only optional when there is one parameter and it doesn’t have a type declared.
+- A body that has one or more lines of code, including a semicolon and a return statement
+- The parentheses can only be omitted if there is a single parameter and its type is not explicitly stated.
+- no need return or use a semicolon when no braces are used.
+- there isn’t a rule that says you must use all defi ned parameters.
+- Java doesn’t allow us to redeclare a local variable,
+```java
+a -> a.canHop()
+(Animal a) -> { return a.canHop(); }
+
+print((String a, String b) -> a.startsWith("test"));
+```
+
+- Predicates: 
+```java
+public interface Predicate<T> {
+   boolean test(T t);
+}
+
+//ArrayList declares a removeIf()
+bunnies.removeIf(s -> s.charAt(0) != 'h');
+```
+
+```
+As you learned in this chapter, Java methods start with an access modifi er of public,
+private, protected or blank (default access). This is followed by an optional specifi er such
+as static, final, or abstract. Next comes the return type, which is void or a Java type.
+The method name follows, using standard Java identifi er rules. Zero or more parameters go
+in parentheses as the parameter list. Next come any optional exception types. Finally, zero
+or more statements go in braces to make up the method body.
+Using the private keyword means the code is only available from within the same class.
+Default (package private) access means the code is only available from within the same
+package. Using the protected keyword means the code is available from the same package
+or subclasses. Using the public keyword means the code is available from anywhere. Static
+methods and static variables are shared by the class. When referenced from outside the
+class, they are called using the classname—for example, StaticClass.method(). Instance
+members are allowed to call static members, but static members are not allowed to call
+instance members. Static imports are used to import static members.
+Java uses pass-by-value, which means that calls to methods create a copy of the parameters.
+Assigning new values to those parameters in the method doesn’t affect the caller’s variables.
+Calling methods on objects that are method parameters changes the state of those objects and
+is refl ected in the caller.
+Overloaded methods are methods with the same name but a different parameter list.
+Java calls the most specifi c method it can fi nd. Exact matches are preferred, followed by
+wider primitives. After that comes autoboxing and fi nally varargs.
+Constructors are used to instantiate new objects. The default no-argument constructor
+is called when no constructor is coded. Multiple constructors are allowed and can call each
+other by writing this(). If this() is present, it must be the fi rst statement in the constructor.
+Constructors can refer to instance variables by writing this before a variable name to indicate
+they want the instance variable and not the method parameter with that name. The order
+of initialization is the superclass (which we will cover in Chapter 5); static variables and static
+initializers in the order they appear; instance variables and instance initializers in the order
+they appear; and fi nally the constructor.
+Encapsulation refers to preventing callers from changing the instance variables directly.
+This is done by making instance variables private and getters/setters public. Immutability
+refers to preventing callers from changing the instance variables at all. This uses several
+techniques, including removing setters. JavaBeans use methods beginning with is and get
+for boolean and non-boolean property types, respectively. Methods beginning with set are
+used for setters.
+Lambda expressions, or lambdas, allow passing around blocks of code. The full syntax
+looks like (String a, String b) -> { return a.equals(b); }. The parameter types can
+be omitted. When only one parameter is specifi ed without a type, the parentheses can also
+be omitted. The braces and return statement can be omitted for a single statement, making
+the short form (a -> a.equals(b). Lambdas are passed to a method expecting an interface
+with one method. Predicate is a common interface. It has one method named test
+that returns a boolean and takes any type. The removeIf() method on ArrayList takes a
+Predicate.
+```
