@@ -11,6 +11,12 @@
 ### synchronized
 - join(): wait thread finished
 - synchronized: uses intrinsic lock to prevent interleaving between operation steps used by mt
+- block: declare **seperate Object lock** for synchronized block instead of using the actual object in case Java optimize the vars
+### thread pool
+- ExecutorService: sumbit task, shutdown(), awaitTermincation() 
+
+### CountDownLatch
+- latch.wait() for count reach
 
 ```java
 
