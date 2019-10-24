@@ -18,6 +18,13 @@
 ### CountDownLatch
 - latch.wait() for count reach
 
+### Producer-Consumer
+- BlockingQueue: put(), take() waiting for valid size
+
+### wait & notify
+- wait: only in syn, lose lock, 
+- notify: only in syn, wake up all waiting threads; better release lock after notify quickly
+- Producer-Consumer: combine with syn block on a shared collection
 ```java
 
 ```
