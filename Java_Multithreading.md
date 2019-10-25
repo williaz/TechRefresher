@@ -25,7 +25,49 @@
 - wait: only in syn, lose lock, 
 - notify: only in syn, wake up all waiting threads; better release lock after notify quickly
 - Producer-Consumer: combine with syn block on a shared collection
+
+### ReenrantLock
+- Lock: lock(), unlock() in try-finally block
+- Condition: await(), singal() in between lock()/unlock() 
+
+
+### Deadlock
+- 2 lock, diff order
+- nested synchronized block
+- reentrantLock1.tryLock() && reentrantLock2.tryLock()
+
 ```java
+// resolve deadlock
+
+private void acquireLocks(Lock lock1, Lock2) {
+    while (true) {
+        // acq locks
+        boolean gotLock1 = false;
+        boolean gotLock2 = false;
+        try {
+            gotLock1 = lock1.tryLock();
+            gotLock2 = lock2.tryLock();
+        } finally {
+            if (gotLock1 && gotLock2) {
+                return;
+            }
+            if (gotLock1) {
+                lock1.unlock();
+            }
+            if (gotLock2) {
+                lock2.unlock();
+            }
+        
+        }
+        // didn't acquire lock
+        Thread.sleep(1);
+    }
+}
+
+
+
+
+
 
 ```
 
