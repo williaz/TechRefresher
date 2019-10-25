@@ -655,6 +655,83 @@ and showed how objects can be accessed in a variety of forms. Make sure you
 understand when casts are needed for accessing objects, and be able to spot the difference
 between compile-time and runtime cast problems.
 ```
+#### Handling Exceptions
+- an exception is an event that alters program fl ow.
+- In general, try to avoid return codes.
+- A method can handle the exception case itself or make it the caller’s responsibility.
+- Object
+  - Throwable
+    - Exception
+      - RuntimeException
+        - Runtime exceptions tend to be unexpected but not necessarily fatal.
+      - Checked Exception
+        - handle or declare rule.
+        - Checked exceptions tend to be more anticipated
+    - Error
+      - Error means something went so horribly wrong that your program should not attempt to recover from it.
+
+- The curly braces are required for the try and catch blocks.
+- a try statement must have catch and/or finally. try-with-resources that allows neither a catch nor a finally block
+- If it is impossible for one of the catch blocks to be executed, a compiler error about unreachable code occurs. This happens when a superclass is caught before a subclass.
+- Declaring an unused exception isn’t considered unreachable code.
+- catching multiple exceptions: at most one catch block will run and it will be the fi rst catch block that can handle it.
+
+- another try/catch inside a finally block—to make sure it doesn’t **mask** the exception from the catch block. The exception from the catch block gets forgotten about, due to exception thrown from finally.
+
+- Runtime Exceptions
+  - ArithmeticException Thrown by the JVM when code attempts to divide by zero
+  - ArrayIndexOutOfBoundsException Thrown by the JVM when code uses an illegal index to access an array
+  - ClassCastException Thrown by the JVM when an attempt is made to cast an exception to a subclass of which it is not an instance
+  - IllegalArgumentException Thrown by the programmer to indicate that a method has been passed an illegal or inappropriate argument
+    - NumberFormatException Thrown by the programmer when an attempt is made to convert a string to a numeric type but the string doesn’t have an appropriate format
+  - NullPointerException Thrown by the JVM when there is a null reference where an object is required
+
+
+- Checked Exceptions
+  - IOException Thrown programmatically when there’s a problem reading or writing a fi le
+    - FileNotFoundException Thrown programmatically when code tries to reference a fi le that does not exist
+
+- Errors
+  - ExceptionInInitializerError Thrown by the JVM when a static initializer throws an exception and doesn’t handle it
+  - StackOverflowError Thrown by the JVM when a method calls itself too many times
+  - NoClassDefFoundError Thrown by the JVM when a class that the code uses is available at compile time but not runtime
+
+- No swallowing exception: print out a stack trace or at least a message when catching
+an exception. Also, consider whether continuing is the best course of action.
+
+```
+An exception indicates something unexpected happened. A method can handle an exception
+by catching it or declaring it for the caller to deal with. Many exceptions are thrown
+by Java libraries. You can throw your own exception with code such as throw new
+Exception().
+Subclasses of java.lang.Error are exceptions that a programmer should not attempt to
+handle. Subclasses of java.lang.RuntimeException are runtime (unchecked) exceptions.
+Subclasses of java.lang.Exception, but not java.lang.RuntimeException are checked
+exceptions. Java requires checked exceptions to be handled or declared.
+If a try statement has multiple catch blocks, at most one catch block can run. Java
+looks for an exception that can be caught by each catch block in the order they appear, and
+the fi rst match is run. Then execution continues after the try statement. If both catch and
+finally throw an exception, the one from finally gets thrown.
+Common runtime exceptions include:
+■ ArithmeticException
+■ ArrayIndexOutOfBoundsException
+■ ClassCastException
+■ IllegalArgumentException
+■ NullPointerException
+■ NumberFormatException
+IllegalArgumentException and NumberFormatException are typically thrown by the
+programmer, whereas the others are typically thrown by the JVM.
+Common checked exceptions include:
+■ IOException
+■ FileNotFoundException
+Common errors include:
+■ ExceptionInInitializerError
+■ StackOverflowError
+■ NoClassDefFoundError
+When a method overrides a method in a superclass or interface, it is not allowed to add
+checked exceptions. It is allowed to declare fewer exceptions or declare a subclass of a
+declared exception. Methods declare exceptions with the keyword throws.
+```
 
 
 
