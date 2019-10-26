@@ -64,9 +64,21 @@ private void acquireLocks(Lock lock1, Lock2) {
     }
 }
 
+### Semaphore
+- maintain a number as the permits to control resource access, DB connection?
+- fair - true if this semaphore will guarantee first-in first-out granting of permits under contention, else false
+- release(): +1, acquire(): -1, or wait till get a permit
 
+### Callable & Future
+- Callable for return value
+- future to get return or catch exception
+```java
+Future<Integer> future = Executor.submit(new Callable<Integer>{...});
 
+future.get();
 
+Future<?> future = Executor.submit(new Callable<Void>{...});
+```
 
 
 ```
