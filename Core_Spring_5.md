@@ -32,31 +32,145 @@ databases?
 
 
 - [x] What is a callback? What are the three JdbcTemplate callback interfaces that can be used with queries? What is each used for? (You would not have to remember the interface names in the exam, but you should know what they do if you see them in a code sample).
+- Callback: is any executable code that is passed as an argument to other code that is expected to call back (execute) the argument at a given time. Lambda/Interface
+- callbacks for JdbcTemplate:
+  - ResultSetExtractor: Allows for processing of an entire result set, possibly consisting multiple rows of data, at once. stateless
+  - RowCallbackHandler: Allows for processing rows in a result set one by one typically accumulating some type of result. stateless, void processRow()
+  - RowMapper: Allows for processing rows in a result set one by one and creating a Java object for each row.
+
+- [x] Can you execute a plain SQL statement with the JDBC template?
+- batchUpdate
+- execute
+- query
+- queryForList
+- queryForMap
+- queryForObject
+- queryForRowSet
+- update
 
 
-- Can you execute a plain SQL statement with the JDBC template?
-- When does the JDBC template acquire (and release) a connection - for every method called or once per
-template? Why?
-- How does the JdbcTemplate support generic queries? How does it return objects and lists/maps of
+- [x] When does the JDBC template acquire (and release) a connection - for every method called or once per template? Why?
+
+- JdbcTemplate acquire and release a database connection for every method called. immediately
+- avoid holding on to resources, back to connection pool
+
+
+
+- [x] How does the JdbcTemplate support generic queries? How does it return objects and lists/maps of
 objects?
-- What is a transaction? What is the difference between a local and a global transaction?
-- Is a transaction a cross cutting concern? How is it implemented by Spring?
-- How are you going to define a transaction in Spring?
-  - What does @Transactional do? What is the PlatformTransactionManager?
-- Is the JDBC template able to participate in an existing transaction?
-- What is a transaction isolation level? How many do we have and how are they ordered?
-- What is @EnableTransactionManagement for?
-- What does transaction propagation mean?
-- What happens if one @Transactional annotated method is calling another @Transactional annotated
+- The **queryForList** methods all return a list containing the resulting rows of the query
+  - with type as param or not
+- All **queryForMap** methods are expected to return one single row.
+
+
+- [x] What is a transaction? What is the difference between a local and a global transaction?
+- A transaction is an operation that consists of a number of tasks that takes place as a single unit – either all tasks are performed or no tasks are performed.
+- A reliable transaction system enforces the ACID principle:
+  - Atomicity: **“All or nothing”**, The changes within a transaction are either all applied or none applied.
+  - Consistency: Any integrity **constraints**, for instance of a database, are not violated.
+  - Isolation: Transactions are isolated from each other and do not affect each other. Visible during
+  - Durability: Changes applied as the **result** of a successfully completed transaction are durable.
+- Global transactions allow for transactions to span multiple transactional resources. like DB + MQ
+- Local transactions are transactions associated with one **single** resource
+
+- [x] Is a transaction a cross cutting concern? How is it implemented by Spring?
+- Yes, using AOP
+
+- [x] How are you going to define a transaction in Spring?
+- Declare a PlatformTransactionManager bean: impls like
+  - JmsTransactionManager
+  - JpaTransactionManager
+- Add @EnableTransactionManagement on @Configuration class
+- Declare transaction boundaries in the application code
+  - @Transactional, can replaced with JPA's
+  - Programmatic transaction management
+  - XML config
+
+  - [x] What does @Transactional do? What is the PlatformTransactionManager?
+  - @Transactional
+    - to specify attr, can be applied to methods and classes.
+    - transactionManager, isolation, propagation, readOnly, timeout
+    - rollbackFor, rollbackForClassName, noRollbackFor, noRollbackForClassName
+  - PlatformTransactionManager
+    - void commit/rollback(TransactionStatus)
+    - TransactionStatus getTransaction(TransactionDefinition): create new
+    - recommended to use declarative transactions or the TransactionTemplate class
+  
+- [x] Is the JDBC template able to participate in an existing transaction?
+- accomplished by wrapping the DataSource using a TransactionAwareDataSourceProxy.
+
+
+
+- [ ] What is a transaction isolation level? How many do we have and how are they ordered?
+- Transaction isolation in database systems determine how the changes within a transaction are visible to other users and systems accessing the database prior to the transaction being committed
+  - reduce concurrency
+- Serializable
+  - highest: read/write lock + range-locks for select-where
+- Repeatable reads
+  - no range-lock, can read uncommitted data from itself
+  - Phantom Read occurs when two same queries are executed, but the rows retrieved by the two, are different.
+- Read committed
+  - Read locks are held, but only until the select statement with which the read lock is associated has completed.
+  - non-repeatable reads can occur
+  - A non-repeatable read is one in which data read twice inside the same transaction cannot be guaranteed to contain the same value
+- Read uncommitted
+  - A Dirty read is the situation when a transaction reads a data that has not yet been committed. 
+  
+  
+- [x] What is @EnableTransactionManagement for?
+- to annotate exactly one configuration class in an application in order to enable annotation-driven transaction management using the @Transactional
+- it registers:
+  - A TransactionInterceptor
+  - A JDK Proxy or AspectJ advice.
+- optional attr:
+  - mode: AdviceMode.ASPECTJ and AdviceMode.PROXY
+  - order: Default value is Ordered.LOWEST_PRECEDENCE
+  - proxyTargetClass: True of CGLIB proxies are to be used, false if JDK interface-based proxies are to be used in the application (affects proxies for all Spring managed beans in the application!).
+
+
+- [x] What does transaction propagation mean?
+- Typically, all code executed within a transaction scope will run in that transaction. However, you have the option of specifying the behavior in the event that a transactional method is executed when a transaction context already exists. For example, code can continue running in the existing transaction (the common case); or the existing transaction can be suspended and a new transaction created.
+- 7 opts:
+  - MANDATORY: There **must be an existing** transaction when the method is invoked, or an exception will be thrown.
+  - NESTED: Executes in a nested transaction if a transaction exists, otherwise a new transaction will be created. This transaction propagation mode is not implemented in all transaction managers.
+  - NEVER: Method is executed **outside** of a transaction. Throws exception if a transaction exists.
+  - NOT_SUPPORTED: Method is executed outside of a transaction. **Suspends any existing** transaction.
+  - REQUIRED Method will be executed in the **current** transaction. If no transaction exists, one will be created.
+  - REQUIRES_NEW: Creates a new transaction in which the method will be executed. **Suspends any existing **transaction
+  - SUPPORTS: Method will be executed in the current transaction, if one exists, or outside of a transaction if one does not exist.
+
+- [ ] What happens if one @Transactional annotated method is calling another @Transactional annotated
 method on the same object instance?
-- Where can the @Transactional annotation be used? What is a typical usage if you put it at class level?
-- What does declarative transaction management mean?
-- What is the default rollback policy? How can you override it?
-- What is the default rollback policy in a JUnit test, when you use the
+- a self-invocation of a proxied Spring bean effectively bypasses the proxy and thus also any transaction interceptor managing transactions.
+- sec same transaction context as first 
+- ?? If Spring transaction management is used with AspectJ, then any transaction-configuration using @Transactional on non-public methods will be honored.
+
+
+- [x] Where can the @Transactional annotation be used? What is a typical usage if you put it at class level?
+- When using Spring AOP proxies, only @Transactional annotations on public methods will have any effect
+- no control no error for other access
+
+- [x] What does declarative transaction management mean?
+- not implemented, but use annotations or Spring XML configuration.
+
+- [x] What is the default rollback policy? How can you override it?
+- automatic rollback only takes place in the case of an unchecked exception being thrown.
+- use rollbackFor, noRollbackFor control which exception
+
+- [x] What is the default rollback policy in a JUnit test, when you use the
 @RunWith(SpringJUnit4ClassRunner.class) in JUnit 4 or @ExtendWith(SpringExtension.class) in JUnit 5,
 and annotate your @Test annotated method with @Transactional?
-- Why is the term "unit of work" so important and why does JDBC AutoCommit violate this
-- pattern?
+- automatically be rolled back after the completion of the test-method.
+- to change: @Rollback annotation and setting the value to false.
+
+
+- Why is the term "unit of work" so important and why does JDBC AutoCommit violate this pattern?
+- JDBC AutoCommit commit each individual SQL 
+- impossible to perform operations that consist of multiple SQL statements as a unit of work.
+- JDBC AutoCommit can be disabled by calling the **setAutoCommit** method with the value false on a JDBC connection.
+
+
+
 - What does JPA stand for - what about ORM?
   - What is the idea behind an ORM? What are benefits/disadvantages or ORM?
   - What is a PersistenceContext and what is an EntityManager. What is the relationship between
