@@ -171,9 +171,16 @@ and annotate your @Test annotated method with @Transactional?
 
 
 
-- What does JPA stand for - what about ORM?
-  - What is the idea behind an ORM? What are benefits/disadvantages or ORM?
-  - What is a PersistenceContext and what is an EntityManager. What is the relationship between
+- [x] What does JPA stand for - what about ORM?
+- JPA stands for Java Persistence API, Is the Java API for the management of persistence and object/relational mapping in Java EE and Java SE environments”.
+- ORM is an abbreviation for Object-Relational Mapping and is a technique for converting data format typically between what can be inserted into a SQL database and what can be represented by a Java object hierarchy residing in memory.
+
+  - [x] What is the idea behind an ORM? What are benefits/disadvantages or ORM?
+  - to allow developers to work with  domain objects, with their properties and relations as Java objects in memory without having to concern they are persisted in DB.
+  - Data-type conversion, Maintaining relationships between objects, no need deal with SQL
+  - Caching, Lazy loading
+  - may affect preformance, add complexity, hard to use with legacy DB
+  - [x] What is a PersistenceContext and what is an EntityManager. What is the relationship between
 both?
   - Why do you need the @Entity annotation. Where can it be placed?
 - What do you need to do in Spring if you would like to work with JPA?
