@@ -356,6 +356,121 @@ number of days, months, or years to add or subtract from a LocalDate or LocalDat
 DateTimeFormatter is used to output dates and times in the desired format. The date and
 time classes are all immutable, which means the return value must be used.
 ```
+#### Collection
+- A collection is a group of objects contained in a single object.
+- List: A list is an ordered collection of elements that allows duplicate entries. Elements in a list can be accessed by an int index.
+  - ArrayList
+    - look up any element in constant time.
+    - Adding or removing an element is slower than accessing
+    - reading more
+  - LinkedList
+    - both List and Queue
+    - you can access, add, and remove from the beginning and end of the list in constant time.
+    - an arbitrary index takes linear time.
+- Set: A set is a collection that does not allow duplicate entries.
+  - HashSet
+    - adding elements and checking if an element is in the set both have constant time
+    - no order
+  - A TreeSet stores its elements in a sorted tree structure.
+    - always in sorted order. 
+    - adding and checking if an element is present are both O(log n).
+- Queue: A queue is a collection that orders its elements in a specific order for processing. A typical queue processes its elements in a first-in, first-out order, but other orderings are possible.
+- Map: A map is a collection that maps keys to values, with no duplicate keys allowed. The elements in a map are key/value pairs.
+  - Map doesn’t implement the Collection interface.
+```
+O(1)—constant time
+O(log n)—logarithmic time
+O(n)—linear time
+O(n^2)—n squared time
+```
+- Common Collections Methods
+  - boolean add(E element)
+  - boolean remove(Object object)
+  - boolean isEmpty(), int size()
+  - void clear()
+  - boolean contains(Object object)
+
+- If your class implements Comparable , it can be used in these data structures that require comparison
+- Comparator , which is used to specify that you want to use a different order than the object itself provides.
+-  A natural ordering that uses compareTo() is said to be consistent with equals if, and only if, x.equals(y) is true whenever x.compareTo(y) equals 0.
+
+
+```
+Generics are type parameters for code. To create a class with a generic parameter, add <T>
+after the class name. You can use any name you want for the type parameter. Single uppercase
+letters are common choices.
+The diamond operator (<>) is used to tell Java that the generic type matches the declaration
+without specifying it again. The diamond operator can be used for local variables or
+instance variables as well as one-line declarations.
+Generics allow you to specify wildcards. <?> is an unbounded wildcard that means any
+type. <? extends Object> is an upper bound that means any type that is Object or extends
+it. <? extends MyInterface> means any type that implements MyInterface. <? super
+Number> is a lower bound that means any type that is Number or a superclass. A compiler
+error results from code that attempts to add or remove an item in a list with an unbounded
+or upper-bounded wildcard.
+When working with code that doesn’t use generics (also known as legacy code or raw types),
+Java gives a compiler warning. A compiler warning is different than a compiler error in that the
+compiler still produces a class file. If you ignore the compiler warning, the code might throw a
+ClassCastException at runtime. Unboxing gives a compiler error when generics are not used.
+Each primitive class has a corresponding wrapper class. For example, long’s wrapper
+class is Long. Java can automatically convert between primitive and wrapper classes when
+needed. This is called autoboxing and unboxing. Java will only use autoboxing if it doesn’t
+find a matching method signature with the primitive. For example, remove(int n) will be
+called rather than remove(Object o) when called with an int.
+The Java Collections Framework includes four main types of data structures: lists, sets,
+queues, and maps. The Collection interface is the parent interface of List, Set, and Queue.
+The Map interface does not extend Collection. You need to recognize the following:
+List—An ordered collection of elements that allows duplicate entries
+ArrayList—Standard resizable list.
+..
+LinkedList—Can easily add/remove from beginning or end.
+..
+Vector—Older thread-safe version of ArrayList.
+..
+Stack—Older last-in, first-out class.
+..
+Set—Does not allow duplicates
+..
+HashSet—Uses hashcode() to find unordered elements.
+..
+TreeSet—Sorted and navigable. Does not allow null values.
+..
+Queue—Orders elements for processing
+..
+LinkedList—Can easily add/remove from beginning or end.
+..
+ArrayDeque—First-in, first-out or last-in, first-out. Does not allow null values.
+..
+Map—Maps unique keys to values
+..
+HashMap—Uses hashcode() to find keys.
+..
+TreeMap—Sorted map. Does not allow null keys.
+..
+Hashtable—Older version of hashmap. Does not allow null keys or values.
+..
+The Comparable interface declares the compareTo() method. This method returns
+a negative number if the object is smaller than its argument, zero if the two objects
+are equal, and a positive number otherwise. compareTo() is declared on the object
+that is being compared, and it takes one parameter. The Comparator interface defines
+the compare() method. A negative number is returned if the first argument is smaller,
+zero if they are equal, and a positive number otherwise. compare() can be declared
+in any code, and it takes two parameters. Comparator is often implemented using a
+lambda.
+The Arrays and Collections classes have methods for sort() and binarySearch().
+Both take an optional Comparator parameter. It is necessary to use the same sort order for
+both sorting and searching, so the result is not undefined. Collection has a few methods
+that take lambdas, including removeIf(), forEach(), and merge().
+A method reference is a compact syntax for writing lambdas that refer to methods.
+There are four types: static methods, instance methods referring to a specific
+instance, instance methods with the instance supplied at runtime, and constructor
+references.
+```
+
+
+
+
+
 #### Methods
 - Access
   - public The method can be called from any class.
@@ -383,6 +498,21 @@ package.
   - A vararg parameter must be the last element in a method’s parameter list. This implies you are only allowed to have one vararg parameter per method.
   - When calling a method with a vararg parameter, you have a choice. You can pass in an array, or you can list the elements of the array and let Java create it for you. You can even omit the vararg values in the method call and Java will create an array of length zero for you.
   - Java will create an empty array if no parameters are passed for a vararg. However, it is still possible to pass null explicitly
+
+- Method references are a way to make the code shorter by reducing some of the code that can be inferred and simply mentioning the name of the method.
+  - :: operator tells Java to pass the parameters automatically
+
+```java
+Static methods
+// Instance methods on a particular instance
+Predicate<String> methodRef2 = str::startsWith;
+Predicate<String> lambda2 = s -> str.startsWith(s);
+■ Instance methods on an instance to be determined at runtime
+// Constructors
+Supplier<ArrayList> methodRef4 = ArrayList::new;
+```
+
+
 
 
 #### Access Modifiers
@@ -882,6 +1012,88 @@ pattern. Finally, the factory pattern is useful for creating various objects wit
 the underlying constructors and complex rules for selecting a particular object subtype.
 ```
 
+- Autoboxing automatically converts a primitive to the corresponding wrapper classes when needed if the generic type is specifi ed in the declaration. Unsurprisingly, unboxing automatically converts a wrapper class back to a primitive.
+
+##### Generic
+- Generics fix ClassCastException by allowing you to write and use parameterized types
+- just for compile time
+  - Type erasure allows your code to be compatible with old version
+  - The compiler adds the relevant casts
+- Cannot:
+  - Call the constructor. new T() is not allowed because at runtime it would be new Object().
+  - Create an array of that static type
+  - Call instanceof.
+  - Use a primitive type as a generic type parameter. 
+  - Create a static variable as a generic type parameter. 
+- Generic Method:
+  - Before the return type, we declare the formal type parameter of <T>.
+  - ```public static <T> T identity(T t) { return t; }```
+  - You can call a generic method normally, and the compiler will figure out which one you want. Alternatively, you can specify the type explicitly
+   
+```java
+public class Crate < T > {
+    private T contents;
+    public T emptyCrate() {
+        return contents;
+    }
+    public void packCrate(T contents) {
+        this.contents = contents;
+    }
+}
+
+
+// implementing Generic interface
+// The first is to specify the generic type in the class.
+class ShippableRobotCrate implements Shippable < Robot > {
+    public void ship(Robot t) {}
+}
+// The next way is to create a generic class.
+class ShippableAbstractCrate < U > implements Shippable < U > {
+    public void ship(U t) {}
+}
+// The final way is to not use generics at all.
+class ShippableCrate implements Shippable {
+    public void ship(Object t) {}
+}
+```
+
+- A wildcard generic type is an unknown generic type represented with a question mark (?).
+
+- Unbounded wildcard: ?
+   - ```List<?> l =new ArrayList<String>();```
+- Wildcard with an upper bound: ? extends type 
+   - ```List<? extends Exception> l = new ArrayList<RuntimeException>();```
+- Wildcard with a lower bound: ? super type
+  - ```List<? super Exception> l = new ArrayList<Object>();``` can't add object though
+- when we work with upper bounds or unbounded wild cards. The list becomes logically immutable, can remove though
+
+```
+Naming Conventions for Generics
+■■ E for an element
+■■ K for a map key
+■■ V for a map value
+■■ N for a number
+■■ T for a generic data type
+■■ S, U, V, and so forth for multiple generic types
+```
+
+✓✓ Generics and Collections
+■■ Create and use a generic class
+■■ Create and use ArrayList, TreeSet, TreeMap and ArrayDeque
+objects
+■■ Use java.util.Comparator and java.lang.Comparable interfaces
+■■ Iterate using forEach methods on Streams and List
+■■ Use method references with Streams
+✓✓ Advanced Java Class Design
+■■ Create and use lambda expressions
+✓✓ Generics and Collections
+■■ Filter a collection using lambda expressions
+✓✓ Java Stream API
+■■ Use of merge()and flatMap()methods of the Stream API
+
+
+
+### Functional Programming
 
 
 
