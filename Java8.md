@@ -536,6 +536,7 @@ with one method. Predicate is a common interface. It has one method named test
 that returns a boolean and takes any type. The removeIf() method on ArrayList takes a
 Predicate.
 ```
+### Class Design
 #### class
 - At its core, proper Java class design is about code reusability, increased functionality,
 and standardization.
@@ -628,7 +629,7 @@ and standardization.
 - A virtual method is a method in which the specific implementation is not determined until runtime
 - if you call a method on an object that overrides a method, you **get the overridden method**, even if the call to the method is **on a parent reference** or within the parent class.
 - polymorphic parameters of a method: an explicit cast is not required for casting from a subtype to a supertype
-
+- @Override
 ```
 This chapter took the basic class structure we presented in Chapter 4 and expanded it by
 introducing the notion of inheritance. Java classes follow a multilevel single-inheritance
@@ -655,6 +656,109 @@ and showed how objects can be accessed in a variety of forms. Make sure you
 understand when casts are needed for accessing objects, and be able to spot the difference
 between compile-time and runtime cast problems.
 ```
+- An annotation is extra information about the program, and it is a type of metadata.
+- Reflection is a technique used in Java to look at information about the class at runtime.
+- Whenever you override equals(), you are also expected to override hashCode().
+- A hash code is a number that puts instances of a class into a finite number of categories
+```java
+@Override
+public String toString() {
+return name;
+}
+// It is common to multiply by a prime number when combining multiple fields in the hash code.
+public int hashCode() {
+return keyField + 7 * otherKeyField.hashCode();
+}
+
+// Apache Commons
+@Override public String toString() {
+return ToStringBuilder.reflectionToString(this,
+ToStringStyle.SHORT_PREFIX_STYLE);
+}
+
+public boolean equals(Object obj) {
+if ( !(obj instanceof LionEqualsBuilder)) return false;
+Lion other = (Lion) obj;
+return new EqualsBuilder().appendSuper(super.equals(obj))
+.append(idNumber, other.idNumber)
+.append(name, other.name)
+.isEquals();
+}
+
+```
+##### Enum
+- an enum is a type of class that mainly contains static members
+- you can’t do is extend an enum.
+- the semicolon at the end of the enum values is optional only if the only thing in the enum is that list of values.
+
+##### Nested Class
+- A nested class is a class that is defined within another class. A nested class that is not
+static is called an inner class. There are four of types of nested classes:
+  - A member inner class is a class defined at the same level as instance variables. It is notstatic. Often, this is just referred to as an inner class without explicitly saying the type.
+    - Can be declared public, private, or protected or use default access
+    - Can extend any class and implement interfaces
+    - Can be abstract or final
+    - **Cannot declare static fields or methods**
+    - Can access members of the outer class including private members
+    - For the inner class, the compiler creates Outer$Inner.class.
+    - private interface as declared as inner, its methods still need be public
+  - A local inner class is defined within a method.
+    - They do not have an access specifier.
+    - They cannot be declared static and cannot declare static fields or methods.
+    - They have access to all fields and methods of the enclosing **class**.
+    - They do not have access to local variables of a method unless those variables are **final or effectively final**.
+      - If the code could still compile with the keyword final inserted before the local variable, the variable is effectively fi nal.
+  - An anonymous inner class is a special case of a local inner class that does not have a name.
+    - Anonymous inner classes are required to extend an existing class or implement an existing interface
+    - don’t even store it in a local variable
+    - must have exactly one superclass or one interface
+  - A static nested class is a static class that is defined at the same level as static variables.
+    - It can be instantiated without an object of the enclosing class
+    - as regular class except:
+      - The nesting creates a namespace because the enclosing class name must be used to refer to it.
+        - Java treats the static nested class as if it were a namespace.
+        - either import or import static
+      - It can be made private or use one of the other access modifiers to encapsulate it.
+      - The **enclosing class can refer to the fields and methods** of the static nested class. while it can't access enclosing class'
+
+
+```java
+Outer outer = new Outer();
+Inner inner = outer.new Inner(); // create the inner class
+```
+```
+The instanceof keyword compares an object to a class or interface type. It also looks at
+subclasses and subinterfaces. x instanceof Object returns true unless x is null. If the
+compiler can determine that there is no way for instanceof to return true, it will generate
+a compiler error. Virtual method invocation means that Java will look at subclasses when
+finding the right method to call. This is true, even from within a method in the superclass.
+The methods toString(), equals(), and hashCode() are implemented in Objects
+that classes can override to change their behavior. toString() is used to provide a
+human‐readable representation of the object. equals() is used to specify which instance
+variables should be considered for equality. equals() is required to return false when the
+object passed in is null or is of the wrong type. hashCode() is used to provide a grouping
+in some collections. hashCode() is required to return the same number when called with
+objects that are equals().
+The enum keyword is short for enumerated values or a list of values. Enums can be used
+in switch statements. They are not int values and cannot be compared to int values. In a
+switch, the enum value is placed in the case. Enums are allowed to have instance variables,
+constructors, and methods. Enums can also have value‐specific methods. The enum itself
+declares that method as well. It can be abstract, in which case all enum values must
+provide an implementation. Alternatively, it can be concrete, in which case enum values can
+choose whether they want to override the default implementation.
+There are four types of nested classes. Member inner classes require an instance of
+the outer class to use. They can access private members of that outer class. Local inner
+classes are classes defined within a method. They can also access private members of the
+outer class. Local inner classes can also access final or effectively final local variables.
+Anonymous inner classes are a special type of local inner class that does not have a name.
+Anonymous inner classes are required to extend exactly one class by name or implement
+exactly one interface. Static nested classes can exist without an instance of the outer class.
+This chapter also contained a review of access modifiers, overloading, overriding,
+abstract classes, static, final, and imports. It also introduced the optional @Override
+annotation for overridden methods or methods implemented from an interface.
+```
+  
+### Exception
 #### Handling Exceptions
 - an exception is an event that alters program fl ow.
 - In general, try to avoid return codes.
