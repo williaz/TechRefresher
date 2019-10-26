@@ -757,7 +757,134 @@ This chapter also contained a review of access modifiers, overloading, overridin
 abstract classes, static, final, and imports. It also introduced the optional @Override
 annotation for overridden methods or methods implemented from an interface.
 ```
-  
+##### Interface
+- An interface provides a way for one individual to develop code that uses another individual’s code, without having access to the other individual’s underlying implementation. Interfaces can facilitate rapid application development by enabling development teams to create applications **in parallel**, rather than being directly dependent on each other.
+  - mock object, sometimes referred to as dummy code
+
+- @FunctionalInterface
+- The Java compiler implicitly assumes that any interface that contains **exactly one abstract method** is a functional interface.
+- implement FunctionalInterface using lambda expressions.
+- Deferred execution means that code is specified now but runs later.
+
+
+- Polymorphism is the ability of a single interface to support multiple underlying forms. In Java, this allows multiple types of objects to be passed to a single method or class.
+- If you use a variable to refer to an object, then only the methods or variables that are part of the variable’s reference type can be called without an explicit cast.
+
+- In Java, all objects are accessed by reference, so as a developer you never have direct access to the memory of the object itself.
+
+
+##### Design Principle
+- A design principle is an established idea or best practice that facilitates the software design process
+ - more logical, easier to understand, to reuse, to maintain
+- a data model is the representation of our objects and their properties within our application and how they relate to items in the real world.
+- encapsulation is the idea of combining fi elds and methods in a class such that the methods operate on the data, as opposed to the users of the class accessing the fi elds directly. In Java, it is commonly implemented with private instance members that have public methods to retrieve or modify the data, commonly referred to as getters and setters, respectively.
+- An **invariant** is a property or truth that is maintained even after the data is modifi ed.
+- In object.oriented design, we describe the property of an object being an instance of a data type as having an **is.a** relationship. The is.a relationship is also known as the **inheritance test**.
+- We refer to the **has.a** relationship as the property of an object having a named data object or primitive as a member. The has.a relationship is also known as the object **composition test**,
+
+- object **composition** as the property of constructing a class using references to other classes in order to reuse the functionality of the other classes
+  - an alternate to inheritance and is often used to **simulate polymorphic** behavior that cannot be achieved via single inheritance
+
+- A design pattern is an established general solution to a commonly occurring software development problem.
+- An anti.pattern is a common solution to a reoccurring problem that tends to lead to unmanageable or difficult.to.use code.
+- The creational patterns simply apply a level of indirection to object creation by creating the object in some other class, rather than creating the object directly in your application.
+
+###### Singleton
+- The singleton pattern is a creational pattern focused on creating only one instance of an object in memory within an application, sharable by all classes and threads within the application. The **globally available object** created by the singleton pattern is referred to as a singleton.
+- singletons in Java are created as **private static** variables within the class, often with the name **instance**. They are accessed via a single **public static** method, often named **getInstance()**, which returns the reference to the singleton object. Finally, all **constructors** in a singleton class are marked **private**, which ensures that no other class is capable of instantiating another version of the class.
+- **application configuration data and reusable data caches** are commonly implemented using singletons. Singletons may also be used to **coordinate access to shared resources**, such as coordinating write access to a file
+- Creating a reusable object the first time it is requested is a software design pattern known as lazy instantiation.
+  - Lazy instantiation reduces memory usage and improves performance when an application starts up.
+- Multiple JVM, serialzation, thread safe, global access, reflection, clone(override it then)
+- hard for unit testing, global access
+
+```java
+public class Singleton implements Serializable {
+    // volatile variable guaranteeing happens-before relationship: a guarantee that action performed by one thread is visible to another action in different thread
+    private static volatile Singleton instance;
+
+    // private constructor, implicit final class
+    private Singleton(){
+
+        //Prevent form the reflection api.
+        if (instance != null){
+            throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
+        }
+    }
+    
+    public static Singleton getInstance() {
+        // double.checked locking: check needed first
+        if (instance == null) { // Lazy instantiation
+            synchronized (Singleton.class) { // thread safe
+                if (instance == null) instance = new Singleton();
+            }
+        }
+
+        return sSoleInstance;
+    }
+
+    // when an object is read, replace it with the singleton instance. This ensures that nobody can create another instance by serializing and deserializing the singleton
+    protected SingletonClass readResolve() {
+        return getInstance();
+    }
+}
+```
+
+###### Immutable
+- final calss, private final field. only getter, construct once, defensive copy, 
+
+- 1. Use a constructor to set all properties of the object.
+- 2. Mark all of the instance variables private and final .
+- 3. Don’t define any setter methods.
+- 4. Don’t allow referenced mutable objects to be modified or accessed directly.
+- 5. Prevent methods from being overridden.
+- Defensive copy
+
+###### Builder
+- a lot feilds, may dependent on each other, too many combination
+- The builder pattern is a creational pattern in which parameters are passed to a builder object, often through method chaining(return the object), and an object is generated with a final build call. It is often used with immutable objects, since immutable objects do not have setter methods and must be created with all of their parameters set, although it can be used with mutable objects as well.
+- In practice, a builder class is often **packaged alongside its target class, either as a static inner class** within the target class or within the same Java package.
+
+###### Factory
+- creates objects in which the precise type of the object may not be known until runtime
+- supporting class polymorphism
+- postfix the class name with the word Factory
+
+```
+One of the primary goals of this chapter was to teach you how to write better code. We
+demonstrated techniques for designing class structures that scale naturally over time, integrate
+well with other applications, and are easy for other developers to read and understand.
+We started off with a brief review of interfaces from your OCA studies showing how to
+declare, implement, and extend them. We then moved on to functional programming and
+reviewed the various syntax options available for defining functional interfaces and writing
+lambda expressions. Given the prevalence of lambda expressions throughout Java 8, you
+absolutely need to practice writing and using lambda expressions before taking the exam.
+We concluded the discussion with a review of the generics‐based Predicate interface and
+showed how it can be used in place of your own functional interface. We will return to
+lambdas and streams in Chapter 3 and Chapter 4 in much greater detail.
+This chapter introduced the concept of polymorphism, which is central to the Java
+language, and showed how objects can be accessed in a variety of forms. Make sure
+that you understand when casts are needed for accessing objects, and be able to spot the
+difference between compile‐time and runtime cast problems.
+In the design principles section, we taught you how to encapsulate your classes in Java
+properly, allowing you to enforce class invariants in your data model. We then described
+the is‐a and has‐a principles and showed how you can apply them to your data model.
+Finally, we introduced the technique of creating class structures using object composition
+that rely on the has‐a principle as an alternative to inheritance.
+We completed this chapter by explaining what a design pattern is and presenting you with
+four well‐known design patterns. Design patterns provide you with a way to solve a problem
+that you encounter using solutions that other developers have already built and generalized.
+The singleton pattern is excellent for managing a single shared instance of an object within
+an application. The immutable object pattern is useful for creating read‐only objects that
+cannot be modified by other classes. The builder pattern solves the problem of how to
+create complex objects cleanly, and it is often used in conjunction with the immutable object
+pattern. Finally, the factory pattern is useful for creating various objects without exposing
+the underlying constructors and complex rules for selecting a particular object subtype.
+```
+
+
+
+
 ### Exception
 #### Handling Exceptions
 - an exception is an event that alters program fl ow.
