@@ -63,7 +63,7 @@ private void acquireLocks(Lock lock1, Lock2) {
         Thread.sleep(1);
     }
 }
-
+```
 ### Semaphore
 - maintain a number as the permits to control resource access, DB connection?
 - fair - true if this semaphore will guarantee first-in first-out granting of permits under contention, else false
@@ -79,7 +79,15 @@ future.get();
 
 Future<?> future = Executor.submit(new Callable<Void>{...});
 ```
+### interrupt
+- t1.interrupt()
+- Thread.currentThread().isInterrupted()
 
 
-```
+
+
+
+
+
+
 
