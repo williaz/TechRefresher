@@ -1093,9 +1093,199 @@ objects
 
 
 
-### Functional Programming
+### Concurrency
+- A thread is the smallest unit of execution that can be scheduled by the operating system. 
+  - A task is a single unit of work performed by a thread.
+  - A thread can complete multiple independent tasks but only one task at a time.
+  - A system thread is created by the JVM and runs in the background of the application.
+  - a user-defi ned thread is one created by the application developer to accomplish a specifi c task.
+  - a daemon thread is one that will not prevent the JVM from exiting when the program finishes. mark any type
+- A process is a group of associated threads that execute in the same, shared environment.
+
+- A core is the physical hardware that works on the thread. In general, a processor can only work on one thread per core (CPUs with hyper threading can work on up to two threads per core).
+- The property of executing multiple threads and processes at the same time is referred to as concurrency . -> fork/join
+  - Operating systems use a thread scheduler to determine which threads should be currently executing, like round-robin schedule
+  - A **context switch** is the process of storing a thread’s current state and later restoring the state of the thread to continue execution. when allotted time is complete but the thread has not finished processing,
+  - A thread priority is a numeric value associated with a thread that is taken into consideration by the thread scheduler when determining which threads should currently be executing.
+    - Java, int: Thread.MIN_PRIORITY 1, Thread.NORM_PRIORITY 5, Thread.MAX_PRIORITY 10
+
+- Runnable @FunctionalInterface takes no arguments and returns no data.
+- Java does not provide any guarantees about the order in which a thread will be processed once it is started.
 
 
+##### Thread
+- Creating thread
+  - Provide a Runnable object or lambda expression to the Thread constructor.
+  - Create a class that extends T hread and overrides the run() method.
+  - use the ExecutorService
+- Runnable VS Thread
+  - If you need to define your **own Thread rules upon which multiple tasks** will rely, such as a priority Thread, extending Thread may be preferable.
+  - Since Java doesn't support **multiple inheritance**, extending Thread does not allow you to extend any other class, whereas implementing Runnable lets you extend another class.
+  - Implementing Runnable is often a better object-oriented design practice since it **separates the task being performed from the Thread object performing it**. 
+  - Implementing Runnable allows the class to be used by numerous Concurrency API classes.
+
+- sleep
+  - Polling is the process of intermittently checking data at some fixed interval
+  - Using a while() loop to check for data without some kind of delay is considered a very bad coding practice as it ties up CPU resources for no reason.
+  - ```Thread.sleep(1000); // 1 SECOND throws InterruptedException```
+
+- ExecutorService
+  - Lifecycle: isShutdown(), isTerminated()
+    - Active: Accepts New Tasks, Executes Tasks; false, false
+    - Shutting Down: Rejects New Tasks, Executes Tasks; true, false
+    - Shutdown: Rejects New Tasks, No Tasks Running; true, true
+  - **submit()** returns a Future object that can be used to determine if the task is complete. It can also be used to return a generic result object after the task has been completed. 
+    - support both Runnable and Callable => use it over execute()
+  - “fire-and-forget": The execute() method takes a Runnable lambda expression or instance and completes the task asynchronously.
+  - invokeAll()/invokeAny(): Both execute synchronously
+    - will wait until the results are available before returning control to the enclosing program.
+    - take a timeout value and TimeUnit parameter.
+  - A thread executor creates a non-daemon thread on the first task that is executed, so failing to call shutdown() will result in your application never terminating.
+    - ```finally { if(service != null) service.shutdown();}```
+    - define a static method foruser signals to terminate static instance of a thread executor and have all processes share it.
+  - shutdownNow() **attempts** to stop all running tasks and discards any that have not been started yet. and return never started List<Runnable> of tasks.
+  - awaitTermination(long timeout, TimeUnit unit): Check whether all tasks are finished
+
+###### Executors
+- newSingleThreadExecutor()
+- newSingleThreadScheduledExecutor()
+  - schedule(Callable/Runnable): after the given delay
+  - scheduleAtFixedRate(Runnable, ..): after initial delay, period; 
+    - regardless of whether or not the previous task fi nished
+  - scheduleAtFixedDelayRunnable, ..(): with delay
+    - creates a new task after the previous task has fi nished.
+  - may not thread availble or got shutdown
+- newCachedThreadPool(): creates new threads as needed, unbounded size, require executing many short-lived asynchronous tasks
+- newFixedThreadPool(int nThreads)
+- newScheduledThreadPool(int nThreads)
+
+- A thread pool is a group of pre-instantiated reusable threads that are available to perform a set of arbitrary tasks.
+- the number of CPUs available is used to determine the thread size using this command
+  - ```Runtime.getRuntime().availableProcessors()```
+  - task type: CPU-intensive, or external resources
+
+
+- Future
+  - get(): Retrieves the result of a task, waiting endlessly or time out
+    - the return type of Runnable.run() is void, the get() method always returns null.
+    - result.get(10, TimeUnit.SECONDS);
+- Callable
+  - call() method returns a value and can throw a checked exception.
+
+- When the compiler is unable to assign a functional interface to a lambda expression, it is referred to as an ambiguous lambda expression. <= resolved with an explicit cast
+
+##### Synchronizing Data Access
+- thread safety is the property of an object that guarantees safe execution by multiple threads at the same time.
+- Atomic is the property of an operation to be carried out as a single unit of execution without any interference by another thread.
+  - Atomic Classes
+- A monitor is a structure that supports mutual exclusion or the property that at most one thread is executing a particular segment of code at a given time.
+  - any Object can be used as a monitor
+- You can use static synchronization if you need to order thread access across all instances, rather than a single instance.
+- synchronization is about taking multiple threads and making them perform in a more single-threaded manner.
+
+##### Concurrent Collections
+- A memory consistency error occurs when two threads have inconsistent views of what should be the same data.
+- When two threads try to modify the same non-concurrent collection, the JVM may throw a ConcurrentModificationException at runtime.
+- At any given instance, all threads should have the same consistent view of the structure of the collection.
+- You should use a concurrent collection class anytime that you are going to have **multiple threads modify a collections object outside a synchronized** block or method
+- a good practice to instantiate a concurrent collection but **pass it around using a non-concurrent interface** whenever possible
+
+- ConcurrentHashMap is ordering read/write access such that all access to the class is consistent.
+  -  keySet() is updated as soon as an object is removed from the Map.
+  - no ConcurrentModificationException
+- ConcurrentLinkedDeque, ConcurrentLinkedQueue
+- ConcurrentSkipListMap, ConcrentSkipListSet
+  - The SkipList classes, ConcurrentSkipListSet and ConcurrentSkipListMap, are concurrent versions of their sorted counterparts, TreeSet and TreeMap, respectively.
+- CopyOnWriteArrayList, CopyOnWriteArraySet
+  - These classes copy all of their elements to a new underlying structure anytime an element is added, modified, or removed from the collection.
+  - Any iterator established prior to a modifi cation will not see the changes, but instead it will iterate over the original elements prior to the modification
+- LinkedBlockingDeque, LinkedBlockingQueue
+  - The BlockingQueue is just like a regular Queue, except that it includes methods that will wait a specific amount of time to complete an operation.
+  
+- defined in the Collections class, contain synchronized methods that operate on the inputted collection and return a reference that is the same type as the underlying collection.
+- if you are given an existing collection that is not a concurrent class and need to access it among multiple threads, you can wrap it using the methods
+- they do not synchronize access on any iterators that you may create from the synchronized collection.
+  - synchronization block if you need to iterate over any of the returned collections
+- synchronized collections also throw an exception if they are modifi ed within an iterator by a single thread.
+
+##### Parallel Streams
+- parallel()
+- parallelStream()
+- the Stream.concat(Stream s1, Stream s2) is parallel if either s1 or s2 is parallel
+- flatMap() creates a new stream that is not parallel by default
+
+- Scaling is the property that, as we add more resources such as CPUs, the results gradually improve.
+- A stateful lambda expression is one whose result depends on any state that might change dur ing the execution of a pipeline.
+- stateful lambda expressions should be avoided in parallel streams
+- Anytime you are working with a collection with a parallel stream, it is recommended that you use a concurrent collection.
+- Reduction operations on parallel streams are referred to as parallel reductions.
+  - it is recommended that you use the three-argument version of reduce() when working with parallel streams. Providing an explicit combiner method allows the JVM to partition the operations in the stream more efficiently
+  - use a concurrent collection to combine the results, ensuring that the results of concurrent threads do not cause a ConcurrentModificationException.
+- Any stream operation that is based on order, including findFirst(), limit(), or skip(), may actually perform more slowly in a parallel environment.
+  - All of the streams with which you have been working are considered ordered by default.
+  - .unordered() tells the JVM ignore the order 
+
+```java
+// forEach() operation on a parallel stream is equivalent to submitting multiple Runnable lambda expressions to a pooled thread executor.
+Arrays.asList(1,2,3,4,5,6)
+.parallelStream()
+.forEach(s -> System.out.print(s+" "));
+
+```
+
+##### Managing Concurrent Processes
+- The CyclicBarrier takes in its constructors a limit value, indicating the number of threads to wait for.
+  - order the tasks, barrier between diff task type. threads stop and wait
+  - As each thread finishes, it calls the await() method on the cyclic barrier. Once the specified number of threads have each called await(), the barrier is released and all threads can continue.
+  - If you are using a thread pool, make sure that you set the number of available threads to be at least as large as your CyclicBarrier limit value.
+  - Reuse: After a CyclicBarrier is broken, all threads are released and the number of threads waiting on the CyclicBarrier goes back to zero.
+
+- The fork/join framework relies on the concept of recursion to solve complex tasks.
+  - D-C: The goal of the fork/join framework is to break up large tasks into smaller ones
+  - 1. Create a ForkJoinTask.
+  - 2. Create the ForkJoinPool.
+  - 3. Start the ForkJoinTask. pool.invoke(task);
+  - RecursiveAction
+    - compute(){... invokeAll()}
+  - RecursiveTask
+    - The fork() method instructs the fork/join framework to complete the task in a separate thread, while the join() method causes the current thread to wait for the results.
+  - Unlike fork(), calling compute() within a compute() method causes the task to wait for the results of the subtask.
+  - The fork() method should be called before the current thread performs a compute() operation, with join() called to read the results afterward.
+  - Since compute() takes no arguments, the constructor of the class is often used to pass instructions to the task.
+
+##### Threading Problems
+- Liveness is the ability of an application to be able to execute in a timely manner.
+- Deadlock occurs when two or more threads are blocked forever, each waiting on the other.
+  - One common strategy to avoid deadlocks is for all threads to order their resource requests.
+- Starvation occurs when a single thread is perpetually denied access to a shared resource or lock.
+- Livelock occurs when two or more threads are conceptually blocked forever, although they are each still active and trying to complete their task.
+  - Livelock is often a result of two threads trying to resolve a deadlock.
+  - stuck in an endless cycle.
+- A race condition is an undesirable result that occurs when two tasks, which should be completed sequentially, are completed at the same time.
+  - use a monitor to synchronize on the relevant overlapping task.
+  - singleton
+
+```
+This chapter introduced you to threads and showed you how to process tasks in parallel
+using the Concurrency API. For the exam, you should know how to create threads
+indirectly using an ExecutorService and a fork/join recursive framework. The work that a
+thread performs can be defi ned in an instance of Runnable or Callable . As of Java 8, these
+tasks can now be expressed as lambda expressions.
+We presented techniques for organizing tasks among multiple threads using atomic
+classes, synchronization blocks, synchronized methods, and the CyclicBarrier class.
+The Concurrency API includes numerous collections classes that support multi-threaded
+processing. For the exam, you should also be familiar with the CopyOnWriteArrayList
+class, which creates a new underlying structure anytime the list is modifi ed.
+We then introduced the notion of parallel streams and showed you how using them
+can improve performance in your application. Parallel streams can also cause unexpected
+results, since the results are no longer ordered. We also reviewed parallel reductions and
+showed how they differed from reductions on serial streams.
+We concluded this chapter by discussing potential threading issues with which you
+should be familiar for the exam including deadlock, starvation, livelock, and race
+conditions. You need to know only the basic theory behind these concepts for the exam. In
+professional software development, however, finding and resolving such problems is often
+quite challenging.
+```
 
 ### Exception
 #### Handling Exceptions
