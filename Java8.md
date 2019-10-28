@@ -356,6 +356,37 @@ number of days, months, or years to add or subtract from a LocalDate or LocalDat
 DateTimeFormatter is used to output dates and times in the desired format. The date and
 time classes are all immutable, which means the return value must be used.
 ```
+```
+A LocalDate contains just a date. A LocalTime contains just a time. A LocalDateTime contains
+both a date and time. A ZonedDateTime adds a time zone. All four have private constructors
+and are created using LocalDate.now() or LocalDate.of() (or the equivalents for
+that class). Instant represents a moment in time.
+Dates and times can be manipulated using plus or minus methods. The Period
+class represents a number of days, months, or years to add to or subtract from a LocalDate,
+LocalDateTime, or ZonedDateTime. The Duration class represents hours, minutes, and seconds.
+It is used with LocalTime, LocalDateTime, or ZonedDateTime.
+UTC represents the time zone offset from zero. Daylight savings time is observed in the
+United States and other countries by moving the clocks ahead an hour in the spring and an
+hour back in the fall. Java changes time and UTC offset to account for this.
+You can create a Locale class with a desired language and optional country. The
+language is a two-letter lowercase code, and the country is a two-letter uppercase
+code. For example, en and en_US are locales for English and US English, respectively.
+ResourceBundle allows specifying key/value pairs in a property file or in a Java class. Java
+goes through candidate resource bundles from the most specific to the most general to
+find a match. If no matches are found for the requested locale, Java switches to the default
+locale and then finally the default resource bundle. Java looks at the equivalent Java class
+before the property file for each locale. Once a matching resource bundle is found, Java
+only looks in the hierarchy of that resource bundle to find keys.
+NumberFormat uses static methods to retrieve the desired formatter, such as one for
+currency. DateTimeFormatter is used to output dates and times in the desired format. The
+date and time classes are all immutable, which means that the return value must be used or
+the operation will be ignored.
+```
+
+
+
+
+
 #### Collection
 - A collection is a group of objects contained in a single object.
 - List: A list is an ordered collection of elements that allows duplicate entries. Elements in a list can be accessed by an int index.
@@ -666,6 +697,54 @@ with one method. Predicate is a common interface. It has one method named test
 that returns a boolean and takes any type. The removeIf() method on ArrayList takes a
 Predicate.
 ```
+#### Functional
+```
+Lambdas can reference static variables, instance variables, effectively final parameters, and
+effectively final local variables. A functional interface has a single abstract method. You
+must know the functional interfaces:
+■■ Supplier<T>: Method get() returns T
+■■ Consumer<T>: Method accept(T t) returns void
+■■ BiConsumer<T>: Method accept(T t, U u) returns void
+■■ Predicate<T>: Method test(T t) returns boolean
+■■ BiPredicate<T>: Method test(T t, U u) returns boolean
+■■ Function<T, R>: Method apply(T t) returns R
+■■ BiFunction<T, U, R>: Method apply(T t, U u) returns R
+■■ UnaryOperator<T>: Method apply(T t) returns T
+■■ BinaryOperator<T>: Method apply(T t1, T t2) returns T
+An Optional can be empty or store a value. You can check if it contains a value with
+ifPresent() and get() the value inside. There are also three methods that take functional
+interfaces as parameters: ifPresent(Consumer c), orElseGet(Supplier s), and
+orElseThrow(Supplier s). There are three optional types for primitives: DoubleSupplier,
+IntSupplier, and LongSupplier. These have the methods getDouble(), getInt(), and
+getLong(), respectively.
+A stream pipeline has three parts. The source is required, and it creates the data in
+the stream. There can be zero or more intermediate operations, which aren’t executed
+until the terminal operation runs. Examples of intermediate operations include filter(),
+flatMap(), and sorted(). Examples of terminal operations include allMatch(), count(),
+and forEach().
+There are three primitive streams: DoubleStream, IntStream, and LongStream. In
+addition to the usual Stream methods, they have range() and rangeClosed(). The call
+range(1, 10) on IntStream and LongStream creates a stream of the primitives from 1 to
+9. By contrast, rangeClosed(1, 10) creates a stream of the primitives from 1 to 10. The
+primitive streams have math operations including average(), max(), and sum(). They also
+have summaryStatistics() to get many statistics in one call. There are also functional
+interfaces specific to streams. Except for BooleanSupplier, they are all for double, int, and
+long primitives as well.
+You can use a Collector to transform a stream into a traditional collection. You can
+even group fields to create a complex map in one line. Partitioning works the same way as
+grouping, except that the keys are always true and false. A partitioned map always has
+two keys even if the value is empty for the key.
+You should review the tables in the chapter. You absolutely must memorize Table 4.1.
+You should memorize Table 4.6 and Table 4.7 but be able to spot incompatibilities, such as
+type differences, if you can’t memorize these two. Finally, remember that streams are lazily
+evaluated. They take lambdas or method references as parameters, which occur later when
+the method is run.
+```
+
+
+
+
+
 ### Class Design
 #### class
 - At its core, proper Java class design is about code reusability, increased functionality,
@@ -1365,13 +1444,123 @@ When a method overrides a method in a superclass or interface, it is not allowed
 checked exceptions. It is allowed to declare fewer exceptions or declare a subclass of a
 declared exception. Methods declare exceptions with the keyword throws.
 ```
+```
+An exception indicates that something unexpected happened. Subclasses of java.lang.
+Error are exceptions that a program should not attempt to handle. Subclasses of java.
+lang.RuntimeException are runtime (unchecked) exceptions. Subclasses of java.lang.
+Exception that do not subclass java.lang.RuntimeException are checked exceptions. Java
+requires checked exceptions to be handled or declared.
+If a try statement has multiple catch blocks, at most one catch block can run. Java
+looks for an exception that can be caught by each catch block in the order in which they
+appear, and the first match is run. Then execution continues after the try statement to
+the finally block if present. If both catch and finally throw an exception, the one from
+finally gets thrown. Common checked exceptions include ParseException, IOException,
+and SQLException.
+Multi-catch allows catching multiple exception types in the same catch block. The types
+are separated with a pipe (|). The multiple exception types are not allowed to have a subclass/
+superclass relationship. The variable in a multi-catch expression is effectively final.
+Try-with-resources allows Java to take care of calling the close() method. This is called
+automatic resource management. Objects instantiated in the try clause must implement the
+AutoCloseable interface. This interface has a single method close() and can throw any
+type of Exception. Unlike traditional try statements, try-with-resources does not require
+a catch or finally block to be present. If the try clause and one or more of the close()
+methods throw an exception, Java uses suppressed exceptions to keep track of both.
+Similarly, if multiple close() methods throw an exception, the first one is the primary
+exception and the others are suppressed exceptions. getSuppressed() allows these exceptions
+to be retrieved.
+An assertion is a boolean expression placed at a particular point in your code where
+you think something should always be true. A failed assertion throws an AssertionError.
+Assertions should not change the state of any variables. You saw how the –ea and –enableassertion
+flags turn on assertions.```
+```
 
+#### IO
+```
+The bulk of this chapter focused on teaching you how to use Java to interact with files. We
+started off by introducing you to the concept of files and directories, and then we showed
+you how to reference them using path Strings. We presented the java.io.File class, and
+we showed you how to use it to read basic file information.
+We then introduced java.io streams to read/write file contents, and we described their
+various attributes, including low-level vs. high-level, byte vs. character, input vs. output,
+and so on. The description of the stream is designed to help you remember the function of
+the stream by using its name as a context clue.
+We visited many of the byte and character stream classes that you will need to know for
+the exam in increasing order of complexity. A common practice is to start with a low-level
+resource or file stream and wrap it in a buffered stream to improve performance. You can
+also apply a high-level stream to manipulate the data, such as a data stream. We described
+what it means to be serializable in Java, and we showed you how to use the object stream
+classes to persist objects directly to and from disk.
+We concluded the chapter by showing you how to read input data from the user, using
+both the legacy System.in method and the newer Console class. The Console class has many
+advanced features, such as support for passwords and built-in support for String formatting.
+```
 
+```
+This chapter introduced the NIO.2 API for working with files and directories using the
+Path interface. For the exam, you need to know what the NIO.2 Path interface is and how
+it differs from the legacy java.io.File class. You should be familiar with how to create
+and use Path objects, including how to combine or resolve them with other Path objects.
+We spent time reviewing various static methods available in the Files helper class. As
+discussed, the name of the function often tells you exactly what it does. We explained that
+most of these methods are capable of throwing an IOException and many take optional
+vararg enum values.
+We also discussed how the NIO.2 API provides methods for reading and writing file
+metadata using views. Java uses views to retrieve all of the file system attributes for a
+file without numerous round-trips to the operating system. The NIO.2 API also includes
+support for operating system–specific file attributes, such as those found in Windows-,
+Mac-, and Linux-based file systems. For the exam, you should be familiar with the
+BasicFileAttributes and BasicFileAttributeView classes.
+With the introduction of functional programming in Java 8, the NIO.2 Files class was
+updated with new methods that use the lambda expressions and streams to process files
+and directories. For the exam, you need to know how to apply the Streams API in NIO.2 to
+walk a directory tree, search for files, and list the contents of a directory or file.
+```
 
-
-
-
-
+#### JDBC
+```
+There are four key SQL statements: SELECT reads data, INSERT creates a new row, UPDATE
+changes existing data, and DELETE removes existing data. On the exam, JDBC uses four key
+interfaces: Driver , Connection , Statement , and ResultSet . The interfaces are part of the
+Java API. A database-specifi c JAR fi le provides the implementations.
+To connect to a database, you need the JDBC URL. A JDBC URL has three parts
+separated by colons. The fi rst part is jdbc . The second part is the name of the vendor/
+product. The third part varies by database, but it includes the location and name of the
+database. The location is either localhost or an IP address followed by an optional
+port.
+The DriverManager class provides a factory method called getConnection() to get a
+Connection implementation. Modern driver JARs contain a fi le in META-INF/servic e called
+java.sql.Driver . This is the name of the implementation class of Driver . Older JARs do
+not, and they require Class.forName() to load the driver.
+There are three ResultSet types that you can request when creating a Statement . If the
+type you request isn’t available, JDBC will downgrade your request to one that is available.
+The default, TYPE_FORWARD_ONLY , means that you can only go through the data in order.
+TYPE_SCROLL_INSENSITIVE means that you can go through the data in any order, but you
+won’t see changes made in the database while you are scrolling. TYPE_SCROLL_SENSITIVE
+means that you can go through the data in any order, and you will see changes made in the
+database.
+You can request either of two modes for ResultSet concurrency when creating
+a Statement . Again, JDBC will downgrade your request if needed. The default,
+CONCUR_READ_ONLY, means that you can read the ResultSet but not write to it. CONCUR_
+UPDATABLE means that you can both read and write to it.
+When running a SELECT SQL statement, the executeQuery() method returns a
+ResultSet. When running a DELETE, INSERT, or UPDATE SQL statement, the executeUpdate()
+method returns the number of rows that were affected. There is also an execute() method
+that returns a boolean to indicate whether the statement was a query.
+For a forward-only result set, call rs.next() from an if statement or while loop to
+set the cursor position. To get data from a column, call a method like getString(1) or
+getString("a"). Column indexes begin with 1, not 0. Aside from the primitive getters,
+there are getDate(), getTime(), and getTimeStamp(). They return just the date, just the
+time, or both, respectively. Also, getObject() can return any type.
+For a scrollable result set, you can use methods to move to an absolute() position
+or relative() position. Scrolling to next() and previous() are also allowed. There are
+also methods to go to the first() and last() rows. All of these methods return true
+if the cursor is pointing to a row with data. Other methods allow you to go outside the
+ResultSet with beforeFirst() and afterLast().
+It is important to close JDBC resources when finished with them to avoid leaking
+resources. Closing a Connection automatically closes the Statement and ResultSet objects.
+Closing a Statement automatically closes the ResultSet object. Also, running another SQL
+statement closes the previous ResultSet object from that Statement.
+```
 
 
 
