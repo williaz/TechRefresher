@@ -1,4 +1,90 @@
 
+- Tuning: Thread, SQL, JVM
+
+- Goal: speed up
+- one core CPU: a lot IO waiting in thread like Web, can improve
+- when give away CPU: blocked: wait, await; sleep, yield, finished
+- Thread: execution flow of code, pass to CPU
+1. Runnable => task
+2. Thread => thread
+3. Callable's call() in run()
+- CPU: execute code
+- how many?
+1. create, destroy time
+2. space for trhead: JVM 1M for a thread
+3. conect switching reduce performance
+- thread pool:
+1. blocking threads
+2. task repo: queue => BlockingQueue: block or timeout
+3. thread pick up task
+
+```java
+public  class ThreadPool {
+    private BlockingQueue<Runnable> que;
+    private List<Thread> workers;
+    
+    public ThreadPool (int size, int taskNum) {
+       this.que = new LinkedBlockingQueue<>(taskNum);
+       this.workers = Collections.synchronizedList(new ArrayList<>());
+       for (int i = 0; i < size; i++) {
+           Worker w = new Worker(this);
+           workers.add(w);
+           w.start(); ///
+       }
+    }
+    
+    public bolean submit(Runnable r) {
+        if (!isWorking) {
+           return false;
+        }
+        this.que.offer(r);
+    }
+    
+    private volatile isWorking = true;
+    public void close() {
+        // no more new task
+        // finsih task
+        // no blocking thread
+        // current blocking thread <= interrupt
+        isWorking = false;
+        for (Thread t : workers) {
+            if (t.getState().equals(Thread.state.BLOCKED)) {
+                t.interrupt();
+            }
+        }
+        
+    }
+
+    
+    public static class Worker extends Thread {
+        private ThreadPool pool;
+        public Worker(ThreadPool pool) {
+           this.pool = pool; ///
+        }
+        public void run() {
+            que.take();
+            while (this.isWorking || !que.isEmpty()) { ///
+                Runnable task = null;
+                try {
+                    if (isWorking)
+                        task = this.pool.que.take(); ///
+                    else {
+                        task = this.pool.que.poll(); ///
+                    }
+                } catch (InterruptedException e) {
+                }
+                if (task != null) {
+                    task.run();
+                }
+            }
+        }
+    }
+}
+
+
+
+```
+
 ### start thread
 - 1. extends Thread, overriding run() and use start() trigger
 - 2. implements Runnable, overriding run(), pass the class as arg in Thread constructor, start() thread; can use anonymous class
