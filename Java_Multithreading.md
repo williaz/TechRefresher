@@ -1,4 +1,4 @@
-
+### Thread
 - Tuning: Thread, SQL, JVM
 
 - Goal: speed up
@@ -17,6 +17,11 @@
 1. blocking threads
 2. task repo: queue => BlockingQueue: block or timeout
 3. thread pick up task
+
+- determine thread num
+1. computing: CPU num * 1 -2
+2. IO: time of IO blocking, tomcat default max=200
+
 
 ```java
 public  class ThreadPool {
@@ -81,9 +86,38 @@ public  class ThreadPool {
     }
 }
 
-
-
 ```
+### Thread safe
+- variable
+1. global
+2. local
+- data shared by thread: globale var
+- can a thread see the upated var by another thread?
+1. synchronized
+2. volatile
+
+- JMM: memory model <= logical 
+1. shared var in main memory(heap)
+2. Thread can only operate own memory(stack)
+3. if need operation shared var, need copy from main memory and then operate and copy back
+- JMM sync contract: 8 atomic opt
+1. lock
+2. unlock
+3. read: main m -> temp/register
+4. load: temp -> own m
+5. use: -> thread opt
+6. assign
+7. store: own -> temp 
+8. write: temp -> main
+* read&load, store&write: require ordered, not need contigous
+
+- ensure var visualizable
+1. final
+2. synchronized: just empty work memory before entering; must sync to main m before unlocking VS before use and after
+3. volatile: 
+must load from main before use, read and load must be contigous; 
+after modifed, must sync to main immediately, store and write be contiguous
+
 
 ### start thread
 - 1. extends Thread, overriding run() and use start() trigger
