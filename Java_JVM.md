@@ -1,0 +1,6 @@
+- JVM
+  - shared resource: 
+    - method area: class info
+    - heap: objects(obj head -> class, field, no func)= 8b*n
+  - thread resource:
+    - stack: contains stack frame(func call)
