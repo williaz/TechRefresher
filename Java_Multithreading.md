@@ -114,7 +114,7 @@ public  class ThreadPool {
 - ensure var visualizable
 1. final
 2. synchronized: just empty work memory before entering; must sync to main m before unlocking VS before use and after
-3. volatile: 
+3. volatile: can't ensure thread safe; easy, better performance; avoid code reorder by JVM
 must load from main before use, read and load must be contigous; 
 after modifed, must sync to main immediately, store and write be contiguous
 
