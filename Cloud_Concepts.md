@@ -15,3 +15,26 @@
   - on-demand access: pay as you go
   - Data intensive nature: I/O focus
   - New Cloud Programming Paradigms: MapReduce, NoSQL
+
+- Operating System
+  - UI to hardware(device drivers)
+  - provide abstraction(process, file system)
+  - Resource manager(scheduler)
+  - Means of communication(networking)
+
+- A distributed system is a collection of entities, each of which is autonomous, programmable, asynchronous and failure-prone, and which communicate through an unreiable communication medium.
+  - challenges
+    - Failure: normal
+    - Scalability: 1000s machine/ TB data
+    - Asynchrony: clock skew and clock drift
+    - Concurrency: 1000s machine to access same data
+
+
+
+
+
+
+
+
+
+- Lamport Timestamps
