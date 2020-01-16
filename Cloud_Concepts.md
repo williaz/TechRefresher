@@ -29,8 +29,11 @@
     - Asynchrony: clock skew and clock drift
     - Concurrency: 1000s machine to access same data
 
-
-
+- MapReduce
+  - map: processes each record sequentially and independently
+  - reduce: processes set of all records in batches
+    - by partitioning keys
+  - barrier between the 2 phrase
 
 
 
