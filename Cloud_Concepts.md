@@ -34,7 +34,10 @@
   - reduce: processes set of all records in batches
     - by partitioning keys
   - barrier between the 2 phrase
-
+  - Fault-Tolerance
+    - node heartbeat
+    - Straggler: slowest slows entire; Speculative Execution: replicating slow taks, complete task when first copy finish
+    - Locality: same machine > same rack > anywhere
 
 
 
