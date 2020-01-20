@@ -94,7 +94,22 @@
       - Nodes periodically gossip their membership list(address, heartbeat counter, Time(local)), merge latest
       - On receipt, the local membership list is updated
       - thredhold: no increased for more tahn T sec, mark as failed; clean up membership entry time(ping-pong prob);
-    
-    
-    
+  - Swim Failure Detector
+    - During protocol period(T time unit), random pick node to ping, gert ACK back then fine
+    - If no ACK, ping indirect node to send ping to that node agaion <= second chance
+    - Time-bound completeness: round robin pinging => permutate
+  - Infection-style dissemination
+- Grid computing: RAMs model, a DAGs of jobs
+  - HPC(High Computation-intensive computing), often federated
+  - diff sites run same task
+  - 5 stages
+    - init
+    - stage in
+    - execute 
+    - stage out
+    - publish
+ - Computation intensive, so massively parellel
+ - Globus Protocol: external allocation, wide area transfer; => Single sign-on
+ - intra-site: HTCondor
+  
 - Lamport Timestamps
