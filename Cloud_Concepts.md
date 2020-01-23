@@ -1,3 +1,26 @@
+Questions:
+```
+Know the key differences between cloud computing and previous generations of distributed systems.
+Design MapReduce programs for a variety of problems.
+Know how Hadoop schedules jobs.
+
+Why are gossip and epidemic protocols fast and reliable?
+What is the most efficient way for cloud computing systems to detect failures of servers?
+How is grid computing related to cloud computing?
+
+What is the difference between how Napster clients and Gnutella clients search for files?
+What is the difference between Gnutella and FastTrack?
+What is BitTorrent’s tit for tat mechanism?
+What is consistent hashing?
+Why are DHTs efficient in searching?
+How does Chord route queries?
+How does Pastry route queries?
+How does Kelips route queries?
+What is churn in P2P systems?
+How does Chord maintain correct neighbors in spite of failures and churn?
+
+```
+
 
 - Cloud: a Cloud consists of a lot of storage resources with compute cycles located nearby
 - Data center: a single site cloud: 
@@ -111,5 +134,43 @@
  - Computation intensive, so massively parellel
  - Globus Protocol: external allocation, wide area transfer; => Single sign-on
  - intra-site: HTCondor
+  
+- P2P systems
+  - uses:
+    - First distributed system on scalability
+    - key-value stores uses P2P chord hashing
+  - Napster
+    - client as peer, quartlly
+    - centralized server store meta only, <filename, id_address, port> tuples
+  - Gnutella
+    - client as a server, store nearby peers info => overlaid graph
+    - payload: TTL decrement per node; <<7/10
+    - QueryHit routed back from the path
+    - use HTTP
+    - push: direct or path(behind firewall)
+    - ping/pong: 50% traffic; membership
+    - 70% freeload: only download
+  - Fasttrack:(kazaa)
+    - healthier <- supernode, promoted by reputaion(upload/connectivity)
+  - BitTorrent
+    - incentive for node to provide good download rate
+    - tracker(receives, heartbeat)(torrent)
+    - choking: limit num of neighbors(best) to upload <= 5
+  - DHT(distributed): above systems sort of
+    - performance concerns
+      - Load balancing
+      - Fault-tolerance
+      - Efficiency of lookup and inserts
+      - Locality: closer by
+  - P2P with Provable Properties
+  - chord
+    - log(n)
+    - Consistent Hashing: SHA-1 => 160bit str, truncated to m b
+    - peer in ring: know successor's IP
+    - Finer table: WFB
+  - Pastry
+  - Kelips
+  
+  
   
 - Lamport Timestamps
