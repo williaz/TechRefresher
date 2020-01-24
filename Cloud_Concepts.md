@@ -168,6 +168,7 @@ How does Chord maintain correct neighbors in spite of failures and churn?
     - Consistent Hashing: SHA-1 => 160bit str, truncated to m b
     - peer in ring: know successor's IP
     - Finer table: WFB
+    - rounting: #
   - Pastry
   - Kelips
   
