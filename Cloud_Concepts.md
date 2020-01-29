@@ -19,6 +19,22 @@ How does Kelips route queries?
 What is churn in P2P systems?
 How does Chord maintain correct neighbors in spite of failures and churn?
 
+
+Why are key-value/NoSQL systems popular today?
+How does Cassandra make writes fast?
+How does Cassandra handle failures?
+What is the CAP theorem?
+What is eventual consistency?
+What is a quorum?
+What are the different consistency levels in Cassandra?
+How do snitches work in Cassandra?
+Why is time synchronization hard in asynchronous systems?
+How can you reduce the error while synchronizing time across two machines over a network?
+How does HBase ensure consistency?
+What is Lamport causality?
+Can you assign Lamport timestamps to a run?
+Can you assign vector timestamps to a run?
+
 ```
 
 
@@ -170,8 +186,41 @@ How does Chord maintain correct neighbors in spite of failures and churn?
     - Finer table: WFB
     - rounting: #
   - Pastry
+    - Routing tables based prefix mathcing: prefix for distance
+    - O(logN) lookup
   - Kelips
+    - O(1) lookup
+    - k "affinity groups"
   
-  
+- NoSQL(Not only SQL)
+  - workloads
+    - Data: large and unstructured
+    - Lots of randoim reads and writes
+    - Sometimes write-heavy
+    - Foreigh keys rarely needed
+    - Join infrequent
+  - need:
+    - speed
+    - avoid SPoF
+    - low TCO(total cost of opt)
+    - fewer sys admin
+    - incremental scalability
+      - scale up: more powerful machine
+      - scale out: more COTS machines
+  - API:
+    - get
+    - put
+  - Tables
+    - column families: Cassandra
+    - Table: HBase
+    - Collection: MongoDB
+  - Column oriented
+    - RDBMS: store a row together
+    - NoSQL a column together WFB
+    - fast range search within a col
+      - all blog_id updated within past month => search in last_updated col, fetch blog_id <= no ned fetch other col
+    
+
+- Time and Ordering
   
 - Lamport Timestamps
