@@ -219,8 +219,16 @@ Can you assign vector timestamps to a run?
     - NoSQL a column together WFB
     - fast range search within a col
       - all blog_id updated within past month => search in last_updated col, fetch blog_id <= no ned fetch other col
-    
-
+  - Cassandra
+    - uses a Ring-based DHT but without finger tables or routing
+    - Key: server mapping is the partiioner <= coordinator
+    - Data replacement
+      - Simple Strategy
+        - Random Paritioner: chord-like hash partitioning
+        - Byte Ordered: assign ranges of keys to servers <= range queries
+      - Network Topop
+        - 2/3 replica per DC
+        - per DC: first replica placed according to partitioner; then go clockwise until hit a diff rack
 - Time and Ordering
   
 - Lamport Timestamps
