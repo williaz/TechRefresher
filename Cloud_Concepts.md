@@ -226,9 +226,45 @@ Can you assign vector timestamps to a run?
       - Simple Strategy
         - Random Paritioner: chord-like hash partitioning
         - Byte Ordered: assign ranges of keys to servers <= range queries
-      - Network Topop
+      - Network Topo
         - 2/3 replica per DC
         - per DC: first replica placed according to partitioner; then go clockwise until hit a diff rack
+    - Maps: IPs to racks and DCs. Configured in cassandra.yaml file
+    - Write:
+      - lock free and fast
+      - Client sends write to one coordinator node(if per key, ensure serilaized) in cluster
+      - Coordinator uses Partitioner to send query to all replica nodes responsible for key
+      - When X replicas respond, coordinator returns ans ack to the client
+      - always writable: Hinted handoff machanism
+        - If any replica is down, coordinator writes to all other and keeps the write locally untill down replica back up
+        - When all replica down, the coordinator buffer writes
+        - one ring per DC, Zookeeper, Paxos
+      - write at replica
+        - log it in disk commit log(failure recovery)
+        - make change to Memtable(in-memory cache, write-back(faster than write through))
+        - when memtabke is full or old, flush to disk
+          - data fiile: SSTable(Sorted String Table)
+            - periodically compaction
+          - Index file: SSTable of key and its position in data sstable
+          - Bloom filter(for efficient search): not in
+            - compact way of representing a set of items
+            - possibly false positive, never false negative
+            - key => multiple hash function -> one large Bit Map as 1
+      - delete: don't del right away
+        - mark tombstone
+        - compaction will do delete eventually
+      - Read
+        - Coordinator contact X replicas
+        - return latest-timestamped value
+        - also init read repair to eventually consistent
+      - Memebership
+        - any node can be coordnator
+        - all contains list
+      - Suspicion mechanisams to adaptively set the timeout based on underlying network and failure behavior
+      - In practice, PHI = 5 => 10-15 sec
+      - Speed: > 50G, avg:
+        - MySQL: r 350ms, w 300ms
+        - Cassandra: r 15ms, w 0.12ms 
 - Time and Ordering
   
 - Lamport Timestamps
