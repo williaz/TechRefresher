@@ -265,6 +265,53 @@ Can you assign vector timestamps to a run?
       - Speed: > 50G, avg:
         - MySQL: r 350ms, w 300ms
         - Cassandra: r 15ms, w 0.12ms 
+      - CAP
+        - Cassandra: Eventual(weak) consistency, Availabliity, Partition-tolerance
+          - BASE: Basically Available Soft-state(memeory) Eventual Consistency
+        - RDBMS: Strong consistency over availablity partition
+          - ACID
+      - Consistency Level:
+        - ANY: any server: fastest
+        - ALL: all replica: string consistency
+        - ONE: at least one replica,  cannot tolerate a failure
+        - QUORUM: replica across DC
+          - = majority, >50%
+          - faster than ALL, still strong consistency
+          - R = read replica count, W = write replica count: W+R > N; W > N/2
+            - W1R1: very few writes and reads
+            - W=N, R= 1: read-heavy
+            - W/R= N/2 + 1: wrtie heavy
+            - W1, R=N; write heavy, mostly one client to write
+  - HBase
+    - blob-based
+    - API:
+      - get/put
+      - Scan(row range, filter) - range queies
+      - MultiPut
+    - HLOg: write-ahead log: Write to HLog before writing to MenStore, helps revocer
+    - Master cluster-slave cluster
+    - Zookeeper to cooridnate among cluster
+- CAP
+  - Consistency: same data
+    - Eventual  Strong
+    - models:
+      - Per key sequential: all opt have a global order
+      - CRDTs: commutated writes,same result
+      - Red-blue:
+        - blue ops in any order
+        - red in same order
+      - Strong:
+        - Linearizability: instananeously
+        - Sequential[Lamport]
+        - NewSQL: Spanner
+  - Availablity: all time
+    - Reads/writes complete reliably and quickly
+    - SLA
+  - Partition-tolerance
+  - Tradeoff
+    - Consistency, Availability: RDNMS
+    - Partition, Availability: Cassandra, RIAK, Dynamo, Voldemort
+    - Partition, Consisitency: HBASE, HyperTable, BigTable, Spanner
 - Time and Ordering
   
 - Lamport Timestamps
