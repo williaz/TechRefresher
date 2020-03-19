@@ -5,6 +5,8 @@
 ./mvnw spring-boot:run
 
 spring.h2.console.enabled=true
+
+# o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at
 ```
 - JPA: ORM
 ```java
@@ -21,6 +23,9 @@ public class Book {
     @JoinTable(name = "author_book", joinColumns = @JoinColumn(name = "book_id"),
     inverseJoinColumns = @JoinColumn(name = "author_id"))
     private Set<Author> authors = new HashSet<>();
+    
+    @ManyToOne
+    private Publisher publisher;
 ...
 
 @Entity                                            
@@ -36,6 +41,17 @@ public class Author {
     private Set<Book> books  = new HashSet<>();    
 
 ...
+
+@Entity
+public class Publisher {
+
+    @OneToMany
+    @JoinColumn(name = "publisher_id")
+    private Set<Book> books = new HashSet<>();
+    
+...
+public interface PublisherRepository extends CrudRepository<Publisher, Long> {
+}
 ```
 - Equilty for JPA entity object
   - business keys
