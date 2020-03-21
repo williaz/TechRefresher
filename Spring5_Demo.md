@@ -81,3 +81,36 @@ public class ConstructorInjectedController {
   - via Interface: decide imp in runtime; @ on impl
 - IoC runtime env, control DI
 
+
+- @Qualifier and @Primary
+```java
+
+    public ConstructorInjectedController(@Qualifier("beanName") GreetingService greetingService) {
+        this.greetingService = greetingService;
+    }
+    
+    
+@Primary
+@Service
+public class PrimaryGreetingService implements GreetingService {
+    
+```
+- @Profile
+
+```java
+@Profile("ES")
+@Service("i18nService")
+public class I18NSpanishService implements GreetingService {
+
+spring.profiles.active=ES
+
+@Profile({"EN", "default"})
+```
+
+- for module not need be built as fat jar, as not main class
+```xml
+    <properties>
+        <spring-boot.repackage.skip>true</spring-boot.repackage.skip>
+    </properties>
+```
+
