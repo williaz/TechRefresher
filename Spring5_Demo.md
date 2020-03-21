@@ -56,3 +56,28 @@ public interface PublisherRepository extends CrudRepository<Publisher, Long> {
 - Equilty for JPA entity object
   - business keys
   - id
+
+```java
+
+		ApplicationContext ctx = SpringApplication.run(DemoBootApplication.class, args);
+		MyBean bean = (MyBean) ctx.getBean("myBean");
+        
+        
+@Service
+public class GreetingServiceImpl implements GreetingService {...}
+
+@Controller
+public class ConstructorInjectedController {
+    private final GreetingService greetingService;
+
+    public ConstructorInjectedController(GreetingService greetingService) {
+        this.greetingService = greetingService;
+    }
+....
+}
+```
+- DI: composition 
+  - perfer Constructor(@Autowired is optional) with final field, no DI field, less DI setter
+  - via Interface: decide imp in runtime; @ on impl
+- IoC runtime env, control DI
+
