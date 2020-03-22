@@ -113,4 +113,47 @@ spring.profiles.active=ES
         <spring-boot.repackage.skip>true</spring-boot.repackage.skip>
     </properties>
 ```
+- External property
+```java
+@Configuration
+// @PropertySource("classpath:datasource.properties")
+@PropertySources({ // Spring 4 // no need for Spring Boot app.prop
+        @PropertySource("classpath:datasource.properties"),
+        @PropertySource("classpath:jms.properties")
+})
+public class PropertyConfig {
+
+    @Value("${guru.username}") // SpEL
+    String user;
+
+    @Value("${guru.password}")
+    String password;
+
+    @Value("${guru.dburl}")
+    String url;
+    
+    @Autowired
+    Environment env;  // env.getProperty("USERNAME")
+
+    @Bean
+    public FakeDataSource fakeDataSource(){
+        FakeDataSource fakeDataSource = new FakeDataSource();
+        fakeDataSource.setUser(user);
+        fakeDataSource.setPassword(password);
+        fakeDataSource.setUrl(url);
+        return fakeDataSource;
+    }
+
+    @Bean // no need for Spring Boot app.prop
+    public static PropertySourcesPlaceholderConfigurer properties(){
+        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer =new           PropertySourcesPlaceholderConfigurer();
+        return  propertySourcesPlaceholderConfigurer;
+    }
+```
+
+
+- Externalized config order
+- test usage > command line > Java System prop > OS env > profile based prop > application.prop outside > app.prop in jar > default SpringApplication.setDefaultProperties
+
+
 
