@@ -155,5 +155,79 @@ public class PropertyConfig {
 - Externalized config order
 - test usage > command line > Java System prop > OS env > profile based prop > application.prop outside > app.prop in jar > default SpringApplication.setDefaultProperties
 
+- Axis TCPMon
+  - http req info
+
+- devtools
+  - restart quick for class load
+  - liveload(browser)
+
+### JPA
+
+- Relationship
+```java
+@Entity
+public class Recipe {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Lob
+    private Byte[] image;
+
+    @OneToOne(cascade = CascadeType.ALL)  // owner
+    private Notes notes;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe") // target property from Ingredient 
+    private Set<Ingredient> ingredients;
+    
+    @Enumerated(value = EnumType.STRING) // default is EnumType.ORDINAL
+    private Difficulty difficulty;
+    
+    @ManyToMany  
+    @JoinTable(name = "recipe_category",  
+        joinColumns = @JoinColumn(name = "recipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))  // to have only one join table
+    private Set<Category> categories;
+
+@Entity
+public class Notes {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    private Recipe recipe;
+
+    @Lob
+    private String recipeNotes;
+
+@Entity
+public class Ingredient {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    private Recipe recipe;
+
+@Entity
+public class Category {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToMany(mappedBy = "categories")
+    private Set<Recipe> recipes;
+
+```
+
+
+
+
 
 
