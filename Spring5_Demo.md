@@ -239,8 +239,47 @@ public class Category {
 
 ```
 
+- Database initializer
+  - Spring's DataSource initializer via Spring Boot by default load schema.sql and data.sql from the root of classpath
+  - or set spring.datasource.platform to load schema-${platform}.sql and data-${platform}.sql
+
+- Hibernate DDL Auto
+  - spring.jpa.hibernate.ddl-auto
+  - options: none, validate, update, create, create-drop
+  - Spring Boot uses create-drop for embedded DB or none
+
+- JPA query method
+```java
+public interface CategoryRepository extends CrudRepository<Category, Long> {
+
+    Optional<Category> findByDescription(String description);
+    
+    
+@Component
+public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent> {
+   
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        recipeRepository.saveAll(getRecipes());
+    }
+
+    private List<Recipe> getRecipes() {
+```
+- use one side setters to manage JPA Bi-directional relationship
+- Recommand Bidirectional which mean both side know the other, allows to navigate the object graph from either 
+- JPA Cascade types
+  - control how changes are cascasded from parent obj to child
+  - No default type in JPA
+  - JPA 2.1: PERSIST, MERGE, REFRESH, REMOVE, DETACH, ALL @@
+
+- JPA embedable type like Address @@
+- JPA auto update timestamp prop for audit
+  - @PrePersist, @PreUpdate
+
+- Hibernate persistence strategy for inheritance
+  - default: SINGLE TABLE, create for each => a lot unused DB columns
+  - JOIN TABLE
 
 
 
-
-
+  
