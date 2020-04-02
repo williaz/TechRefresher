@@ -318,10 +318,74 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
   - @IfProfileValue, @ProfileValueSourceConfiguration
 
 
+- Mockito
+```java
+    @Mock
+    RecipeRepository recipeRepository;
 
 
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);  ///
+
+        recipeService = new RecipeServiceImpl(recipeRepository);
+    }
+
+    @Test
+    public void getRecipes() throws Exception {
+
+        Recipe recipe = new Recipe();
+        HashSet recipesData = new HashSet();
+        recipesData.add(recipe);
+
+        when(recipeRepository.findAll()).thenReturn(recipesData); ////
+
+        Set<Recipe> recipes = recipeService.getRecipes();
+
+        assertEquals(recipes.size(), 1);
+        verify(recipeRepository, times(1)).findAll(); //// interaction, call times
+    }
+    
+    
+        verify(model, times(1)).addAttribute(eq("recipes"), argumentCaptor.capture());
+        Set<Recipe> setInController = argumentCaptor.getValue();
+```
 
 
+- MockMvc
 
-  
+```java
+   @Test
+    public void testMockMVC() throws Exception {
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"));
+    }
+```
+
+- Integration test
+```java
+@RunWith(SpringRunner.class)
+@DataJpaTest
+public class UnitOfMeasureRepositoryIT {
+
+    @Autowired
+    UnitOfMeasureRepository unitOfMeasureRepository;
+
+    @Before
+    public void setUp() throws Exception {
+    }
+
+    @Test
+    @DirtiesContext // indicates that the ApplicationContext associated with a test 
+    // is dirty and should therefore be closed and removed from the context cache.
+    public void findByDescription() throws Exception {
+
+        Optional<UnitOfMeasure> uomOptional = unitOfMeasureRepository.findByDescription("Teaspoon");
+
+        assertEquals("Teaspoon", uomOptional.get().getDescription());
+    }
+```
   
