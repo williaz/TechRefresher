@@ -280,6 +280,48 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
   - default: SINGLE TABLE, create for each => a lot unused DB columns
   - JOIN TABLE
 
+### Testing
+- code under test
+- Test fixture: a fixed state of objs to get repeatable results
+  - input data, mock, know data in DB
+- Unit Tests: 
+  - specific sections of code, test business logic
+  - code coverage: percentage of lines of code tested: 70-78%
+  - no external dep like DB, Spring context
+- Integration tests
+  - parts of overall sys, test interaction
+  - with Spring context, DV, message brokers
+- Functional tests
+  - app is live, deployed
+  - end to end testing
+
+- TDD: test first, code to meet the test
+- BDD: builds on TDD; given, when, then
+
+- Mock: fake imp of class
+- Spy: partial mock, override select methods of a real class
+
+- Junit4 @
+  - @Test @Ignore, @Test(expected = Exception.class), @Test(timeout = 10)
+  - @Before, @After
+  - @BeforeClass, @AfterClass
+
+- Spring Boot testing @
+  - @RunWith(SpringRunner.class)
+  - @SpringBootTest: search for app for config
+  - @TestConfiguration
+  - @MockBean, @SpyBean
+  - @JsonTest, @WebMvcTest, @DataJpaTest, @JdbcTest, @DataMongoTest, @RestClientTest, @AutoConfigreRestDocks
+  - @BootStrapWith, @ContextConfiguration, @ContextHierachy, @ActiveProfiles, @TestPropertySource, @DirtiesContext, @WebAppConfiguration, @TestExecutionListenes
+  - @Transactional, @BeforeTransaction, @AfterTransaction, @Commit, @Rollback
+  - @Sql, @SqlConfig, @SqlGroup, @Repeat, @Timed
+  - @IfProfileValue, @ProfileValueSourceConfiguration
 
 
+
+
+
+
+
+  
   
