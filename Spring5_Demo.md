@@ -388,4 +388,11 @@ public class UnitOfMeasureRepositoryIT {
         assertEquals("Teaspoon", uomOptional.get().getDescription());
     }
 ```
-  
+- CircleCI 
+- JUnit5 for Java 8+
+  - Lambda, streams, Optional
+  - test runner for Junit 3/4
+  - Assertions.assserThrows, assertTimeout, @ExtendWith
+  - @BeforeEach, @AfterEach, @BeforeAll, @AfterAll, @Disabled, @Tag
+
+- WebJars: client-side web libraries (e.g. jQuery & Bootstrap) packaged into JAR (Java Archive) files.
