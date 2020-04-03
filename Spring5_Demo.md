@@ -396,3 +396,84 @@ public class UnitOfMeasureRepositoryIT {
   - @BeforeEach, @AfterEach, @BeforeAll, @AfterAll, @Disabled, @Tag
 
 - WebJars: client-side web libraries (e.g. jQuery & Bootstrap) packaged into JAR (Java Archive) files.
+
+
+```java
+   @Test
+    public void handleImagePost() throws Exception {
+        MockMultipartFile multipartFile =
+                new MockMultipartFile("imagefile", "testing.txt", "text/plain",
+                        "Spring Framework Guru".getBytes());
+
+        mockMvc.perform(multipart("/recipe/1/image").file(multipartFile))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/recipe/1/show"));
+
+        verify(imageService, times(1)).saveImageFile(anyLong(), any());
+    }
+
+    // ----------
+    @PostMapping("recipe/{id}/image")
+    public String handleImagePost(@PathVariable String id, @RequestParam("imagefile") MultipartFile file){
+
+        imageService.saveImageFile(Long.valueOf(id), file);
+
+        return "redirect:/recipe/" + id + "/show";
+    }
+    
+        
+    @GetMapping("recipe/{id}/recipeimage")
+    public void renderImageFromDB(@PathVariable String id, HttpServletResponse response) throws IOException {
+        RecipeCommand recipeCommand = recipeService.findCommandById(Long.valueOf(id));
+
+        if (recipeCommand.getImage() != null) {
+            byte[] byteArray = new byte[recipeCommand.getImage().length];
+            int i = 0;
+
+            for (Byte wrappedByte : recipeCommand.getImage()){
+                byteArray[i++] = wrappedByte; //auto unboxing
+            }
+
+            response.setContentType("image/jpeg");
+            InputStream is = new ByteArrayInputStream(byteArray);
+            IOUtils.copy(is, response.getOutputStream());  //// tomcat
+        }
+    }
+    // ----------
+    @Override
+    @Transactional
+    public void saveImageFile(Long recipeId, MultipartFile file) {
+
+        try {
+            Recipe recipe = recipeRepository.findById(recipeId).get();
+
+            Byte[] byteObjects = new Byte[file.getBytes().length]; // boolean[] to Boolean[]
+
+            int i = 0;
+
+            for (byte b : file.getBytes()){
+                byteObjects[i++] = b;
+            }
+
+            recipe.setImage(byteObjects);
+
+            recipeRepository.save(recipe);
+        } catch (IOException e) {
+            //todo handle better
+            log.error("Error occurred", e);
+
+            e.printStackTrace();
+        }
+    }
+```
+- Command Object in Spring as a POJO/JavaBean/etc.. that backs the form in your presentation layer.
+
+- WebDataBinder is used to populate form fields onto beans. 
+- An init binder method initializes WebDataBinder and registers specific handlers, etc on it.
+```java
+    @InitBinder
+    public void setAllowedFields(WebDataBinder dataBinder) {
+        dataBinder.setDisallowedFields("id");
+    }
+
+```
