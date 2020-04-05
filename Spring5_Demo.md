@@ -477,3 +477,106 @@ public class UnitOfMeasureRepositoryIT {
     }
 
 ```
+
+- @ResponseStatus
+  - annotate custom **exception class**es to indicate to the framewrok the HTTP status you want returned when that exception is thrown
+  - global to the app
+  
+```java
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class NotFoundException extends RuntimeException {
+```
+- @ExceptionHandler
+  - handle in controller level
+  - can return view
+  - with @ResponseStatus
+- HandlerExceptionResolver
+  - interface to implement for custom exception handling
+  - used internally by MVC
+  - model is not passed
+  - Impl:
+    - ExceptionHandlerExceptionResolver (to @ExceptionHandler)
+    - ResponseStatusExceptionResolver (matching @ResponseStatus)
+    - DefaultHandlerExceptionResolver (internal: spring exc to HTTP code)
+    - SimpleMappingExceptionResolver: map exc to view by defining exc class name and view name
+     
+
+```java
+@Slf4j
+@Controller
+public class RecipeController {
+....
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    public ModelAndView handleNotFound(Exception exception){
+
+        log.error("Handling not found exception");
+        log.error(exception.getMessage());
+
+        ModelAndView modelAndView = new ModelAndView();
+
+        modelAndView.setViewName("404error");
+        modelAndView.addObject("exception", exception);
+
+
+        return modelAndView;
+    }
+    
+    
+@Slf4j
+@ControllerAdvice
+public class ControllerExceptionHandler {
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NumberFormatException.class)
+    public ModelAndView handleNumberFormat(Exception exception){
+
+        log.error("Handling Number Format Exception");
+        log.error(exception.getMessage());
+
+        ModelAndView modelAndView = new ModelAndView();
+
+        modelAndView.setViewName("400error");
+        modelAndView.addObject("exception", exception);
+
+        return modelAndView;
+    }
+}
+```
+- @ControllerAdvice: global level
+
+- Data validation JSR-303
+ - @Null, @NotNUll, @AssertTrue, @AssertFalse, @Min, @Max
+ - @DecimalMin, @DecimalMax, @Negative, @NegativeOrZero, @Positive, @PositiveOrZero
+ - @Size: string or colleciton
+ - @Digits,
+ - date: @Past, @PastOrPresent, @Future, @FutureOrPresent
+ - @Pattern, @NotEmpty, @NotBlank, @Email
+
+- @Valid to trigger validations
+```java
+@PostMapping("recipe")
+    public String saveOrUpdate(@Valid @ModelAttribute("recipe") RecipeCommand command, BindingResult bindingResult){
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class RecipeCommand {
+    private Long id;
+
+    @NotBlank
+    @Size(min = 3, max = 255)
+    private String description;
+
+    @Min(1)
+    @Max(999)
+    private Integer prepTime;
+```
+
+
+
+
+
+
+
+
