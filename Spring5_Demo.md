@@ -546,7 +546,7 @@ public class ControllerExceptionHandler {
 ```
 - @ControllerAdvice: global level
 
--  To apply validation in Spring MVC, you need to
+- To apply validation in Spring MVC, you need to
   - Declare validation rules on the class that is to be validated: @NotNull and @Size in DTO
   - Specify that validation should be performed in the controller methods that
 require validation: @Valid and @Error on argument
@@ -601,6 +601,16 @@ public class RecipeCommand {
 <span class="validationError"
 th:if="${#fields.hasErrors('ccNumber')}"
 th:errors="*{ccNumber}">CC Num Error</span>
+                                <div class="col-md-3 form-group" th:class="${#fields.hasErrors('description')}
+                                ? 'col-md-3 form-group has-error' : 'col-md-3 form-group'">
+                                    <label>Recipe Description:</label>
+                                    <input type="text" class="form-control" th:field="*{description}" th:errorclass="has-error"/>
+                                    <span class="help-block" th:if="${#fields.hasErrors('description')}">
+                                        <ul>
+                                            <li th:each="err : ${#fields.errors('description')}" th:text="${err}"/>
+                                        </ul>
+                                    </span>
+                                </div>
 ```
 
 - view controller
@@ -621,3 +631,31 @@ public class WebConfig implements WebMvcConfigurer {
     }
 }
 ```
+
+- messages.properties
+```
+#Validaiton Messages
+#Order of precedence
+# 1 code.objectName.fieldName
+# 2 code.fieldName
+# 3 code.fieldType (Java data type)
+# 4 code
+NotBlank.recipe.description=Description Cannot Be Blank
+Size.recipe.description={0} must be between {2} and {1} characters long.
+```
+
+- i18n
+  - defualt check header: 'accept-language' = 'en-US'
+    - AcceptHeaderLocaleResolver
+  - locale of JVM: FixedLocaleResolver
+  - MVC: LocaleChangeInterceptor to config a custom poaram to change locale
+  - session, cookie
+  - Resource buildes hignest match: messages_en.properties
+
+```
+<label th:text="#{recipe.description}">Recipe Description d:</label>
+
+recipe.description=Description (default)
+
+```
+
