@@ -171,9 +171,10 @@ public class PropertyConfig {
 - Axis TCPMon
   - http req info
 
-- devtools
+- DevTools
   - restart quick for class load
   - liveload(browser)
+  - it will disable caching for all template libraries but will disable itself (and thus reenable template caching) when your application is deployed.
 
 ### JPA
 
@@ -545,6 +546,13 @@ public class ControllerExceptionHandler {
 ```
 - @ControllerAdvice: global level
 
+-  To apply validation in Spring MVC, you need to
+  - Declare validation rules on the class that is to be validated: @NotNull and @Size in DTO
+  - Specify that validation should be performed in the controller methods that
+require validation: @Valid and @Error on argument
+    - If there are any validation errors, the details of those errors will be captured in an object Errors
+  - Modify the form views to display validation errors.
+
 - Data validation JSR-303
  - @Null, @NotNUll, @AssertTrue, @AssertFalse, @Min, @Max
  - @DecimalMin, @DecimalMax, @Negative, @NegativeOrZero, @Positive, @PositiveOrZero
@@ -557,6 +565,11 @@ public class ControllerExceptionHandler {
 ```java
 @PostMapping("recipe")
     public String saveOrUpdate(@Valid @ModelAttribute("recipe") RecipeCommand command, BindingResult bindingResult){
+          if(bindingResult.hasErrors()){  // BindingResult extends Errors
+
+            bindingResult.getAllErrors().forEach(objectError -> {
+                log.debug(objectError.toString());
+            });
 
 @Getter
 @Setter
@@ -571,12 +584,40 @@ public class RecipeCommand {
     @Min(1)
     @Max(999)
     private Integer prepTime;
+    
+    @Pattern(regexp="^(0[1-9]|1[0-2])([\\/])([1-9][0-9])$", message="Must be formatted MM/YY")
+    private String ccExpiration;
 ```
 
+- Thymeleaf
+  - Spring hands the request over to a view, it copies the model data into **request attributes** that Thymeleaf and other view templating options have ready access to.
+  - The ```${}``` operator tells it to use the value of a request attribute
+  - ```th:each```  iterates over a **collection** of elements, rendering the HTML once for each item in the collection.
+  - Thymeleaf’s operator ```@{}``` is used to produce a **context-relative path to the static** artifacts that they’re referenc ing.```<img th:src="@{/images/TacoCloud.png}"/>```
+  - spring.thymeleaf.cache=false
+  
+  
+```html
+<span class="validationError"
+th:if="${#fields.hasErrors('ccNumber')}"
+th:errors="*{ccNumber}">CC Num Error</span>
+```
 
+- view controller
+  - controller that does nothing but forward the request to a view. GET
+  - when a controller is simple enough that it doesn’t populate a model or process input
+  - WebMvcConfigurer.addViewControllers() is given a ViewControllerRegistry that you can use to register one or more view controllers.
+    - any configuration class can implement WebMvcConfigurer and override the method addViewController
 
+- creating a new configuration class for each kind of configuration (web, data, security, and so on), keeping the application bootstrap configuration clean and simple.
 
+```java
 
-
-
-
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("home");
+    }
+}
+```
