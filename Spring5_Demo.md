@@ -659,3 +659,89 @@ recipe.description=Description (default)
 
 ```
 
+- There are two different (but related) kinds of configurations in Spring:
+  - Bean wiring—Configuration that declares application components to be created
+as beans in the Spring application context and how they should be injected into
+each other.
+  - Property injection—Configuration that sets values on beans in the Spring application
+context.
+     - you can derive their values from other configuration properties.
+
+```yaml
+greeting:
+    welcome: You are using ${spring.application.name}.
+```
+- environment abstraction is a one-stop shop for any configurable property. It abstracts the origins of properties so that beans needing those properties can con sume them from Spring itself.
+  - JVM system properties
+  - Operating system environment variables
+  - Command-line arguments
+  - Application property configuration files
+
+```bash
+$ export SERVER_PORT=9090
+```
+- @ConfigurationProperties on Bean to suppoert prop injection prop from spring env abstraction
+  - With a **configuration property holder bean**, you’ve collected configuration property specifics in one place, leaving the classes that need those properties relatively clean.
+```java
+@ConfigurationProperties(prefix="taco.orders")
+public class OrderController {
+
+
+```
+  - add meta in additional-spring-configuraton-metadata.json
+```json
+{
+"properties": [
+{
+"name": "taco.orders.page-size",
+"type": "java.lang.String",
+"description":
+"Sets the maximum number of orders to display in a list."
+}
+]
+}
+```
+
+- to set it up to handle HTTPS requests.
+  - server.port property is set to 8443,  HTTPS servers. 
+  - The server.ssl.key-store property should be set to the path where the keystore file is created. 
+  - Here it’s shown with a  ```file://URL``` to load it from the filesystem, but if you package it within the application JAR file, you’ll use a classpath: URL to reference it. 
+  - And both the and server.ssl.key-store-password server.ssl.key-password properties are set to the password that was given when creating the keystore.
+```yaml
+$ keytool -keystore mykeys.jks -genkey -alias tomcat -keyalg RSA
+
+server:
+    port: 8443
+    ssl:
+          key-store: file:///path/to/mykeys.jks
+          key-store-password: letmein
+          key-password: letmein
+
+```
+
+- logging
+  - By default, Spring Boot configures logging via Logback (http://logback.qos.ch) to write to the console at an INFO level
+  - prefixed with log.level, followed by the name of the logger
+  - logging.path, logging.file
+  - By default, the log files rotate once they reach 10 MB in size.
+```yaml
+logging:
+    path: /var/logs/
+    file: TacoCloud.log
+    level:
+         root: WARN
+    org:
+         springframework:
+         security: DEBUG
+```
+
+- Profiles are a type of condi tional configuration where different beans, configuration classes, and configuration properties are applied or ignored based on what profiles are active at runtime.
+  - application-{profile name}.properties
+  - if you deploy a Spring application to Cloud Foundry, a profile named **cloud** is automatically activated for you.
+  - on bean ```@Bean @Profile("dev", "!prod")```
+```
+export SPRING_PROFILES_ACTIVE=prod
+
+% java -jar taco-cloud.jar --spring.profiles.active=prod
+```
+
