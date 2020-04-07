@@ -40,3 +40,28 @@ $ docker run -p 27017:27017 -v /Users/williaz/dockerdata/mongo:/data/db -d mongo
   - An Image defines a Docker Container.
   - Immutable, built in layers
   - mount folder for persistent data in case lost when container restart
+
+- mySql
+```bash
+$ docker run --name wz-mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -v /Users/williaz/dockerdata/mysql/:/var/lib/mysql -p 3306:3306 -d mysql
+```
+
+
+```bash
+docker ps
+docker ps -a
+default tag: latest
+docker run <image>
+docker logs <container>
+docker build -t < tag> # from file path
+docker stop/kill <ctn>
+docker run -d <ctn> # bkgd
+docker images
+docker run -p 3306:3305 <img>
+docker logs -f <ctnr>
+docker rm <ctnr>
+docker run -e MY_ENV=prop 
+docker -rmi <img>
+docker exec -it <ctnr> bash
+-v host path: ctnr path
+```
