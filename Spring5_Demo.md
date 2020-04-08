@@ -745,3 +745,62 @@ export SPRING_PROFILES_ACTIVE=prod
 % java -jar taco-cloud.jar --spring.profiles.active=prod
 ```
 
+- code coverage: codecov
+
+- schema gen form hibernate
+```yml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/sfg_dev
+    username: sfg_dev_user
+    password: guru
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    database: mysql
+    show-sql: true
+#    properties:
+#      javax:
+#        persistence:
+#          schema-generation:
+#            create-source: metadata
+#            scripts:
+#              action: create
+#              create-target: guru_database_create.sql
+```
+-- embeded mongo
+
+
+- Mongo model
+
+```java
+@Document
+public class Recipe {
+
+    @Id
+    private String id;
+    
+    private Set<Ingredient> ingredients = new HashSet<>();
+    private Byte[] image;
+
+
+    @DBRef
+    private Set<Category> categories = new HashSet<>();
+
+@Document
+public class Category {
+    @Id
+    private String id;
+
+    @DBRef
+    private Set<Recipe> recipes;
+
+public class Ingredient {
+
+    private String id = UUID.randomUUID().toString();
+
+    @DBRef
+    private UnitOfMeasure uom;
+```
+
