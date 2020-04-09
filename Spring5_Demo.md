@@ -803,4 +803,72 @@ public class Ingredient {
     @DBRef
     private UnitOfMeasure uom;
 ```
+- JdbcTemplate
+  - queryForObject(), query() -> List
+  - update(): a PreparedStatementCreatorFactory, giving it the SQL you want to execute, as well as the types of each query parameter
+  - executeAndReturnKey(), execute()
+
+
+```java
+private long saveTacoInfo(Taco taco) {
+    taco.setCreatedAt(new Date());
+    PreparedStatementCreator psc =
+        new PreparedStatementCreatorFactory( // #1 set
+            "insert into Taco (name, createdAt) values (?, ?)",
+            Types.VARCHAR, Types.TIMESTAMP
+        ).newPreparedStatementCreator(  // #2 value
+            Arrays.asList(
+                taco.getName(),
+                new Timestamp(taco.getCreatedAt().getTime())));
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+    jdbc.update(psc, keyHolder);  // #3 return ID
+    return keyHolder.getKey().longValue();
+}
+
+@Autowired
+public JdbcOrderRepository(JdbcTemplate jdbc) {
+    this.orderInserter = new SimpleJdbcInsert(jdbc)
+        .withTableName("Taco_Order")
+        .usingGeneratedKeyColumns("id");
+    this.orderTacoInserter = new SimpleJdbcInsert(jdbc)
+        .withTableName("Taco_Order_Tacos");
+    this.objectMapper = new ObjectMapper();
+}
+
+```
+- Spring’s RowMapper for the purpose of mapping each row in the result set to an object
+- ```schema.sql/data.sql```: will be executed against the database when the application starts
+
+- class-level @SessionAttributes: kept in session and available across multiple requests
+- @ModelAttribute 
+   - to indicate that its value should come from the **model**
+   - and that Spring MVC **shouldn’t bind request parameters** to it.
+
+- JPA entity requires
+  - @Entity, @Id
+  - @NoArgsConstructor
+
+```java
+@Data
+@Entity
+public class Taco {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @NotNull
+    @Size(min = 5, message = "Name must be at least 5 characters long")
+    private String name;
+    private Date createdAt;
+    @ManyToMany(targetEntity = Ingredient.class)
+    @Size(min = 1, message = "You must choose at least 1 ingredient")
+    private List < Ingredient > ingredients;
+    
+    @PrePersist  // #
+    void createdAt() {
+        this.createdAt = new Date();
+    }
+}
+```
+
+
 
