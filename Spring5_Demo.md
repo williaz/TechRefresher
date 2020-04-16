@@ -870,5 +870,85 @@ public class Taco {
 }
 ```
 
+## Spring Boot
+```
+Spring Boot Intro
+• What is Spring Boot?
+  do srping config for you
+• What are the advantages of using Spring Boot?
 
+Spring Boot is an exciting new way to develop Spring applications with minimal friction
+from the framework itself. Auto-configuration eliminates much of the boilerplate
+configuration that infests traditional Spring applications. Spring Boot starters enable
+you to specify build dependencies by what they offer rather than use explicit library
+names and version. The Spring Boot CLI takes Spring Boot’s frictionless development
+model to a whole new level by enabling quick and easy development with Groovy from
+the command line. And the Actuator lets you look inside your running application to
+see what and how Spring Boot has done.
+
+
+• Why is it “opinionated”?
+• What things affect what Spring Boot sets up?
+• What is a Spring Boot starter POM? Why is it useful?
+• Spring Boot supports both properties and YML files. Would you recognize and understand
+them if you saw them?
+• Can you control logging with Spring Boot? How?
+• Where does Spring Boot look for property file by default?
+• How do you define profile specific property files?
+• How do you access the properties defined in the property files?
+• What properties do you have to define in order to configure external MySQL?
+• How do you configure default schema and initial data?
+• What is a fat far? How is it different from the original jar?
+• What is the difference between an embedded container and a WAR?
+• What embedded containers does Spring Boot support?
+
+Spring Boot Auto Configuration
+• How does Spring Boot know what to configure?
+• What does @EnableAutoConfiguration do?
+• What does @SpringBootApplication do?
+• Does Spring Boot do component scanning? Where does it look by default?
+• How are DataSource and JdbcTemplate auto-configured?
+• What is spring.factories file for?
+• How do you customize Spring auto configuration?
+• What are the examples of @Conditional annotations? How are they used?
+
+Spring Boot Actuator
+• What value does Spring Boot Actuator provide?
+• What are the two protocols you can use to access actuator endpoints?
+• What are the actuator endpoints that are provided out of the box?
+• What is info endpoint for? How do you supply data?
+• How do you change logging level of a package using loggers endpoint?
+• How do you access an endpoint using a tag?
+• What is metrics for?
+• How do you create a custom metric with or without tags?
+• What is Health Indicator?
+• What are the Health Indicators that are provided out of the box?
+• What is the Health Indicator status?
+• What are the Health Indicator statuses that are provided out of the box
+• How do you change the Health Indicator status severity order?
+• Why do you want to leverage 3rd-party external monitoring system?
+
+Spring Boot Testing
+• When do you want to use @SpringBootTest annotation?
+• What does @SpringBootTest auto-configure?
+• What dependencies does spring-boot-starter-test brings to the classpath?
+• How do you perform integration testing with @SpringBootTest for a web application?
+• When do you want to use @WebMvcTest? What does it auto-configure?
+• What are the differences between @MockBean and @Mock?
+• When do you want @DataJpaTest for? What does it auto-configure?
+```
+-  Automatic configuration —Spring Boot can automatically provide configuration for application functionality common to many Spring applications.
+- Starter dependencies — project dependency/version management: special Maven (and Gradle) dependencies that take advantage of transitive dependency resolution to **aggregate** commonly used libraries under a handful of feature-defined dependencies. **no incompatibilities**
+- The command-line interface — This optional feature of Spring Boot lets you write complete applications with just application code, but no need for a traditional project build.```$ spring run HelloController.groovy```
+- The Actuator—inspect the internals of your application at runtime via web endpoints or via a SSH shell interface
+```
+■ What beans have been configured in the Spring application context
+■ What decisions were made by Spring Boot’s auto-configuration
+■ What environment variables, system properties, configuration properties, and
+command-line arguments are available to your application
+■ The current state of the threads in and supporting your application
+■ A trace of recent HTTP requests handled by your application
+■ Various metrics pertaining to memory usage, garbage collection, web requests,
+and data source usage
+```
 
