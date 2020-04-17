@@ -951,4 +951,53 @@ command-line arguments are available to your application
 ■ Various metrics pertaining to memory usage, garbage collection, web requests,
 and data source usage
 ```
+- @SpringBootApplication class: 
+  - configuration: @Configuration + @ComponentScan + @EnableAutoConfiguration
+  - bootstrapping: main() => SpringApplication.run() <= ```$ java -jar xxxx.jar```
 
+- @SpringApplicationConfiguration to load the Spring application context from the SpringBootApplication class.
+- Spring Boot Maven plugin 
+  - provides a spring-boot:run goal
+  - to package the project as an executable uber-JAR.
+- starter:
+  - facet-based dependencies
+  - no need starter version: The versions of the starter dependencies themselves are determined by the version of Spring Boot you’re using ```mvn dependency:tree```
+  - override dep: exclusions or express dep directly(Maven always favors the closest dependency)
+
+- auto-config
+  - a runtime (more accurately, application startup-time) process => decision on classpath
+  - conditional config support: implement the Condition interface and override its matches() & @Conditional (only creat eh bean when meet)
+```
+By taking advantage of Spring Boot starter dependencies and auto-configuration, you
+can more quickly and easily develop Spring applications. Starter dependencies help you
+focus on the type of functionality your application needs rather than on the specific
+libraries and versions that provide that functionality. Meanwhile, auto-configuration
+frees you from the boilerplate configuration that is common among Spring applications
+without Spring Boot.
+Although auto-configuration is a convenient way to work with Spring, it also represents
+an opinionated approach to Spring development.
+```
+  
+```java
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.type.AnnotatedTypeMetadata;
+public class JdbcTemplateCondition implements Condition {
+    @Override
+    public boolean matches(ConditionContext context,
+        AnnotatedTypeMetadata metadata) {
+        try {
+            context.getClassLoader().loadClass(
+                "org.springframework.jdbc.core.JdbcTemplate");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
+
+@Conditional(JdbcTemplateCondition.class)
+public MyService myService() {
+...
+}
+```
