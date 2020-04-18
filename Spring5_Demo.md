@@ -1086,3 +1086,60 @@ by an exception)
 ■ trace—The exception stack trace (if the error was caused by an exception)
 ■ path—The URL path requested when the error occurred
 ```
+
+- Boot Testing
+  - Unit test: no need Spring as Loose coupling and interface-driven design, which Spring encourages, makes it really easy to write unit tests.
+  - context testing
+    - @RunWith is given SpringJUnit4ClassRunner.class to enable Spring integration testing.
+    - @ContextConfiguration specifies how to load the application context, but not loading of external properties and Spring Boot logging.
+    - @SpringApplicationConfiguration loads the Spring application context using SpringApplication the same way and with the same treatment it would get if it was being loaded in a production application.
+
+  - Web test
+    - Spring Mock MVC
+    - Web Intg test: embeded sevlet container(tomcat)
+    
+    
+    - MockMvcBuilders to set up MockMvc
+      - standaloneSetup(): single contoller with unit test - manually instantiate and inject the controllers
+      - webAppContextSetup(): lets Spring load your controllers as well as their dependencies for a full-blown integration test- works from an instance of WebApplicationContext
+        - @WebAppConfiguration enable web context testing - declares that the application context created SpringJUnit4ClassRunner should be a WebApplicationContext
+	- Inject WebApplicationContext
+  - secured 
+    - dep: spring-security-test
+    - ```.apply(springSecurity())``` for MockMvc so Spring Security will be in play on all requests performed through MockMvc.
+    - preform an authenticated req:
+      - @WithMockUser Loads the security context with a using the given UserDetails username, password, and authorization
+      - @WithUserDetails Loads the security context by looking up a UserDetails object for the given username
+        - uses the configured UserDetailsService to load the object UserDetails
+	- in model for req
+  - running app
+    - @WebIntegrationTest 1 create an application context, 2 also to start an embedded servlet container.
+  
+  - webpage
+    - Selenium: fires up a web browser and executes your test within the context of the browser.
+    
+```java
+@WebIntegrationTest(value={"server.port=0"})
+@WebIntegrationTest(randomPort=true)
+
+@Value("${local.server.port}")
+private int port;
+```
+```
+For unit tests, which focus on a single component or a method of a component,
+Spring isn’t really necessary. The benefits and techniques promoted by Spring—loose
+coupling, dependency injection, and interface-driven design—make writing unit tests
+easy. But Spring doesn’t need to be directly involved in unit tests.
+Integration-testing multiple components, however, begs for help from Spring. In
+fact, if Spring is responsible for wiring those components up at runtime, then Spring
+should also be responsible for wiring them up in integration tests.
+The Spring Framework provides integration-testing support in the form of a JUnit
+class runner that loads a Spring application context and enables beans from the context
+to be injected into a test. Spring Boot builds upon Spring integration-testing support
+with a configuration loader that loads the application context in the same way as Spring
+Boot itself, including support for externalized properties and Spring Boot logging.
+Spring Boot also enables in-container testing of web applications, making it possible
+to fire up your application to be served by the same container that it will be served
+by when running in production. This gives your tests the closest thing to a real-world
+environment for verifying the behavior of the application.
+```
