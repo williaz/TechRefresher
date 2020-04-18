@@ -1001,3 +1001,88 @@ public MyService myService() {
 ...
 }
 ```
+
+- Spring security: default password is randomly generated and written to the logs each time the application is run
+- property sources: order of precedence: CLI > JVM > OS > prop outside app > prop inside app > @PropertySource > default
+```
+1 Command-line arguments
+2 JNDI attributes from java:comp/env
+3 JVM system properties
+4 Operating system environment variables
+5 Randomly generated values for properties prefixed with random.* (referenced
+when setting other properties, such as `${random.long})
+6 An application.properties or application.yml file outside of the application
+7 An application.properties or application.yml file packaged inside of the
+application
+8 Property sources specified by @PropertySource
+9 Default properties
+```
+
+- application.properties order of precedence
+```
+properties in application.yml will override those in application.properties
+1 Externally, in a /config subdirectory of the directory from which the application
+is run
+2 Externally, in the directory from which the application is run
+3 Internally, in a package named “config”
+4 Internally, at the root of the classpath
+```
+```
+spring.thymeleaf.cache=false
+server.port=8000
+
+server.ssl.key-store: file:///path/to/mykeys.jks
+server.ssl.key-store-password: letmein
+server.ssl.key-password: letmein
+
+
+logging.path=/var/logs/
+logging.file=BookWorm.log
+logging.level.root=WARN
+logging.level.root.org.springframework.security=DEBUG
+```
+- log4j
+```
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter</artifactId>
+<exclusions>
+<exclusion>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-logging</artifactId>
+</exclusion>
+</exclusions>
+</dependency>
+
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-log4j</artifactId>
+</dependency>
+```
+
+- @Configuration-Properties. This specifies that this bean should have its properties injected (via setter methods) with values from configuration properties.
+  - Spring Boot auto @EnableConfigurationProperties
+  - Spring Boot’s property resolver treats camel-cased properties as interchangeable with similarly named properties with hyphens or underscores.
+    - amazon.associateId is equivalent to both amazon.associate_id and amazon.associate-id.
+  - better to annotate a separate bean with @ConfigurationProperties and let that bean collect all of the configuration properties.
+
+- Profiles are a type of conditional configuration where different beans or configuration classes are used or ignored based on what profiles are active at runtime.
+  - @Profile("production")
+  - spring.profiles.active=production
+  - application-{profile}.properties
+
+- The default error handler that’s auto-configured by Spring Boot looks for a view whose name is “error”. If it can’t find one, it uses its default whitelabel error view
+  - Any bean that implements Spring’s interface and has a bean of “error” View ID (resolved by Spring’s BeanNameViewResolver)
+  - A Thymeleaf template named “error.html” if Thymeleaf is configured.
+  - default available error attributes
+```
+■ timestamp—The time that the error occurred
+■ status—The HTTP status code
+■ error—The error reason
+■ exception—The class name of the exception
+■ message—The exception message (if the error was caused by an exception)
+■ errors—Any errors from a BindingResult exception (if the error was caused
+by an exception)
+■ trace—The exception stack trace (if the error was caused by an exception)
+■ path—The URL path requested when the error occurred
+```
