@@ -1171,5 +1171,19 @@ environment for verifying the behavior of the application.
 ■ Creating a custom repository for storing trace data
 ■ Plugging in custom health indicators: implements HealthIndicator
 ```
+- war
+```
+<packaging>war</packaging>
 
-
+public class ReadingListServletInitializer
+extends SpringBootServletInitializer {
+    @Override
+    protected SpringApplicationBuilder configure(
+        SpringApplicationBuilder builder) {
+        return builder.sources(Application.class);  // @SpringBootApplication
+    }
+}
+```
+- database migration library: work from a set of database scripts and keep careful track of the ones that have already been applied so that they won’t be applied more than once.
+  - Flyway: version, 
+  - Liquibase supports several formats for writing migration scripts that are agnostic to the underlying platform.
