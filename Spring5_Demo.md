@@ -1,17 +1,24 @@
 # Spring 5
 - Container (20%)
+
 - AOP (8%)
-- JDBC (4%)
 - Transactions (8%)
+
 - MVC (8%)
-- Security (6%)
 - REST (6%)
+
+- JDBC (4%)
 - JPA Spring Data (4%)
+
+- Security (6%)
+
 - Testing (4%)
+
 - Boot Into (8%)
 - Boot Autoconfig (8%)
 - Boot Actuator (8%)
 - Boot Testing (8%)
+
 ## Intro with Spring Boot
 - Spring initializr
 ```bash
@@ -1143,3 +1150,26 @@ to fire up your application to be served by the same container that it will be s
 by when running in production. This gives your tests the closest thing to a real-world
 environment for verifying the behavior of the application.
 ```
+- Spring Actuator
+  - view internal
+  - REST endpoint, remote shell, JMX
+  - to enable: 
+    - ```spring-boot-starter-actuator```
+    - ```management.endpoints.web.exposure.include=*```
+  - configuration endpoints
+    - actuator/beans: visualize the relationships of the beans: bean name, resource/class, dependencies, scope, java type
+    - actuator/mappings: @RequestMapping
+  - metrics endpoints
+    - heapdump
+    - POST shutdown
+  - miscellaneous endpoints
+  - customize
+```
+■ Renaming endpoints: changing end point id
+■ Enabling and disabling endpoints: endpoints._endpoint-id.enabled to false
+■ Defining custom metrics and gauges: injects CounterService and GaugeService; implement the interface PublicMetrics
+■ Creating a custom repository for storing trace data
+■ Plugging in custom health indicators: implements HealthIndicator
+```
+
+
