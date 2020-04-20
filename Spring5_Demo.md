@@ -1187,3 +1187,54 @@ extends SpringBootServletInitializer {
 - database migration library: work from a set of database scripts and keep careful track of the ones that have already been applied so that they won’t be applied more than once.
   - Flyway: version, 
   - Liquibase supports several formats for writing migration scripts that are agnostic to the underlying platform.
+
+## Spring Security
+```
+Security
+• What are authentication and authorization? Which must come first?
+• Is security a cross cutting concern? How is it implemented internally?
+• What is the delegating filter proxy?
+• What is the security filter chain?
+• What is a security context?
+
+• What does the ** pattern in an antMatcher or mvcMatcher do?
+• Why is the usage of mvcMatcher recommended over antMatcher?
+mvcMatcher uses the same rules that Spring MVC uses for matching (when using @RequestMapping annotation).
+antMatchers("/secured") matches only the exact /secured URL
+mvcMatchers("/secured") matches /secured as well as /secured/, /secured.html, /secured.xyz
+
+• Does Spring Security support password hashing? What is salting?
+
+• Why do you need method security? What type of object is typically secured at the method level (think of its purpose not its Java type).
+• What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
+• How are these annotations implemented?
+• In which security annotation are you allowed to use SpEL?
+```
+- adding spring-boot-starter-security
+  - All HTTP request paths require authentication.
+  - No specific roles or authorities are required.
+  - There’s no login page.
+  - Authentication is prompted with HTTP basic authentication.
+  - There’s only one user; the username is user, and passowrd in log
+- user stores
+  - An in-memory user store
+  - A JDBC-based user store
+  - An LDAP-backed user store
+    - The default strategy for authenticating against LDAP is to perform a bind operation, authenticating the user directly to the LDAP server
+  - A custom user details service
+    - UserDetails.loadByUsername() it must never return null. throw excp
+- 
+- passwordEncoder(): password in the database is never decoded. Instead, the password that the user enters
+at login is encoded using the same algorithm,
+
+- Cross-site request forgery
+  - Spring Security has built-in CSRF protection, and it’s enabled by default
+
+
+- authen, multi user, path security level
+
+
+
+
+
+
