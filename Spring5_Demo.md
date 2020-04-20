@@ -1189,16 +1189,27 @@ extends SpringBootServletInitializer {
   - Liquibase supports several formats for writing migration scripts that are agnostic to the underlying platform.
 
 ## Spring Security
-```
-Security
+
 • What are authentication and authorization? Which must come first?
-• Is security a cross cutting concern? How is it implemented internally?
-• What is the delegating filter proxy?
-• What is the security filter chain?
+- [x] Is security a cross cutting concern? How is it implemented internally?
+- Spring Security, a security framework implemented with Spring AOP and servlet filters.
+  - provides declarative security
+  - web request level: servlet filter
+  - method invocation level: AOP
+- [x] What is the delegating filter proxy?
+- DelegatingFilterProxy intercept requests coming into the application and delegate them to a bean whose ID is springSecurityFilterChain.
+- [x] What is the security filter chain?
+
+- springSecurityFilterChain bean is a FilterChainProxy. It’s a single filter that chains together one or more additional filters.
+
 • What is a security context?
 
-• What does the ** pattern in an antMatcher or mvcMatcher do?
-• Why is the usage of mvcMatcher recommended over antMatcher?
+- [x] What does the ** pattern in an antMatcher or mvcMatcher do?
+? matches one character
+* matches zero or more characters
+** matches zero or more 'directories' in a path
+
+- [x] Why is the usage of mvcMatcher recommended over antMatcher?
 mvcMatcher uses the same rules that Spring MVC uses for matching (when using @RequestMapping annotation).
 antMatchers("/secured") matches only the exact /secured URL
 mvcMatchers("/secured") matches /secured as well as /secured/, /secured.html, /secured.xyz
@@ -1209,13 +1220,23 @@ mvcMatchers("/secured") matches /secured as well as /secured/, /secured.html, /s
 • What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
 • How are these annotations implemented?
 • In which security annotation are you allowed to use SpEL?
-```
-- adding spring-boot-starter-security
+
+
+
+- 1. adding spring-boot-starter-security
   - All HTTP request paths require authentication.
   - No specific roles or authorities are required.
   - There’s no login page.
   - Authentication is prompted with HTTP basic authentication.
   - There’s only one user; the username is user, and passowrd in log
+
+- 2. @EnableWebSecurity annotation enables web security. It is useless on its own, however. 
+  - Spring Security must be configured in a bean that implements WebSecurityConfigurer or (for convenience) extends WebSecurityConfigurerAdapter.
+  - @EnableWebMvcSecurity annotation configures a Spring MVC argument resolver 
+    - so that handler methods can receive the authenticated user’s principal (or username) via @AuthenticationPrincipal-annotated parameters. 
+    - It also configures a bean that automatically adds a hidden cross-site request forgery (CSRF) token field on forms using Spring’s form-binding tag library.
+
+- 3. configure(AuthenticationManagerBuilder)
 - user stores
   - An in-memory user store
   - A JDBC-based user store
@@ -1230,7 +1251,14 @@ at login is encoded using the same algorithm,
 - Cross-site request forgery
   - Spring Security has built-in CSRF protection, and it’s enabled by default
 
-
+- 4. configure(HttpSecurity)
+  - formLogin() to enable default simple login page.
+  - and() to chain together different configuration instructions.
+  - rememberMe() default 2 weeks
+  - httpBasic(): another app: HTTP Basic authentication is one way to authenticate a user to an application HTTP directly in the request itself.
+  - logout(): logout capability is already enabled by your configuration without you having to do anything else.
+  
+  
 - authen, multi user, path security level
 
 
