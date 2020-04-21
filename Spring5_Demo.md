@@ -1217,10 +1217,15 @@ mvcMatchers("/secured") matches /secured as well as /secured/, /secured.html, /s
 • Does Spring Security support password hashing? What is salting?
 
 • Why do you need method security? What type of object is typically secured at the method level (think of its purpose not its Java type).
-• What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
-• How are these annotations implemented?
-• In which security annotation are you allowed to use SpEL?
+data
 
+• What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
+
+• How are these annotations implemented?
+AOP pointcut
+
+• In which security annotation are you allowed to use SpEL?
+4 
 
 
 - 1. adding spring-boot-starter-security
@@ -1257,8 +1262,25 @@ at login is encoded using the same algorithm,
   - rememberMe() default 2 weeks
   - httpBasic(): another app: HTTP Basic authentication is one way to authenticate a user to an application HTTP directly in the request itself.
   - logout(): logout capability is already enabled by your configuration without you having to do anything else.
-  
-  
+
+
+- 5. secured method
+  - Spring Security provides three different kinds of security annotations:
+    - Spring Security’s own @Secured
+      - @EnableGlobalMethodSecurity(securedEnabled=true) for @Secured
+      - AuthenticationException or Access-DeniedException
+    - JSR-250’s @RolesAllowed
+      - @EnableGlobalMethodSecurity(jsr250Enabled=true)
+      - any methods annotated with @RolesAllowed will be wrapped with Spring Security’s aspects
+    - Expression-driven annotations, with @PreAuthorize, @PostAuthorize, @PreFilter, and @PostFilter
+      - prePostEnabled = true
+      - @PostAuthorize: executed first and intercepted afterward, be care of side effect
+      - @PostFilter: filter data collection
+      - @PreFilter uses SpEL to filter a collection to only the elements that satisfy the SpEL expression.
+    - implements PermissionEvaluator.hasPermission() to replace SpEL
+  - enabling annotation-based method security: @EnableGlobalMethodSecurity
+    - class extends GlobalMethodSecurityConfiguration can config oauth also
+    
 - authen, multi user, path security level
 
 
