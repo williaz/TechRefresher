@@ -1280,8 +1280,128 @@ at login is encoded using the same algorithm,
     - implements PermissionEvaluator.hasPermission() to replace SpEL
   - enabling annotation-based method security: @EnableGlobalMethodSecurity
     - class extends GlobalMethodSecurityConfiguration can config oauth also
-    
-- authen, multi user, path security level
+- 6. get user info
+  - Inject a Principal object into the controller method
+  - Inject an Authentication object into the controller method ```User user = (User) authentication.getPrincipal();```
+  - Use SecurityContextHolder to get at the security context (use in lower levels of the code.)
+  - Use an @AuthenticationPrincipal annotated method```@AuthenticationPrincipal User user)```
+
+- security 2 cautions
+  - By default, Spring AOP proxying is used to apply method security – if a secured method A is called by another method within the same class, security in A is ignored altogether. This means method A will execute without any security checking. The same applies to private methods
+  - Spring SecurityContext is thread-bound – by default, the security context isn't propagated to child-threads.
+
+
+## AOP 
+Aspect oriented programming
+
+- [x] What is the concept of AOP? Which problem does it solve? What is a cross cutting
+concern?
+- a crosscutting concern: functionality that affects multiple points of an application.
+- cross-cutting concerns are conceptually separate from (but often embedded directly within) the application’s business logic.
+- With AOP, you still define the common functionality in one place, but you can declaratively define how and where this functionality is applied without having to modify the class to which you’re applying the new feature. Crosscutting concerns can now be modularized into special classes called aspects.
+
+- [x] Name three typical cross cutting concerns.
+- logging, transactions, security, and caching
+
+- [x] What two problems arise if you don't solve a cross cutting concern via AOP?
+- A common object-oriented technique for reusing common functionality is to apply inheritance or delegation. 
+- Inheritance can lead to a **brittle object hierarchy** if the same base class is used throughout an application
+- Delegation can be **cumbersome** because complicated calls to the delegate object may be required.
+
+- [x] What is a pointcut, a join point, an advice, an aspect, weaving?
+- Advice: the **task** of an aspect
+  - Advice defines both the what and the when of an aspect
+  - Spring: Advice take place when: Before, After, After-returning, After-throwing, Around
+- A join point is a point in the execution of the application where an aspect can be plugged in.
+  - These are the points where your aspect’s code can be **inserted** into the normal flow of your application to add new behavior.
+- Pointcuts: matcher, help narrow down the join points advised by an aspect.
+  - If advice defines the what and when of aspects, then pointcuts define the where. A pointcut definition matches one or more join points at which advice should be woven
+
+- An aspect is the merger of advice and pointcuts.
+- Weaving is the process of applying aspects to a target object to create a new proxied object.
+  - Compile time: AspectJ
+  - Class load time: AspectJ5 LTW
+  - Runtime: an AOP container dynamically generates a proxy object that delegates to the target object while weaving in the aspects => Spring AOP
+
+- An introduction allows you to add new methods or attributes to existing classes.
+
+- [x] How does Spring solve (implement) a cross cutting concern?
+- the ability to create pointcuts that define the join points at which aspects should be woven is what makes it an AOP framework.
+- 4 Style:
+  - Classic Spring proxy-based AOP
+  - Pure-POJO aspects
+  - @AspectJ annotation-driven aspects
+  - Injected AspectJ aspects (available in all versions of Spring)
+
+- **method join points only**: Spring AOP is built around dynamic proxies. Consequently, Spring’s AOP support is limited to **method interception**.
+- **Runtime proxy creation**: Spring doesn’t create a proxied object until that proxied bean is needed by the application.
+
+• Which are the limitations of the two proxy-types?
+
+• What visibility must Spring bean methods have to be proxied using Spring AOP?
+
+- [x] How many advice types does Spring support. Can you name each one? What are they used for? Which two advices can you use if you would like to try and catch exceptions?
+- @After; return or throw
+- @AfterReturning, @AfterThrowing, @Before
+- @Around: ProceedingJoinPoint.procceed()
+  - pass control to advised method
+  - can repeat calls
+
+- [x] What do you have to do to enable the detection of the @Aspect annotation? What does @EnableAspectJAutoProxy do?
+- @EnableAspectJAutoProxy turn on auto-proxying at the class level of the configuration class.
+
+
+
+- @Pointcut defines a named reusable pointcut within an @Aspect aspect.
+```java
+@Pointcut("execution(** concert.Performance.perform(..))")
+public void performance() {}
+
+@Pointcut(
+"execution(* soundsystem.CompactDisc.playTrack(int)) " +
+"&& args(trackNumber)")
+public void trackPlayed(int trackNumber) {}
+
+@Before("performance()")
+public void silenceCellPhones() {}
+
+@Before("trackPlayed(trackNumber)")
+public void countTrack(int trackNumber) {  // int
+int currentCount = getPlayCount(trackNumber);
+trackCounts.put(trackNumber, currentCount + 1);
+}
+```
+
+
+- [x] If shown pointcut expressions, would you understand them? For example, in the course we matched getter methods on Spring Beans, what would be the correct pointcut expression to match both getter and setter methods?
+- In Spring AOP, pointcuts are defined using AspectJ’s pointcut expression language
+- pointcut designators
+  - perform match: execution()
+  - limit match:
+    - arg type: args(), @args()
+    - this(): bean, target(): obj, @target
+    - within(), @within(): certain types
+    - @annotation: on subject
+    - bean(): takes bean ID
+```java
+execution(* concert.Performance.perform(..)&& within(concert.*)))  // * any return type; .. any args; in concert package
+```
+
+• What is the JoinPoint argument used for?
+
+
+• What is a ProceedingJoinPoint? When is it used?
+
+
+```
+AOP is a powerful complement to object-oriented programming. With aspects, you can
+group application behavior that was once spread throughout your applications into
+reusable modules. You can then declare exactly where and how this behavior is applied.
+This reduces code duplication and lets your classes focus on their main functionality.
+```
+
+
+
 
 
 
