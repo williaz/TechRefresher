@@ -1401,9 +1401,70 @@ This reduces code duplication and lets your classes focus on their main function
 ```
 
 
+## Transaction
+
+- [x] What is a transaction? What is the difference between a local and a global transaction?
+- Global transactions enable you to work with multiple transactional resources, typically relational databases and message queues. The application server manages global transactions through the JTA,
+- Local transactions are resource-specific, such as a transaction associated with a JDBC connection
+  - it cannot help ensure correctness across multiple resources.
+
+• Is a transaction a cross cutting concern? How is it implemented by Spring?
 
 
+• How are you going to define a transaction in Spring?
 
+
+• What does @Transactional do? What is the PlatformTransactionManager?
+- PlatformTransactionManager defines A transaction strategy
+  - TransactionDefinition
+    - Isolation
+    - Propagation: scope
+    - Timeout
+    - Read-only
+  - PlatformTransactionManager implementations normally require knowledge of the environment in which they work: JDBC, JTA, Hibernate, and so on.
+
+
+• Is the JDBC template able to participate in an existing transaction?
+
+• What is a transaction isolation level? How many do we have and how are they ordered?
+
+• What is @EnableTransactionManagement for?
+
+• What does transaction propagation mean?
+
+• What happens if one @Transactional annotated method is calling another @Transactional annotated method on the same object instance?
+
+• Where can the @Transactional annotation be used? What is a typical usage if you put it
+at class level?
+
+• What does declarative transaction management mean?
+
+• What is the default rollback policy? How can you override it?
+
+• What is the default rollback policy in a JUnit test, when you use the @RunWith(SpringJUnit4ClassRunner.class) in JUnit 4 or @ExtendWith(SpringExtension.class) in JUnit 5, and annotate your @Test annotated method with @Transactional?
+
+• Why is the term "unit of work" so important and why does JDBC AutoCommit violate this pattern?
+
+## Testing
+
+• Do you use Spring in a unit test?
+• What type of tests typically use Spring?
+• How can you create a shared application context in a JUnit integration test?
+• When and where do you use @Transactional in testing?
+• How are mock frameworks such as Mockito or EasyMock used?
+• How is @ContextConfiguration used?
+• How does Spring Boot simplify writing tests?
+• What does @SpringBootTest do? How does it interact with @SpringBootApplication
+and @SpringBootConfiguration?
+
+Spring Boot Testing
+• When do you want to use @SpringBootTest annotation?
+• What does @SpringBootTest auto-configure?
+• What dependencies does spring-boot-starter-test brings to the classpath?
+• How do you perform integration testing with @SpringBootTest for a web application?
+• When do you want to use @WebMvcTest? What does it auto-configure?
+• What are the differences between @MockBean and @Mock?
+• When do you want @DataJpaTest for? What does it auto-configure?
 
 
 
