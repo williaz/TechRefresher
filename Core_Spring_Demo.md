@@ -1387,11 +1387,11 @@ trackCounts.put(trackNumber, currentCount + 1);
 execution(* concert.Performance.perform(..)&& within(concert.*)))  // * any return type; .. any args; in concert package
 ```
 
-• What is the JoinPoint argument used for?
+- [x] What is the JoinPoint argument used for?
+- get JoinPoint method info like joinPoint.getSignature(), Object[] joinPoint.getArgs()
 
-
-• What is a ProceedingJoinPoint? When is it used?
-
+- [x] What is a ProceedingJoinPoint? When is it used?
+- In @Around, invoke the advised method from within your advice using proceed()
 
 ```
 AOP is a powerful complement to object-oriented programming. With aspects, you can
