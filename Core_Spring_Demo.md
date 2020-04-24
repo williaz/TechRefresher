@@ -1312,6 +1312,7 @@ concern?
 - Advice: the **task** of an aspect
   - Advice defines both the what and the when of an aspect
   - Spring: Advice take place when: Before, After, After-returning, After-throwing, Around
+  - The ordering of advice is controlled through the Ordered interface.
 - A join point is a point in the execution of the application where an aspect can be plugged in.
   - These are the points where your aspect’s code can be **inserted** into the normal flow of your application to add new behavior.
 - Pointcuts: matcher, help narrow down the join points advised by an aspect.
@@ -1338,7 +1339,8 @@ concern?
 
 • Which are the limitations of the two proxy-types?
 
-• What visibility must Spring bean methods have to be proxied using Spring AOP?
+- [x] What visibility must Spring bean methods have to be proxied using Spring AOP?
+- public
 
 - [x] How many advice types does Spring support. Can you name each one? What are they used for? Which two advices can you use if you would like to try and catch exceptions?
 - @After; return or throw
@@ -1422,24 +1424,84 @@ This reduces code duplication and lets your classes focus on their main function
     - Timeout
     - Read-only
   - PlatformTransactionManager implementations normally require knowledge of the environment in which they work: JDBC, JTA, Hibernate, and so on.
+    - transactionManager drive advice
 
 
 • Is the JDBC template able to participate in an existing transaction?
 
 • What is a transaction isolation level? How many do we have and how are they ordered?
 
-• What is @EnableTransactionManagement for?
+- [x] What is @EnableTransactionManagement for?
+- make @Transactional bean instance transactional through an @EnableTransactionManagement annotation in a @Configuration class
+- [x] What does transaction propagation mean?
+- Defines how transactions relate to each other. Common options:  
+  - Required: Code will always run in a transaction. Creates a new transaction or reuses one if available.
+  - Requires_new: Code will always run in a new transaction. Suspends the current transaction if one exists.
+- PROPAGATION_REQUIRED enforces a physical transaction, either locally for the current scope if no transaction exists yet or **participating in an existing** 'outer' transaction defined for a larger scope. 
+- PROPAGATION_REQUIRES_NEW: **always uses an independent** physical transaction for each affected transaction scope, never participating in an existing transaction for an outer scope. 
+- PROPAGATION_NESTED uses a single physical transaction with multiple **savepoints** that it can roll back to.
 
-• What does transaction propagation mean?
+- [x] What happens if one @Transactional annotated method is calling another @Transactional annotated method on the same object instance?
+- By default, a participating transaction joins the characteristics of the outer scope, **silently ignoring the local isolation level**, timeout value, or read-only flag (if any). Consider switching the validateExistingTransactions flag to true on your transaction manager if you want isolation level declarations to be rejected when participating in an existing transaction with a different isolation level. 
 
-• What happens if one @Transactional annotated method is calling another @Transactional annotated method on the same object instance?
-
-• Where can the @Transactional annotation be used? What is a typical usage if you put it
+- [x] Where can the @Transactional annotation be used? What is a typical usage if you put it
 at class level?
+- declare transactional semantics metadata
+- class level or method level, better not on interface in case you use class-based proxies (proxy-target-class="true") or the weaving-based aspect (mode="aspectj")
+- only to methods with **public** visibility
+- does not apply to ancestor classes up the class hierarchy
+- the proxy must be fully initialized to provide the expected behavior
+- The default advice mode for processing @Transactional annotations is proxy, which allows for interception of calls through the proxy only. **Local calls** within the same class **cannot** get intercepted that way.
+- @Transactional(readOnly = true)
+- default settings
+```
+The propagation setting is PROPAGATION_REQUIRED.
+The isolation level is ISOLATION_DEFAULT.
+The transaction is read-write.
+The transaction timeout defaults to the default timeout of the underlying transaction system, or to none if timeouts are not supported.
+Any RuntimeException triggers rollback, and any checked Exception does not.
+```
+- multiple TXM
+  - use the value attribute of the @Transactional annotation to optionally specify the bean name/ qualifier value of the PlatformTransactionManager to be used
+```
+public class TransactionalService {
 
-• What does declarative transaction management mean?
+    @Transactional("order")
+    public void setSomething(String name) { ... }
 
-• What is the default rollback policy? How can you override it?
+    @Transactional("account")
+    public void doSomething() { ... }
+}
+
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Transactional("account")
+public @interface AccountTx {
+}
+```
+
+- [x] What does declarative transaction management mean?
+- It keeps transaction management out of business logic and is not difficult to configure. 
+
+- [x] What is the default rollback policy? How can you override it?
+
+- The recommended way to indicate to the Spring Framework’s transaction infrastructure that a transaction’s work is to be rolled back is to throw an Exception from code that is currently executing in the context of a transaction.
+- RuntimeException/Error: In its default configuration, the Spring Framework’s transaction infrastructure code marks a transaction for rollback only in the case of runtime, unchecked exceptions. 
+
+```
+    <tx:method name="get*" read-only="true" rollback-for="NoProductInStockException"/>
+  <tx:method name="updateStock" no-rollback-for="InstrumentNotFoundException"/>
+
+
+public void resolvePosition() {
+    try {
+        // some business logic...
+    } catch (NoProductInStockException ex) {
+        // trigger rollback programmatically
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+    }
+}
+```
 
 • What is the default rollback policy in a JUnit test, when you use the @RunWith(SpringJUnit4ClassRunner.class) in JUnit 4 or @ExtendWith(SpringExtension.class) in JUnit 5, and annotate your @Test annotated method with @Transactional?
 
