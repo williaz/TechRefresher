@@ -1507,6 +1507,97 @@ public void resolvePosition() {
 
 • Why is the term "unit of work" so important and why does JDBC AutoCommit violate this pattern?
 
+## JDBC
+• What is the difference between checked and unchecked exceptions?
+
+- [x] Why does Spring prefer unchecked exceptions?
+- without having annoying boilerplate catch-and-throw blocks and exception declarations in your DAOs.
+
+- [x] What is the data access exception hierarchy?
+- DataAccessException as the root exception
+- runtime exception, wrapper
+- @Repository: to guarantee that your Data Access Objects (DAOs) or repositories provide exception translation
+
+
+- [x] How do you configure a DataSource in Spring? Which bean is very useful for development/test databases?
+- a JDBC-based repository needs access to a JDBC DataSource, and a JPA-based repository needs access to an @PersistenceContext EntityManager
+- You should use the **DriverManagerDataSource and SimpleDriverDataSource** classes (as included in the Spring distribution) only for **testing** purposes! Those variants do not provide pooling and perform poorly when multiple requests for a connection are made.
+
+
+- [x] What is the Template design pattern and what is the JDBC template?
+- A template method defines the skeleton of a process.
+- The process itself is fixed; it never changes.
+
+- [x] What is a callback? What are the three JdbcTemplate callback interfaces that can be used with queries? What is each used for? (You would not have to remember the interface names in the exam, but you should know what they do if you see them in a code sample).
+- PreparedStatementCreator callback interface creates a prepared statement
+- CallableStatementCreator interface, which creates callable statements.
+
+
+
+- [x] Can you execute a plain SQL statement with the JDBC template?
+- yes
+
+
+- [x] When does the JDBC template acquire (and release) a connection, for every method called or once per template? Why?
+- The execute() method :
+  - picks up Connection object from connection pool.
+  - create Statment object.
+  - execute sql query.
+  - release Connection object.
+
+- Method's like update, queryForObject internally call execute()
+- reuse, avoid expensive connection creation
+
+- [x] How does the JdbcTemplate support generic queries? How does it return objects and lists/maps of objects?
+- SELCT: query(), queryForObject()
+- UPDATE/ INSERT/ DELETE: udpate()
+- DDL/any: execute()
+- JdbcOperations interface
+```java
+Actor actor = jdbcTemplate.queryForObject(
+        "select first_name, last_name from t_actor where id = ?",
+        (resultSet, rowNum) -> {
+            Actor newActor = new Actor();
+            newActor.setFirstName(resultSet.getString("first_name"));
+            newActor.setLastName(resultSet.getString("last_name"));
+            return newActor;
+        },
+        1212L);
+	
+public List<Actor> findAllActors() {
+    return this.jdbcTemplate.query( "select first_name, last_name from t_actor", actorRowMapper);
+}
+
+this.jdbcTemplate.update(
+        "insert into t_actor (first_name, last_name) values (?, ?)",
+        "Leonor", "Watling");
+	
+this.jdbcTemplate.update(
+        "update t_actor set last_name = ? where id = ?",
+        "Banjo", 5276L);	
+	
+this.jdbcTemplate.update(
+        "delete from t_actor where id = ?",
+        Long.valueOf(actorId));	
+	
+this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))");
+```
+
+
+## Spring Data JPA
+• What do you need to do in Spring if you would like to work with JPA?
+• Are you able to participate in a given transaction in Spring while working with JPA?
+• Which PlatformTransactionManager(s) can you use with JPA?
+• What do you have to configure to use JPA with Spring? How does Spring Boot make this
+easier?
+
+• What is a Repository interface?
+• How do you define a Repository interface? Why is it an interface not a class?
+• What is the naming convention for finder methods in a Repository interface?
+• How are Spring Data repositories implemented by Spring at runtime?
+• What is @Query used for?
+
+
 ## Testing
 
 • Do you use Spring in a unit test?
