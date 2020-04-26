@@ -22,61 +22,89 @@
 
 ## Spring Security
 
-• What are authentication and authorization? Which must come first?
-- [x] Is security a cross cutting concern? How is it implemented internally?
+### What are authentication and authorization? Which must come first?
+- Authentication: verify user
+- Authorization: permission
+
+### Is security a cross cutting concern? How is it implemented internally?
 - Spring Security, a security framework implemented with Spring AOP and servlet filters.
   - provides declarative security
   - web request level: servlet filter
+    - First of all a servlet filter of the type DelegatingFilterProxy is configured.
+    - The DelegatingFilterProxy delegates to a FilterChainProxy. The FilterChainProxy is defined as a Spring bean and takes one or more SecurityFilterChain instances as constructor parameter(s).
+    - A SecurityFilterChain associates a request URL pattern with a list of (security) filters.
   - method invocation level: AOP
-- [x] What is the delegating filter proxy?
+
+## What is the delegating filter proxy?
+- implement javax.servlet.Filter
+- Spring’s DelegatingFilterProxy provides the link between web.xml and the application context.
 - DelegatingFilterProxy intercept requests coming into the application and delegate them to a bean whose ID is springSecurityFilterChain.
-- [x] What is the security filter chain?
+- Proxy for a standard Servlet Filter, delegating to a Spring-managed bean that implements the Filter interface. 
+
+
+### What is the security filter chain?
 
 - springSecurityFilterChain bean is a FilterChainProxy. It’s a single filter that chains together one or more additional filters.
+- It maps a particular URL pattern to a list of filters built up from the bean names specified in the filters element, and combines them in a bean of type SecurityFilterChain. The pattern attribute takes an Ant Paths and the most specific URIs should appear first [7]. At runtime the FilterChainProxy will locate the first URI pattern that matches the current web request and the list of filter beans specified by the filters attribute will be applied to that request. The filters will be invoked in the order they are defined, so you have complete control over the filter chain which is applied to a particular URL.
 
-• What is a security context?
+### What is a security context?
 
-- [x] What does the ** pattern in an antMatcher or mvcMatcher do?
-? matches one character
-* matches zero or more characters
-** matches zero or more 'directories' in a path
+- SecurityContextHolder, to provide access to the SecurityContext. default: ThreadLocal 
+- SecurityContext, to hold the Authentication and possibly request-specific security information.
+- Authentication, to represent the principal in a Spring Security-specific manner.
+- GrantedAuthority, to reflect the application-wide permissions granted to a principal.
+- UserDetails, to provide the necessary information to build an Authentication object from your application’s DAOs or other source of security data.
+- UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
 
-- [x] Why is the usage of mvcMatcher recommended over antMatcher?
-mvcMatcher uses the same rules that Spring MVC uses for matching (when using @RequestMapping annotation).
-antMatchers("/secured") matches only the exact /secured URL
-mvcMatchers("/secured") matches /secured as well as /secured/, /secured.html, /secured.xyz
 
-• Does Spring Security support password hashing? What is salting?
+### What does the ** pattern in an antMatcher or mvcMatcher do?
+- ? matches one character
+- * one level, matches zero or more characters
+- ** all leve, matches zero or more 'directories' in a path
 
-• Why do you need method security? What type of object is typically secured at the method level (think of its purpose not its Java type).
-data
+### Why is the usage of mvcMatcher recommended over antMatcher?
+- mvcMatcher uses the same rules that Spring MVC uses for matching (when using @RequestMapping annotation).
+- antMatchers("/secured") matches only the exact /secured URL
+- mvcMatchers("/secured") matches /secured as well as /secured/, /secured.html, /secured.xyz
 
-• What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
+### Does Spring Security support password hashing? What is salting?
+- Password hashing is the process of calculating a hash-value for a password.
+- PasswordEncoder
+- a salt is random data that is used as an additional input to a one-way function that hashes data, a password or passphrase. Salts are used to safeguard passwords in storage. 
+  - A new salt is randomly generated for each password. 
 
-• How are these annotations implemented?
+### Why do you need method security? What type of object is typically secured at the method level (think of its purpose not its Java type).
+- service layer
+
+
+### What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
+- It is recommended to use the @PreAuthorize annotation in new applications over @Secured
+- RolesAllowed: only supports role-based security.
+
+### How are these annotations implemented?
 AOP pointcut
 
-• In which security annotation are you allowed to use SpEL?
-4 
+### In which security annotation are you allowed to use SpEL?
+- 4: @PreAuthoriz2, @PostAuthorize, @PreFilter, @PostFilter
+
 
 ## AOP 
 Aspect oriented programming
 
-- [x] What is the concept of AOP? Which problem does it solve? What is a cross cutting
-concern?
+### What is the concept of AOP? Which problem does it solve? What is a cross cutting concern?
 - a crosscutting concern: functionality that affects multiple points of an application.
 - cross-cutting concerns are conceptually separate from (but often embedded directly within) the application’s business logic.
 - With AOP, you still define the common functionality in one place, but you can declaratively define how and where this functionality is applied without having to modify the class to which you’re applying the new feature. Crosscutting concerns can now be modularized into special classes called aspects.
 
-- [x] Name three typical cross cutting concerns.
+### Name three typical cross cutting concerns.
 - logging, transactions, security, and caching
 
-- [x] What two problems arise if you don't solve a cross cutting concern via AOP?
+### What two problems arise if you don't solve a cross cutting concern via AOP?
 - A common object-oriented technique for reusing common functionality is to apply inheritance or delegation. 
 - Inheritance can lead to a **brittle object hierarchy** if the same base class is used throughout an application
 - Delegation can be **cumbersome** because complicated calls to the delegate object may be required.
 
-- [x] What is a pointcut, a join point, an advice, an aspect, weaving?
+### What is a pointcut, a join point, an advice, an aspect, weaving?
 - Advice: the **task** of an aspect
   - Advice defines both the what and the when of an aspect
   - Spring: Advice take place when: Before, After, After-returning, After-throwing, Around
@@ -94,7 +122,7 @@ concern?
 
 - An introduction allows you to add new methods or attributes to existing classes.
 
-- [x] How does Spring solve (implement) a cross cutting concern?
+### How does Spring solve (implement) a cross cutting concern?
 - the ability to create pointcuts that define the join points at which aspects should be woven is what makes it an AOP framework.
 - 4 Style:
   - Classic Spring proxy-based AOP
@@ -105,19 +133,28 @@ concern?
 - **method join points only**: Spring AOP is built around dynamic proxies. Consequently, Spring’s AOP support is limited to **method interception**.
 - **Runtime proxy creation**: Spring doesn’t create a proxied object until that proxied bean is needed by the application.
 
-• Which are the limitations of the two proxy-types?
+### Which are the limitations of the two proxy-types?
+- Invocation of advised methods on self.
+  - A proxy implements the advice which is executed prior to invoking the method on a Spring bean. The Spring bean being proxied is not aware of the proxy and when a calling a method on itself, the proxy will not be invoked.
+- JDK Dynamic Proxies
+  - proxy through implementing its interface.
+  - only public method got proxied
+- CGLIB
+  - through extending
+  - not final class, not final method
+  - only piblic or protected method got proxied
 
-- [x] What visibility must Spring bean methods have to be proxied using Spring AOP?
-- public
+### What visibility must Spring bean methods have to be proxied using Spring AOP?
+- public, from ooutside bean
 
-- [x] How many advice types does Spring support. Can you name each one? What are they used for? Which two advices can you use if you would like to try and catch exceptions?
+### How many advice types does Spring support. Can you name each one? What are they used for? Which two advices can you use if you would like to try and catch exceptions?
 - @After; return or throw
 - @AfterReturning, @AfterThrowing, @Before
 - @Around: ProceedingJoinPoint.procceed()
   - pass control to advised method
   - can repeat calls
 
-- [x] What do you have to do to enable the detection of the @Aspect annotation? What does @EnableAspectJAutoProxy do?
+### What do you have to do to enable the detection of the @Aspect annotation? What does @EnableAspectJAutoProxy do?
 - @EnableAspectJAutoProxy turn on auto-proxying at the class level of the configuration class.
 
 
@@ -143,7 +180,7 @@ trackCounts.put(trackNumber, currentCount + 1);
 ```
 
 
-- [x] If shown pointcut expressions, would you understand them? For example, in the course we matched getter methods on Spring Beans, what would be the correct pointcut expression to match both getter and setter methods?
+### If shown pointcut expressions, would you understand them? For example, in the course we matched getter methods on Spring Beans, what would be the correct pointcut expression to match both getter and setter methods?
 - In Spring AOP, pointcuts are defined using AspectJ’s pointcut expression language
 - pointcut designators
   - perform match: execution()
@@ -157,10 +194,11 @@ trackCounts.put(trackNumber, currentCount + 1);
 execution(* concert.Performance.perform(..)&& within(concert.*)))  // * any return type; .. any args; in concert package
 ```
 
-- [x] What is the JoinPoint argument used for?
+### What is the JoinPoint argument used for?
+- first arg for @After, @AfterReturning, @AfterThrowing, @Before if use
 - get JoinPoint method info like joinPoint.getSignature(), Object[] joinPoint.getArgs()
 
-- [x] What is a ProceedingJoinPoint? When is it used?
+### What is a ProceedingJoinPoint? When is it used?
 - In @Around, invoke the advised method from within your advice using proceed()
 
 ```
@@ -170,6 +208,84 @@ reusable modules. You can then declare exactly where and how this behavior is ap
 This reduces code duplication and lets your classes focus on their main functionality.
 ```
 
+
+## JDBC
+• What is the difference between checked and unchecked exceptions?
+
+- [x] Why does Spring prefer unchecked exceptions?
+- without having annoying boilerplate catch-and-throw blocks and exception declarations in your DAOs.
+
+- [x] What is the data access exception hierarchy?
+- DataAccessException as the root exception
+- runtime exception, wrapper
+- @Repository: to guarantee that your Data Access Objects (DAOs) or repositories provide exception translation
+
+
+- [x] How do you configure a DataSource in Spring? Which bean is very useful for development/test databases?
+- a JDBC-based repository needs access to a JDBC DataSource, and a JPA-based repository needs access to an @PersistenceContext EntityManager
+- You should use the **DriverManagerDataSource and SimpleDriverDataSource** classes (as included in the Spring distribution) only for **testing** purposes! Those variants do not provide pooling and perform poorly when multiple requests for a connection are made.
+
+
+- [x] What is the Template design pattern and what is the JDBC template?
+- A template method defines the skeleton of a process.
+- The process itself is fixed; it never changes.
+
+- [x] What is a callback? What are the three JdbcTemplate callback interfaces that can be used with queries? What is each used for? (You would not have to remember the interface names in the exam, but you should know what they do if you see them in a code sample).
+- PreparedStatementCreator callback interface creates a prepared statement
+- CallableStatementCreator interface, which creates callable statements.
+
+
+
+- [x] Can you execute a plain SQL statement with the JDBC template?
+- yes
+
+
+- [x] When does the JDBC template acquire (and release) a connection, for every method called or once per template? Why?
+- The execute() method :
+  - picks up Connection object from connection pool.
+  - create Statment object.
+  - execute sql query.
+  - release Connection object.
+
+- Method's like update, queryForObject internally call execute()
+- reuse, avoid expensive connection creation
+
+- [x] How does the JdbcTemplate support generic queries? How does it return objects and lists/maps of objects?
+- SELCT: 
+  - query()
+  - queryForObject(): exactly 1, catch EmptyResultDataAccessException
+- UPDATE/ INSERT/ DELETE: udpate()
+- DDL/any: execute()
+- JdbcOperations interface
+```java
+Actor actor = jdbcTemplate.queryForObject(
+        "select first_name, last_name from t_actor where id = ?",
+        (resultSet, rowNum) -> {
+            Actor newActor = new Actor();
+            newActor.setFirstName(resultSet.getString("first_name"));
+            newActor.setLastName(resultSet.getString("last_name"));
+            return newActor;
+        },
+        1212L);
+	
+public List<Actor> findAllActors() {
+    return this.jdbcTemplate.query( "select first_name, last_name from t_actor", actorRowMapper);
+}
+
+this.jdbcTemplate.update(
+        "insert into t_actor (first_name, last_name) values (?, ?)",
+        "Leonor", "Watling");
+	
+this.jdbcTemplate.update(
+        "update t_actor set last_name = ? where id = ?",
+        "Banjo", 5276L);	
+	
+this.jdbcTemplate.update(
+        "delete from t_actor where id = ?",
+        Long.valueOf(actorId));	
+	
+this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))");
+```
 
 ## Transaction
 
@@ -274,84 +390,6 @@ public void resolvePosition() {
 • What is the default rollback policy in a JUnit test, when you use the @RunWith(SpringJUnit4ClassRunner.class) in JUnit 4 or @ExtendWith(SpringExtension.class) in JUnit 5, and annotate your @Test annotated method with @Transactional?
 
 • Why is the term "unit of work" so important and why does JDBC AutoCommit violate this pattern?
-
-## JDBC
-• What is the difference between checked and unchecked exceptions?
-
-- [x] Why does Spring prefer unchecked exceptions?
-- without having annoying boilerplate catch-and-throw blocks and exception declarations in your DAOs.
-
-- [x] What is the data access exception hierarchy?
-- DataAccessException as the root exception
-- runtime exception, wrapper
-- @Repository: to guarantee that your Data Access Objects (DAOs) or repositories provide exception translation
-
-
-- [x] How do you configure a DataSource in Spring? Which bean is very useful for development/test databases?
-- a JDBC-based repository needs access to a JDBC DataSource, and a JPA-based repository needs access to an @PersistenceContext EntityManager
-- You should use the **DriverManagerDataSource and SimpleDriverDataSource** classes (as included in the Spring distribution) only for **testing** purposes! Those variants do not provide pooling and perform poorly when multiple requests for a connection are made.
-
-
-- [x] What is the Template design pattern and what is the JDBC template?
-- A template method defines the skeleton of a process.
-- The process itself is fixed; it never changes.
-
-- [x] What is a callback? What are the three JdbcTemplate callback interfaces that can be used with queries? What is each used for? (You would not have to remember the interface names in the exam, but you should know what they do if you see them in a code sample).
-- PreparedStatementCreator callback interface creates a prepared statement
-- CallableStatementCreator interface, which creates callable statements.
-
-
-
-- [x] Can you execute a plain SQL statement with the JDBC template?
-- yes
-
-
-- [x] When does the JDBC template acquire (and release) a connection, for every method called or once per template? Why?
-- The execute() method :
-  - picks up Connection object from connection pool.
-  - create Statment object.
-  - execute sql query.
-  - release Connection object.
-
-- Method's like update, queryForObject internally call execute()
-- reuse, avoid expensive connection creation
-
-- [x] How does the JdbcTemplate support generic queries? How does it return objects and lists/maps of objects?
-- SELCT: 
-  - query()
-  - queryForObject(): exactly 1, catch EmptyResultDataAccessException
-- UPDATE/ INSERT/ DELETE: udpate()
-- DDL/any: execute()
-- JdbcOperations interface
-```java
-Actor actor = jdbcTemplate.queryForObject(
-        "select first_name, last_name from t_actor where id = ?",
-        (resultSet, rowNum) -> {
-            Actor newActor = new Actor();
-            newActor.setFirstName(resultSet.getString("first_name"));
-            newActor.setLastName(resultSet.getString("last_name"));
-            return newActor;
-        },
-        1212L);
-	
-public List<Actor> findAllActors() {
-    return this.jdbcTemplate.query( "select first_name, last_name from t_actor", actorRowMapper);
-}
-
-this.jdbcTemplate.update(
-        "insert into t_actor (first_name, last_name) values (?, ?)",
-        "Leonor", "Watling");
-	
-this.jdbcTemplate.update(
-        "update t_actor set last_name = ? where id = ?",
-        "Banjo", 5276L);	
-	
-this.jdbcTemplate.update(
-        "delete from t_actor where id = ?",
-        Long.valueOf(actorId));	
-	
-this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))");
-```
 
 
 ## Spring Data JPA
