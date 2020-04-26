@@ -427,24 +427,60 @@ public void resolvePosition() {
 - JDBC AutoCommit can be disabled by calling the setAutoCommit method with the value false on a JDBC connection.
 
 ## Spring Data JPA
-• What do you need to do in Spring if you would like to work with JPA?
+### What do you need to do in Spring if you would like to work with JPA? What do you have to configure to use JPA with Spring? How does Spring Boot make this easier?
+- 1. Declare the appropriate dependencies.
+- 2.  Implement entity classes with mapping metadata in the form of annotations.
+- 3. Define an EntityManagerFactory bean.
+  - An entity manager factory is used to interact with a persistence unit.
+  - A persistence unit is a grouping of one or more persistent classes that correspond to a single data source.
+  - @PersistenceContext to assoicate 2
+- 4. Define a DataSource bean.
+- 5. Define a TransactionManager bean: JpaTransactionManager
+- 6. Implement repositories.
 
-• Are you able to participate in a given transaction in Spring while working with JPA?
+- Boot provides
+  - dependencies
+  - beans need
+  - default properties to persistence and JPA
 
-• Which PlatformTransactionManager(s) can you use with JPA?
+### Are you able to participate in a given transaction in Spring while working with JPA?
+- @Transactional indicates that the persistence methods in this repository are involved in a transactional context.
 
-• What do you have to configure to use JPA with Spring? How does Spring Boot make this easier?
-
-• What is a Repository interface?
-• How do you define a Repository interface? Why is it an interface not a class?
-• What is the naming convention for finder methods in a Repository interface?
-• How are Spring Data repositories implemented by Spring at runtime?
-• What is @Query used for?
+### Which PlatformTransactionManager(s) can you use with JPA?
+- global transactions: JTA transaction manage
+- JpaTransactionManager: using JPA with one single entity manager factory
 
 
+
+### What is a Repository interface? How do you define a Repository interface? Why is it an interface not a class?
+- 1. is a repository that need no implementation and that supports the basic CRUD (create, read, update and delete) operations
+- 2. The Repository uses Java generics and takes two type arguments; an entity type and a type of the primary key of entities.
+- 3.1 in order for Spring Data to be able to use the JDK dynamic proxy mechanism to create the proxy objects that intercept calls to repositories.
+- 3.2 This also allows for supplying a custom base repository implementation class that will act as a
+(custom) base class for all the Spring Data repositories in the application
+
+
+### What is the naming convention for finder methods in a Repository interface?
+- ```find(First[count])By[property expression][comparison operator][ordering operator]```
+  - property expression: And Or
+  - comparison opt: LessThan, GreaterThans, Between, like
+  - orderer: OrderBy, Asc, desc
+- Spring Data allows for four verbs in the method name: get, read, find, and count.
+- parameter names are irrelevant, but they must be ordered to match up with the method name’s comparators
+
+
+### How are Spring Data repositories implemented by Spring at runtime?
+- JDK dynamic proxy
+- check custom impl if have, or route to default
+
+### What is @Query used for?
+- to provide Spring Data with the query that should be performed.
+```
+@Query("select p from Person p where p.emailAddress = ?1")
+```
 ## Testing
 
-- [x] Do you use Spring in a unit test?
+### Do you use Spring in a unit test?
 - mostly not, but with some Spring mock obj
 - POJO with new and mock for insolation
 - quick as  there is no runtime infrastructure to set up
@@ -452,7 +488,7 @@ public void resolvePosition() {
 - To unit test your Spring MVC Controller classes as POJOs, use ModelAndViewAssert combined with MockHttpServletRequest, MockHttpSession
 
 
-- [x] What type of tests typically use Spring?
+### What type of tests typically use Spring?
 - integration testing
 ```
 Spring’s integration testing support has the following primary goals:
@@ -466,17 +502,20 @@ To provide transaction management appropriate to integration testing.
 To supply Spring-specific base classes that assist developers in writing integration tests.
 ```
 
-• How can you create a shared application context in a JUnit integration test?
+### How can you create a shared application context in a JUnit integration test?
+- @ContextConfiguration
 
-- [x] When and where do you use @Transactional in testing?
+### When and where do you use @Transactional in testing?
 - Annotating a test method with @Transactional causes the test to be run within a transaction that is, by default, automatically rolled back after completion of the test. If a test class is annotated with @Transactional, each test method within that class hierarchy runs within a transaction. 
 
-- [x] How are mock frameworks such as Mockito or EasyMock used?
+### How are mock frameworks such as Mockito or EasyMock used?
+- A mock object produces **predetermined results** when methods on the object are invoked.
+- Mockito and EasyMock allows for dynamic creation of mock objects that can be used to mock collaborators of class(es) under test that are external to the system or trusted.
 - you may have a facade over some remote service that is unavailable during development. Mocking can also be useful when you want to simulate failures that might be hard to trigger in a real environment.
 
 
 
-- [x] How is @ContextConfiguration used?
+### How is @ContextConfiguration used?
 - @ContextConfiguration defines **class-level** metadata that is used to determine how to load and configure an **ApplicationContext** for integration tests. Specifically, @ContextConfiguration declares the application context **resource locations or the component classes** used to load the context.
 
 - @WebAppConfiguration is a class-level annotation that you can use to declare that the ApplicationContext loaded for an integration test should be a WebApplicationContext. 
@@ -508,11 +547,13 @@ class MyWebTests {
 }
 ```
 
-- [x] How does Spring Boot simplify writing tests?
+### How does Spring Boot simplify writing tests?
 - Spring Boot’s @*Test annotations search for your primary configuration automatically whenever you do not explicitly define one. @SpringBootApplication or @SpringBootConfiguration. 
 
-- [x] What does @SpringBootTest do? How does it interact with @SpringBootApplication and @SpringBootConfiguration?
+### What does @SpringBootTest do? How does it interact with @SpringBootApplication and @SpringBootConfiguration?
 - used as an alternative to the standard spring-test @ContextConfiguration annotation when you need Spring Boot features. The annotation works by creating the ApplicationContext used in your tests through SpringApplication. 
+- Searches for a @SpringBootConfiguration
+- custom Environment properties to be defined using the properties attribute
 - if with JUnit4, also add @RunWith(SpringRunner.class); 5 not need
 - webEnvironment
   - MOCK(default): mocj web env
@@ -525,7 +566,7 @@ class MyWebTests {
 
 • What does @SpringBootTest auto-configure?
 
-- [x] What dependencies does spring-boot-starter-test brings to the classpath?
+### What dependencies does spring-boot-starter-test brings to the classpath?
 ```
 JUnit 5 (including the vintage engine for backward compatibility with JUnit 4): The de-facto standard for unit testing Java applications.
 
@@ -545,18 +586,116 @@ JsonPath: XPath for JSON.
 
 • How do you perform integration testing with @SpringBootTest for a web application?
 
-- [x] When do you want to use @WebMvcTest? What does it auto-configure?
+### When do you want to use @WebMvcTest? What does it auto-configure?
 - Often, @WebMvcTest is limited to a single controller and is used in combination with @MockBean to provide mock implementations for required collaborators.
 - @WebMvcTest also auto-configures MockMvc.
 
 
-- [x] What are the differences between @MockBean and @Mock?
+### What are the differences between @MockBean and @Mock?
 - @MockBean annotation that can be used to define a Mockito mock for a bean inside your ApplicationContext. You can use the annotation to add new beans or replace a single existing bean definition.
 
-- [x] When do you want @DataJpaTest for? What does it auto-configure?
+### When do you want @DataJpaTest for? What does it auto-configure?
 - By default, it scans for @Entity classes and configures Spring Data JPA repositories. If an embedded database is available on the classpath, it configures one as well. Regular @Component beans are not loaded into the ApplicationContext.
 - By default, data JPA tests are transactional and roll back at the end of each test. 
 - If you want to use TestEntityManager outside of @DataJpaTest instances, you can also use the @AutoConfigureTestEntityManager annotation.
 - A JdbcTemplate is also available if you need that. 
 
+## Container, Dependency, and IOC
+• What is dependency injection and what are the advantages?
+• What is an interface and what are the advantages of making use of them in Java?
+• Why are they recommended for Spring beans?
+• What is meant by “application-context?
+• How are you going to create a new instance of an ApplicationContext?
+• Can you describe the lifecycle of a Spring Bean in an ApplicationContext?
+• How are you going to create an ApplicationContext in an integration test?
+• What is the preferred way to close an application context? Does Spring Boot do this for
+you?
+• Can you describe:
+• Dependency injection using Java configuration?
+• Dependency injection using annotations (@Autowired)?
+• Component scanning, Stereotypes?
+• Scopes for Spring beans? What is the default scope?
+• Are beans lazily or eagerly instantiated by default? How do you alter this behavior?
+• What is a property source? How would you use @PropertySource?
+• What is a BeanFactoryPostProcessor and what is it used for? When is it invoked?
+• Why would you define a static @Bean method?
+• What is a ProperySourcesPlaceholderConfigurer used for?
+• What is a BeanPostProcessor and how is it different to a BeanFactoryPostProcessor?
+What do they do? When are they called?
+• What is an initialization method and how is it declared on a Spring bean?
+• What is a destroy method, how is it declared and when is it called?
+• Consider how you enable JSR-250 annotations like @PostConstruct and
+@PreDestroy? When/how will they get called?
+• How else can you define an initialization or destruction method for a Spring bean?
+• What does component-scanning do?
+• What is the behavior of the annotation @Autowired with regards to field injection,
+constructor injection and method injection?
+• What do you have to do, if you would like to inject something into a private field? How does
+this impact testing?
+• How does the @Qualifier annotation complement the use of @Autowired?
+• What is a proxy object and what are the two different types of proxies Spring can create?
+• What are the limitations of these proxies (per type)?
+• What is the power of a proxy object and where are the disadvantages?
+• What does the @Bean annotation do?
+• What is the default bean id if you only use @Bean? How can you override this?
+• Why are you not allowed to annotate a final class with @Configuration
+• How do @Configuration annotated classes support singleton beans?
+• Why can’t @Bean methods be final either?
+• How do you configure profiles? What are possible use cases where they might be useful?
+• Can you use @Bean together with @Profile?
+• Can you use @Component together with @Profile?
+• How many profiles can you have?
+• How do you inject scalar/literal values into Spring beans?
+• What is @Value used for?
+• What is Spring Expression Language (SpEL for short)?
+• What is the Environment abstraction in Spring?
+• Where can properties in the environment come from – there are many sources for
+properties – check the documentation if not sure. Spring Boot adds even more.
+• What can you reference using SpEL?
+• What is the difference between $ and # in @Value expressions?
 
+
+## Spring Boot Intro
+• What is Spring Boot?
+• What are the advantages of using Spring Boot?
+• Why is it “opinionated”?
+• What things affect what Spring Boot sets up?
+• What is a Spring Boot starter POM? Why is it useful?
+• Spring Boot supports both properties and YML files. Would you recognize and understand
+them if you saw them?
+• Can you control logging with Spring Boot? How?
+• Where does Spring Boot look for property file by default?
+• How do you define profile specific property files?
+• How do you access the properties defined in the property files?
+• What properties do you have to define in order to configure external MySQL?
+• How do you configure default schema and initial data?
+• What is a fat far? How is it different from the original jar?
+• What is the difference between an embedded container and a WAR?
+• What embedded containers does Spring Boot support?
+
+## Spring Boot Auto Configuration
+• How does Spring Boot know what to configure?
+• What does @EnableAutoConfiguration do?
+• What does @SpringBootApplication do?
+• Does Spring Boot do component scanning? Where does it look by default?
+• How are DataSource and JdbcTemplate auto-configured?
+• What is spring.factories file for?
+• How do you customize Spring auto configuration?
+• What are the examples of @Conditional annotations? How are they used?
+
+
+## Spring Boot Actuator
+• What value does Spring Boot Actuator provide?
+• What are the two protocols you can use to access actuator endpoints?
+• What are the actuator endpoints that are provided out of the box?
+• What is info endpoint for? How do you supply data?
+• How do you change logging level of a package using loggers endpoint?
+• How do you access an endpoint using a tag?
+• What is metrics for?
+• How do you create a custom metric with or without tags?
+• What is Health Indicator?
+• What are the Health Indicators that are provided out of the box?
+• What is the Health Indicator status?
+• What are the Health Indicator statuses that are provided out of the box
+• How do you change the Health Indicator status severity order?
+• Why do you want to leverage 3rd-party external monitoring system?
