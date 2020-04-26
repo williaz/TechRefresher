@@ -8,16 +8,14 @@
 - Testing (4%)
 - Boot Testing (8%)
 
-- MVC (8%)
-- REST (6%)
-
 - Container (20%)
 
 - Boot Into (8%)
 - Boot Autoconfig (8%)
 - Boot Actuator (8%)
 
-
+- MVC (8%)
+- REST (6%)
 
 
 ## Spring Security
@@ -601,43 +599,125 @@ JsonPath: XPath for JSON.
 - A JdbcTemplate is also available if you need that. 
 
 ## Container, Dependency, and IOC
-• What is dependency injection and what are the advantages?
-• What is an interface and what are the advantages of making use of them in Java?
-• Why are they recommended for Spring beans?
-• What is meant by “application-context?
-• How are you going to create a new instance of an ApplicationContext?
-• Can you describe the lifecycle of a Spring Bean in an ApplicationContext?
-• How are you going to create an ApplicationContext in an integration test?
-• What is the preferred way to close an application context? Does Spring Boot do this for
-you?
-• Can you describe:
-• Dependency injection using Java configuration?
-• Dependency injection using annotations (@Autowired)?
-• Component scanning, Stereotypes?
-• Scopes for Spring beans? What is the default scope?
-• Are beans lazily or eagerly instantiated by default? How do you alter this behavior?
-• What is a property source? How would you use @PropertySource?
-• What is a BeanFactoryPostProcessor and what is it used for? When is it invoked?
-• Why would you define a static @Bean method?
-• What is a ProperySourcesPlaceholderConfigurer used for?
-• What is a BeanPostProcessor and how is it different to a BeanFactoryPostProcessor?
-What do they do? When are they called?
-• What is an initialization method and how is it declared on a Spring bean?
-• What is a destroy method, how is it declared and when is it called?
-• Consider how you enable JSR-250 annotations like @PostConstruct and
-@PreDestroy? When/how will they get called?
+
+### What is dependency injection and what are the advantages?
+- IoC is also known as dependency injection (DI). It is a process whereby objects define their dependencies (that is, the other objects they work with) only through constructor **arguments**, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean. This process is fundamentally the inverse (hence the name, Inversion of Control) of the bean itself controlling the instantiation or location of its dependencies by using direct construction of classes or a mechanism such as the Service Locator pattern.
+
+
+### What is an interface and what are the advantages of making use of them in Java? Why are they recommended for Spring beans?
+- mock
+- JDK dynamic proxy
+
+### What is meant by “application-context?
+-  BeanFactory provides the configuration framework and basic functionality, and the ApplicationContext adds more enterprise-specific functionality.
+
+- ApplicationContext is a sub-interface of BeanFactory. It adds:
+```
+Easier integration with Spring’s AOP features
+
+Message resource handling (for use in internationalization)
+
+Event publication
+
+Application-layer specific contexts such as the WebApplicationContext for use in web applications.
+```
+- A bean is an object that is instantiated, assembled, and otherwise managed by a Spring IoC container.
+
+### How are you going to create a new instance of an ApplicationContext?
+- new AnnotationConfigApplicationContext(MyConfiguration.class);
+- new AnnotationConfigWebApplicationContext()
+
+
+### Can you describe the lifecycle of a Spring Bean in an ApplicationContext?
+- the bean is instantiated (if it is not a pre-instantiated singleton), 
+- its dependencies are set
+- the relevant lifecycle methods (such as a configured init method or the InitializingBean callback method) are invoked.
+
+### How are you going to create an ApplicationContext in an integration test?
+- @RunWith (JUnit 4) or @ExtendWith (JUnit 5)
+- @ContextConfiguration or @WebAppConfiguration
+
+### What is the preferred way to close an application context? Does Spring Boot do this for you?
+
+- standalone: Registering a shutdown-hook by calling the method registerShutdownHook
+  - ensures a graceful shutdown and calls the relevant **destroy methods** on your singleton beans so that all resources are released.
+- Web: taken care of by the ContextLoaderListener
+
+
+
+### Can you describe: Dependency injection using Java configuration? Dependency injection using annotations (@Autowired)? Component scanning, Stereotypes? Scopes for Spring beans? What is the default scope?
+- config class with bean method
+- @Component/@Autowired + @ComponetScan
+- Singleton, prototype, request, session
+
+### Are beans lazily or eagerly instantiated by default? How do you alter this behavior?
+- By default, ApplicationContext implementations eagerly create and configure all singleton beans as part of the initialization process.
+- A lazy-initialized bean tells the IoC container to create a bean instance when it is first requested, rather than at startup.
+- @Lazy
+
+### What is a property source? How would you use @PropertySource?
+- A PropertySource is a simple abstraction over any source of key-value pairs, and Spring’s StandardEnvironment is configured with two PropertySource objects — one representing the set of JVM system properties (System.getProperties()) and one representing the set of system environment variables (System.getenv()).
+- @PropertySource annotation provides a convenient and declarative mechanism for adding a PropertySource to Spring’s Environment.
+
+### What is a BeanFactoryPostProcessor and what is it used for? When is it invoked? 
+- only modify bean meta-data
+- scoped per-container
+- the Spring IoC container allows a BeanFactoryPostProcessor to read the configuration metadata and potentially change it **before the container instantiates any beans** other than BeanFactoryPostProcessors.
+- ex: PropertySourcesPlaceholderConfigurer
+
+### Why would you define a static @Bean method?
+- to be created before other beans
+- When defining a BeanPostProcessor or a BeanFactoryPostProcessor using an @Bean annotated
+method, it is recommended that the method is static, in order for the post-processor to be
+instantiated early in the Spring context creation process.
+
+### What is a ProperySourcesPlaceholderConfigurer used for?
+- Spring bean configuration can be externalized into property files.
+- resolves @Value(${PROPERTY_NAME})
+
+
+## What is a BeanPostProcessor and how is it different to a BeanFactoryPostProcessor? What do they do? When are they called?
+- AutowiredAnnotationBeanPostProcessor
+  - Implements support for dependency injection with the @Autowired annotation.
+- PersistenceExceptionTranslationPostProcessor
+  - Applies exception translation to Spring beans annotated with the @Repository annotation.
+
+
+### What is an initialization method and how is it declared on a Spring bean?
+- after all prop set and before in use, 3 options in order
+- 1. @PostConstruct
+- 2. InitializingBean.afterPropertiesSet()
+- 3. @Bean(initMethod="")
+### What is a destroy method, how is it declared and when is it called?
+- before out of use, in order:
+- 1. @PreDestroy
+- 2. DisposableBean.destroy()
+- 3. @Bean(destroyMethod="")
+
+
+### Consider how you enable JSR-250 annotations like @PostConstruct and @PreDestroy? When/how will they get called?
+- CommonAnnotationBeanPostProcessor, auto registed in AnnotationConfigApplicationContext,
+
 • How else can you define an initialization or destruction method for a Spring bean?
 • What does component-scanning do?
-• What is the behavior of the annotation @Autowired with regards to field injection,
-constructor injection and method injection?
-• What do you have to do, if you would like to inject something into a private field? How does
-this impact testing?
+### What is the behavior of the annotation @Autowired with regards to field injection, constructor injection and method injection?
+
+
+• What do you have to do, if you would like to inject something into a private field? How does this impact testing?
+
+
 • How does the @Qualifier annotation complement the use of @Autowired?
 • What is a proxy object and what are the two different types of proxies Spring can create?
 • What are the limitations of these proxies (per type)?
 • What is the power of a proxy object and where are the disadvantages?
 • What does the @Bean annotation do?
-• What is the default bean id if you only use @Bean? How can you override this?
+
+
+### What is the default bean id if you only use @Bean? How can you override this?
+- Bean name
+  - The convention is to use the standard Java convention for instance field names when naming beans. That is, bean names start with a lowercase letter and are camel-cased from there.
+  - With component scanning in the classpath, Spring generates bean names for unnamed components, following the rules described earlier: essentially, taking the simple class name and turning its initial character to lower-case. 
+
 • Why are you not allowed to annotate a final class with @Configuration
 • How do @Configuration annotated classes support singleton beans?
 • Why can’t @Bean methods be final either?
