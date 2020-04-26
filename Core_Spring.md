@@ -210,37 +210,40 @@ This reduces code duplication and lets your classes focus on their main function
 
 
 ## JDBC
-• What is the difference between checked and unchecked exceptions?
+### What is the difference between checked and unchecked exceptions?
+- The class java.lang.Exception and its subclasses, except for java.lang.RuntimeException and any
+subclass of RuntimeException, are checked exceptions.
+- either declare or try-catch
 
-- [x] Why does Spring prefer unchecked exceptions?
+### Why does Spring prefer unchecked exceptions?
 - without having annoying boilerplate catch-and-throw blocks and exception declarations in your DAOs.
 
-- [x] What is the data access exception hierarchy?
+### What is the data access exception hierarchy?
 - DataAccessException as the root exception
 - runtime exception, wrapper
 - @Repository: to guarantee that your Data Access Objects (DAOs) or repositories provide exception translation
 
 
-- [x] How do you configure a DataSource in Spring? Which bean is very useful for development/test databases?
+### How do you configure a DataSource in Spring? Which bean is very useful for development/test databases?
 - a JDBC-based repository needs access to a JDBC DataSource, and a JPA-based repository needs access to an @PersistenceContext EntityManager
 - You should use the **DriverManagerDataSource and SimpleDriverDataSource** classes (as included in the Spring distribution) only for **testing** purposes! Those variants do not provide pooling and perform poorly when multiple requests for a connection are made.
 
 
-- [x] What is the Template design pattern and what is the JDBC template?
+### What is the Template design pattern and what is the JDBC template?
 - A template method defines the skeleton of a process.
 - The process itself is fixed; it never changes.
 
-- [x] What is a callback? What are the three JdbcTemplate callback interfaces that can be used with queries? What is each used for? (You would not have to remember the interface names in the exam, but you should know what they do if you see them in a code sample).
-- PreparedStatementCreator callback interface creates a prepared statement
-- CallableStatementCreator interface, which creates callable statements.
+### What is a callback? What are the three JdbcTemplate callback interfaces that can be used with queries? What is each used for? (You would not have to remember the interface names in the exam, but you should know what they do if you see them in a code sample).
+- a callback, also known as a "call-after"[1] function, is any executable code that is passed as an argument to other code; that other code is expected to call back (execute) the argument at a given time. This execution may be immediate as in a synchronous callback, or it might happen at a later time as in an asynchronous callback.
+- ResultSetExtractor: Allows for processing of an entire result set, possibly consisting multiple rows of data, at once.
+- RowCallbackHandler: Allows for processing rows in a result set one by one typically accumulating some type of result.
+- RowMapper: Allows for processing rows in a result set one by one and creating a Java object for each row.
 
-
-
-- [x] Can you execute a plain SQL statement with the JDBC template?
+### Can you execute a plain SQL statement with the JDBC template?
 - yes
 
 
-- [x] When does the JDBC template acquire (and release) a connection, for every method called or once per template? Why?
+### When does the JDBC template acquire (and release) a connection, for every method called or once per template? Why?
 - The execute() method :
   - picks up Connection object from connection pool.
   - create Statment object.
@@ -250,7 +253,7 @@ This reduces code duplication and lets your classes focus on their main function
 - Method's like update, queryForObject internally call execute()
 - reuse, avoid expensive connection creation
 
-- [x] How does the JdbcTemplate support generic queries? How does it return objects and lists/maps of objects?
+### How does the JdbcTemplate support generic queries? How does it return objects and lists/maps of objects?
 - SELCT: 
   - query()
   - queryForObject(): exactly 1, catch EmptyResultDataAccessException
@@ -289,18 +292,27 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
 
 ## Transaction
 
-- [x] What is a transaction? What is the difference between a local and a global transaction?
+### What is a transaction? What is the difference between a local and a global transaction?
+- A transaction is an operation that consists of a number of tasks that takes place as **a single unit – either all** tasks are performed or no tasks are performed.
+  - ACID
+    - Atomicity: all or nothing
+    - Consistency: no violation
+    - Isolation: no effect on others
+    - Durablility: change is durable
+
 - Global transactions enable you to work with multiple transactional resources, typically relational databases and message queues. The application server manages global transactions through the JTA,
 - Local transactions are resource-specific, such as a transaction associated with a JDBC connection
   - it cannot help ensure correctness across multiple resources.
 
-• Is a transaction a cross cutting concern? How is it implemented by Spring?
+### Is a transaction a cross cutting concern? How is it implemented by Spring?
+- AOP
 
+### How are you going to define a transaction in Spring?
+- 1. PlatformTransactionManager bean.
+- 2. @EnableTransactionManagement on @Configuration class
+- 3. @Transactional code
 
-• How are you going to define a transaction in Spring?
-
-
-• What does @Transactional do? What is the PlatformTransactionManager?
+### What does @Transactional do? What is the PlatformTransactionManager?
 - PlatformTransactionManager defines A transaction strategy
   - TransactionDefinition
     - Isolation
@@ -311,13 +323,33 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
     - transactionManager drive advice
 
 
-• Is the JDBC template able to participate in an existing transaction?
+### Is the JDBC template able to participate in an existing transaction?
+- yes, TransactionAwareDataSourceProxy.
 
-• What is a transaction isolation level? How many do we have and how are they ordered?
+###  What is a transaction isolation level? How many do we have and how are they ordered?
+- determine how the changes within a transaction are visible to other users and systems accessing the database prior to the transaction being committed.
+- Serializable
+  - highest isolcation level
+  - read, write, range-lock(if have select where)
+  - hold lock until transaction ends
+- Repeatable Reads
+  - read, write lock until transaction end
+  - no range-lock; 
+    - A **phantom read** occurs when, in the course of a transaction, **new rows** are added or removed by another transaction to the records being read.
+    - INSERT
+- Read Committed:
+  - keeps write locks (acquired on selected data) until the end of the transaction
+  - read locks are released as soon as the SELECT operation is performed
+  - A **non-repeatable read** occurs when, during the course of a transaction, **a row** is retrieved twice and the values within the row differ between reads.
+    - At the SERIALIZABLE and REPEATABLE READ isolation levels, the DBMS must return the old value for the second SELECT. At READ COMMITTED and READ UNCOMMITTED, the DBMS may return the updated value; this is a non-repeatable read.
+    - UPDATE
+- Read Uncommitted
+  - dirty read: one transaction may see **not-yet-committed** changes made by other transactions
 
-- [x] What is @EnableTransactionManagement for?
+
+### What is @EnableTransactionManagement for?
 - make @Transactional bean instance transactional through an @EnableTransactionManagement annotation in a @Configuration class
-- [x] What does transaction propagation mean?
+### What does transaction propagation mean?
 - Defines how transactions relate to each other. Common options:  
   - Required: Code will always run in a transaction. Creates a new transaction or reuses one if available.
   - Requires_new: Code will always run in a new transaction. Suspends the current transaction if one exists.
@@ -325,11 +357,11 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
 - PROPAGATION_REQUIRES_NEW: **always uses an independent** physical transaction for each affected transaction scope, never participating in an existing transaction for an outer scope. 
 - PROPAGATION_NESTED uses a single physical transaction with multiple **savepoints** that it can roll back to.
 
-- [x] What happens if one @Transactional annotated method is calling another @Transactional annotated method on the same object instance?
+### What happens if one @Transactional annotated method is calling another @Transactional annotated method on the same object instance?
+- AOP: a self-invocation of a proxied Spring bean effectively bypasses the proxy
 - By default, a participating transaction joins the characteristics of the outer scope, **silently ignoring the local isolation level**, timeout value, or read-only flag (if any). Consider switching the validateExistingTransactions flag to true on your transaction manager if you want isolation level declarations to be rejected when participating in an existing transaction with a different isolation level. 
 
-- [x] Where can the @Transactional annotation be used? What is a typical usage if you put it
-at class level?
+### Where can the @Transactional annotation be used? What is a typical usage if you put it at class level?
 - declare transactional semantics metadata
 - class level or method level, better not on interface in case you use class-based proxies (proxy-target-class="true") or the weaving-based aspect (mode="aspectj")
 - only to methods with **public** visibility
@@ -364,10 +396,10 @@ public @interface AccountTx {
 }
 ```
 
-- [x] What does declarative transaction management mean?
+### What does declarative transaction management mean?
 - It keeps transaction management out of business logic and is not difficult to configure. 
 
-- [x] What is the default rollback policy? How can you override it?
+### What is the default rollback policy? How can you override it?
 
 - The recommended way to indicate to the Spring Framework’s transaction infrastructure that a transaction’s work is to be rolled back is to throw an Exception from code that is currently executing in the context of a transaction.
 - RuntimeException/Error: In its default configuration, the Spring Framework’s transaction infrastructure code marks a transaction for rollback only in the case of runtime, unchecked exceptions. 
@@ -387,17 +419,21 @@ public void resolvePosition() {
 }
 ```
 
-• What is the default rollback policy in a JUnit test, when you use the @RunWith(SpringJUnit4ClassRunner.class) in JUnit 4 or @ExtendWith(SpringExtension.class) in JUnit 5, and annotate your @Test annotated method with @Transactional?
+### What is the default rollback policy in a JUnit test, when you use the @RunWith(SpringJUnit4ClassRunner.class) in JUnit 4 or @ExtendWith(SpringExtension.class) in JUnit 5, and annotate your @Test annotated method with @Transactional?
+- Such a transaction will automatically be rolled back after the completion of the test-method.
 
-• Why is the term "unit of work" so important and why does JDBC AutoCommit violate this pattern?
-
+### Why is the term "unit of work" so important and why does JDBC AutoCommit violate this pattern?
+- JDBC AutoCommit will cause each individual SQL statement as to be executed in its own transaction and the transaction committed when each statement is completed.
+- JDBC AutoCommit can be disabled by calling the setAutoCommit method with the value false on a JDBC connection.
 
 ## Spring Data JPA
 • What do you need to do in Spring if you would like to work with JPA?
+
 • Are you able to participate in a given transaction in Spring while working with JPA?
+
 • Which PlatformTransactionManager(s) can you use with JPA?
-• What do you have to configure to use JPA with Spring? How does Spring Boot make this
-easier?
+
+• What do you have to configure to use JPA with Spring? How does Spring Boot make this easier?
 
 • What is a Repository interface?
 • How do you define a Repository interface? Why is it an interface not a class?
