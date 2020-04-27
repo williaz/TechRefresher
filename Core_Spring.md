@@ -681,7 +681,7 @@ instantiated early in the Spring context creation process.
   - Implements support for dependency injection with the @Autowired annotation.
 - PersistenceExceptionTranslationPostProcessor
   - Applies exception translation to Spring beans annotated with the @Repository annotation.
-
+- @Autowired, @Inject, @Resource, and @Value annotations are handled by Spring BeanPostProcessor implementations which in turn means that you cannot apply these annotations within your own BeanPostProcessor or BeanFactoryPostProcessor types 
 
 ### What is an initialization method and how is it declared on a Spring bean?
 - after all prop set and before in use, 3 options in order
@@ -701,15 +701,35 @@ instantiated early in the Spring context creation process.
 • How else can you define an initialization or destruction method for a Spring bean?
 • What does component-scanning do?
 ### What is the behavior of the annotation @Autowired with regards to field injection, constructor injection and method injection?
+- As of Spring Framework 4.3, an @Autowired annotation on such a constructor is no longer necessary if the target bean only defines one constructor to begin with. However, if several constructors are available, at least one must be annotated to teach the container which one to use
+  - **Only one** annotated constructor per-class can be marked as required, but multiple non-required constructors can be annotated. => Spring go pick greedist per dep arg
+- Array/Typed collection: provide all beans of a particular type from the ApplicationContext
+  - @Order/@Priority to order
+-  typed Maps can be autowired as long as the expected key type is String. The Map values will contain all beans of the expected type, and the keys will contain the corresponding bean names
+
+- By default, the autowiring fails whenever zero candidate beans are available; the default behavior is to treat annotated methods, constructors, and fields as indicating required dependencies.
+  - @Autowired(**required** = false)
+  - Alternatively, you may express the non-required nature of a particular dependency through Optional type
+- You can also use @Autowired for interfaces that are well-known resolvable dependencies: BeanFactory, ApplicationContext, Environment, ResourceLoader, ApplicationEventPublisher, and MessageSource. These interfaces and their extended interfaces, such as ConfigurableApplicationContext or ResourcePatternResolver, are **automatically resolved, with no special setup necessary**.
+
+- if multiple candidate: @Primary > @Qualifier > try to match the bean name to field/param name > exception
+- Field/Method/Constructor: any visibility
 
 
-• What do you have to do, if you would like to inject something into a private field? How does this impact testing?
+### What do you have to do, if you would like to inject something into a private field? How does this impact testing?
+- @Autowired: mock
+- @Value: @TestPropertySource to use either a test-specific property file or customizing individual property values
 
+### How does the @Qualifier annotation complement the use of @Autowired?
+- At injection points, specify name to match
+- At bean definitions, define bean name
+- At annotation definitions.
 
-• How does the @Qualifier annotation complement the use of @Autowired?
 • What is a proxy object and what are the two different types of proxies Spring can create?
 • What are the limitations of these proxies (per type)?
 • What is the power of a proxy object and where are the disadvantages?
+
+
 • What does the @Bean annotation do?
 
 
@@ -718,22 +738,31 @@ instantiated early in the Spring context creation process.
   - The convention is to use the standard Java convention for instance field names when naming beans. That is, bean names start with a lowercase letter and are camel-cased from there.
   - With component scanning in the classpath, Spring generates bean names for unnamed components, following the rules described earlier: essentially, taking the simple class name and turning its initial character to lower-case. 
 
-• Why are you not allowed to annotate a final class with @Configuration
-• How do @Configuration annotated classes support singleton beans?
-• Why can’t @Bean methods be final either?
+### Why are you not allowed to annotate a final class with @Configuration? How do @Configuration annotated classes support singleton beans? Why can’t @Bean methods be final either?
+- Configuration classes are **subclassed** by the Spring container using CGLIB and final classes
+cannot be subclassed.
+
+
 • How do you configure profiles? What are possible use cases where they might be useful?
 • Can you use @Bean together with @Profile?
 • Can you use @Component together with @Profile?
 • How many profiles can you have?
-• How do you inject scalar/literal values into Spring beans?
-• What is @Value used for?
-• What is Spring Expression Language (SpEL for short)?
-• What is the Environment abstraction in Spring?
-• Where can properties in the environment come from – there are many sources for
-properties – check the documentation if not sure. Spring Boot adds even more.
-• What can you reference using SpEL?
-• What is the difference between $ and # in @Value expressions?
 
+
+### How do you inject scalar/literal values into Spring beans? What is @Value used for?
+- @Value("${personservice.retry-count}")
+
+
+• What is Spring Expression Language (SpEL for short)?
+
+
+• What is the Environment abstraction in Spring?
+• Where can properties in the environment come from – there are many sources for properties – check the documentation if not sure. Spring Boot adds even more.
+
+• What can you reference using SpEL?
+### What is the difference between $ and # in @Value expressions?
+- ${} construct that surrounds the name of the property
+- SpEL surrounded by the characters #{}.
 
 ## Spring Boot Intro
 • What is Spring Boot?
