@@ -842,6 +842,7 @@ jpa:
 - JAR and prop
 
 ### What is spring.factories file for?
+- META-INF/spring.factories file is a special file picked up by the spring framework in which you can define how spring context will be customized.
 - Locating Auto-configuration Candidates
 - Spring Boot checks for the presence of a META-INF/spring.factories file within your published jar. The file should list your configuration classes under the EnableAutoConfiguration key
 
