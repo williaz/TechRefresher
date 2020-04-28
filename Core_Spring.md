@@ -765,33 +765,102 @@ cannot be subclassed.
 - SpEL surrounded by the characters #{}.
 
 ## Spring Boot Intro
-• What is Spring Boot?
-• What are the advantages of using Spring Boot?
-• Why is it “opinionated”?
-• What things affect what Spring Boot sets up?
-• What is a Spring Boot starter POM? Why is it useful?
-• Spring Boot supports both properties and YML files. Would you recognize and understand
-them if you saw them?
-• Can you control logging with Spring Boot? How?
+### What is Spring Boot?
+- autoconifg
+- starter
+
+### What are the advantages of using Spring Boot?
+- rapid dev
+- no version conflict
+- standalone JAR
+
+### Why is it “opinionated”?
+- predefined
+
+### What things affect what Spring Boot sets up?
+- @ConditionalOnXxxx
+- class in classpath
+
+### What is a Spring Boot starter POM? Why is it useful?
+- predconfig without version conflict
+
+### Spring Boot supports both properties and YML files. Would you recognize and understand them if you saw them?
+- key:value
+- YAML: space
+
+### Can you control logging with Spring Boot? How?
+- logging.level.
+- logging.pattern.
+
 • Where does Spring Boot look for property file by default?
-• How do you define profile specific property files?
-• How do you access the properties defined in the property files?
-• What properties do you have to define in order to configure external MySQL?
-• How do you configure default schema and initial data?
-• What is a fat far? How is it different from the original jar?
-• What is the difference between an embedded container and a WAR?
-• What embedded containers does Spring Boot support?
+### How do you define profile specific property files?
+- applicaton-{profile}.properties
+
+### How do you access the properties defined in the property files?
+- @Value
+
+###  What properties do you have to define in order to configure external MySQL?
+```YAML
+spring:
+   profiles: production
+   datasource:
+	url: jdbc:postgresql://localhost:5432/readinglist
+	username: habuma
+	password: password
+jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+```
+
+### How do you configure default schema and initial data?
+- schema.sql, data.sql
+
+### What is a fat jar? How is it different from the original jar?
+- include all dep, standalone
+
+### What is the difference between an embedded container and a WAR?
+- in JAR, one app
+- WAR deployed in a (shared) web container
+
+### What embedded containers does Spring Boot support?
+- Tomcat, Jetty, Undertow
+
 
 ## Spring Boot Auto Configuration
-• How does Spring Boot know what to configure?
-• What does @EnableAutoConfiguration do?
-• What does @SpringBootApplication do?
-• Does Spring Boot do component scanning? Where does it look by default?
-• How are DataSource and JdbcTemplate auto-configured?
-• What is spring.factories file for?
-• How do you customize Spring auto configuration?
-• What are the examples of @Conditional annotations? How are they used?
+### How does Spring Boot know what to configure?
+- detects dep available in classpath and then config bean using @Condtional
 
+### What does @EnableAutoConfiguration do?
+-  tells Spring Boot to “guess” how you want to configure Spring, based on the jar dependencies that you have added.
+
+### What does @SpringBootApplication do?
+- = @Configuration + @ComponentScan + @EnableAutoConfiguration
+
+### Does Spring Boot do component scanning? Where does it look by default?
+- @ComponentScan: Either basePackageClasses() or basePackages() (or its alias value()) may be specified to define specific packages to scan. If specific packages are not defined, scanning will occur from the package of the class that declares this annotation.
+
+### How are DataSource and JdbcTemplate auto-configured?
+- JAR and prop
+
+### What is spring.factories file for?
+- Locating Auto-configuration Candidates
+- Spring Boot checks for the presence of a META-INF/spring.factories file within your published jar. The file should list your configuration classes under the EnableAutoConfiguration key
+
+### How do you customize Spring auto configuration?
+- Under the hood, auto-configuration is implemented with standard @Configuration classes. Additional @Conditional annotations are used to constrain when the auto-configuration should apply. 
+- The file should list your configuration classes under the EnableAutoConfiguration key
+```
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.mycorp.libx.autoconfigure.LibXAutoConfiguration,\
+com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
+```
+### What are the examples of @Conditional annotations? How are they used?
+- annotating @Configuration classes or individual @Bean methods. 
+- The @ConditionalOnClass and @ConditionalOnMissingClass annotations let **@Configuration classes be included** based on the presence or absence of specific classes.
+- @ConditionalOnBean and @ConditionalOnMissingBean let a **bean be included** based on the presence or absence of specific beans.
+- @ConditionalOnProperty annotation lets configuration be included based on a Spring Environment property.
+- @ConditionalOnResource annotation lets configuration be included only when a specific resource is present
+- @ConditionalOnWebApplication and @ConditionalOnNotWebApplication annotations let configuration be included depending on whether the application is a “web application”. 
+- @ConditionalOnExpression annotation lets configuration be included based on the result of a SpEL expression.
 
 ## Spring Boot Actuator
 • What value does Spring Boot Actuator provide?
@@ -808,3 +877,45 @@ them if you saw them?
 • What are the Health Indicator statuses that are provided out of the box
 • How do you change the Health Indicator status severity order?
 • Why do you want to leverage 3rd-party external monitoring system?
+
+
+## Spring MVC and the Web Layer
+• MVC is an abbreviation for a design pattern. What does it stand for and what is the idea
+behind it?
+• What is the DispatcherServlet and what is it used for?
+• What is a web application context? What extra scopes does it offer?
+• What is the @Controller annotation used for?
+• How is an incoming request mapped to a controller and mapped to a method?
+• What is the difference between @RequestMapping and @GetMapping?
+• What is @RequestParam used for?
+• What are the differences between @RequestParam and @PathVariable?
+• What are some of the parameter types for a controller method?
+• What other annotations might you use on a controller method parameter? (You can
+ignore form-handling annotations for this exam)
+• What are some of the valid return types of a controller method?
+
+## REST
+• What does REST stand for?
+• What is a resource?
+• What does CRUD mean?
+• Is REST secure? What can you do to secure it?
+• Is REST scalable and/or interoperable?
+• Which HTTP methods does REST use?
+• What is an HttpMessageConverter?
+• Is REST normally stateless?
+• What does @RequestMapping do?
+• Is @Controller a stereotype? Is @RestController a stereotype?
+• What is a stereotype annotation? What does that mean?
+• What is the difference between @Controller and @RestController?
+• When do you need @ResponseBody?
+• What are the HTTP status return codes for a successful GET, POST, PUT or DELETE
+operation?
+• When do you need @ResponseStatus?
+• Where do you need @ResponseBody? What about @RequestBody? Try not to get these
+muddled up!
+• If you saw example Controller code, would you understand what it is doing? Could you tell
+if it was annotated correctly?
+• Do you need Spring MVC in your classpath?
+• What Spring Boot starter would you use for a Spring REST application?
+• What are the advantages of the RestTemplate?
+• If you saw an example using RestTemplate would you understand what it is doing?
