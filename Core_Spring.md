@@ -881,42 +881,140 @@ com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
 
 
 ## Spring MVC and the Web Layer
-• MVC is an abbreviation for a design pattern. What does it stand for and what is the idea
-behind it?
-• What is the DispatcherServlet and what is it used for?
-• What is a web application context? What extra scopes does it offer?
-• What is the @Controller annotation used for?
-• How is an incoming request mapped to a controller and mapped to a method?
-• What is the difference between @RequestMapping and @GetMapping?
-• What is @RequestParam used for?
-• What are the differences between @RequestParam and @PathVariable?
-• What are some of the parameter types for a controller method?
-• What other annotations might you use on a controller method parameter? (You can
-ignore form-handling annotations for this exam)
-• What are some of the valid return types of a controller method?
+### MVC is an abbreviation for a design pattern. What does it stand for and what is the idea behind it?
+- reusable, loose coupling, seperation of concerns
+
+
+### What is the DispatcherServlet and what is it used for?
+- front controller
+- 1. receive req and delegates to handlers
+- 2. resole view and exception
+
+
+
+###  What is a web application context? What extra scopes does it offer?
+- DispatcherServlet expects a WebApplicationContext, an extension of a plain ApplicationContext, for its own configuration. WebApplicationContext has a link to the ServletContext and Servlet it is associated with. It is also bound to the ServletContext such that applications can use static methods on RequestContextUtils to look up the WebApplicationContext if they need access to it.
+- request, session, applcation(per ServletContext)
+
+### What is the @Controller annotation used for?
+- stereotype of @Component
+
+### How is an incoming request mapped to a controller and mapped to a method?
+- @RequestHandler hold be DispathcerServlet
+
+
+### What is the difference between @RequestMapping and @GetMapping?
+- @RequestMapping: by default matches to all HTTP methods, class level
+- @GetMapping: shortcut for GET
+```
+? matches one character
+
+* matches zero or more characters within a path segment
+
+** match zero or more path segments
+```
+
+
+### What is @RequestParam used for?
+- bind request parameters to method parameters.
+
+### What are the differences between @RequestParam and @PathVariable?
+- map different parts of request URLs: query param VS url
+
+### What are some of the parameter types for a controller method? What other annotations might you use on a controller method parameter? (You can ignore form-handling annotations for this exam)
+
+- javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.http.HttpSession, java.security.Principal
+- java.io.InputStream, java.io.Reader, java.io.OutputStream, java.io.Writer: raw req/respo body
+- @RequestParam, @MatrixVariable, @PathVariable, @RequestHeader, @CookieValue, @RequestPart multipart, @ModelAttribute
+
+### What are some of the valid return types of a controller method?
+- HttpEntity<B>, ResponseEntity<B>, HttpHeaders
+- String, View, ModelAndView
+- @ResponseBody, @ModelAttribute
+- void
+  - A method with a void return type (or null return value) is considered to have fully handled the response if it also has a ServletResponse, or an OutputStream argument, or an @ResponseStatus annotation. The same is true also if the controller has made a positive ETag or lastModified timestamp check (see Controllers for details).
+
+  - If none of the above is true, a void return type may also indicate "no response body" for REST controllers, or default view name selection for HTML controllers.
+- DeferredResult<V>, Callable<V>, StreamingResponseBody, ResponseBodyEmitter, SseEmitter: async
+
 
 ## REST
-• What does REST stand for?
-• What is a resource?
-• What does CRUD mean?
-• Is REST secure? What can you do to secure it?
-• Is REST scalable and/or interoperable?
-• Which HTTP methods does REST use?
-• What is an HttpMessageConverter?
-• Is REST normally stateless?
-• What does @RequestMapping do?
-• Is @Controller a stereotype? Is @RestController a stereotype?
-• What is a stereotype annotation? What does that mean?
-• What is the difference between @Controller and @RestController?
-• When do you need @ResponseBody?
-• What are the HTTP status return codes for a successful GET, POST, PUT or DELETE
-operation?
-• When do you need @ResponseStatus?
-• Where do you need @ResponseBody? What about @RequestBody? Try not to get these
-muddled up!
-• If you saw example Controller code, would you understand what it is doing? Could you tell
-if it was annotated correctly?
-• Do you need Spring MVC in your classpath?
-• What Spring Boot starter would you use for a Spring REST application?
-• What are the advantages of the RestTemplate?
-• If you saw an example using RestTemplate would you understand what it is doing?
+### What does REST stand for? What is a resource?
+
+- REpresentational State Transfer
+- any info
+
+### What does CRUD mean?
+- Create, Read, Update and Delete
+
+### Is REST secure? What can you do to secure it?
+- add seucrity layer for URL
+
+### Is REST scalable and/or interoperable?
+- The statelessness, the cacheability and the layered system constraints of the REST architectural
+style allows for scaling a REST web service.
+- interoperable: URI, HTTP verb, any media type
+
+### Which HTTP methods does REST use?
+- POST, GET, PUT, DELETE
+
+### What is an HttpMessageConverter?
+- Convert a HttpInputMessage to an object of specified type.
+- Convert an object to a HttpOutputMessage.
+- impl
+  - MappingJackson2HttpMessageConverter
+  - Jaxb2RootElementHttpMessageConverter
+
+### Is REST normally stateless?
+- server however is not aware of state
+
+### What does @RequestMapping do?
+- consumes, headers, method(HTTP), params, path, produces
+
+### Is @Controller a stereotype? Is @RestController a stereotype? What is a stereotype annotation? What does that mean? What is the difference between @Controller and @RestController?
+- yes
+- marker to fulfill a certain, distinct, role.
+- @Contorller + @ResponseBody
+
+### When do you need @ResponseBody?
+- indicates a method return value should be bound to the web response body, like REST
+
+### What are the HTTP status return codes for a successful GET, POST, PUT or DELETE operation?
+- 200, 201, 200, 404
+
+### When do you need @ResponseStatus?
+- annotate exception classes
+- applied to controller handler methods in order to override the original response status information
+
+### Where do you need @ResponseBody? What about @RequestBody? Try not to get these muddled up!
+- used when the web request body is to be bound to a parameter of the controller handler method.
+
+• If you saw example Controller code, would you understand what it is doing? Could you tell if it was annotated correctly?
+
+### Do you need Spring MVC in your classpath?
+- spring-web for @
+
+### What Spring Boot starter would you use for a Spring REST application?
+- spring-boot-starter-web
+
+### What are the advantages of the RestTemplate?
+- synchronous HTTP client that simplifies sending requests and also enforces RESTful principles.
+
+### If you saw an example using RestTemplate would you understand what it is doing?
+- URI templates are automatically encoded
+```java
+restTemplate.getForObject("http://example.com/hotel list", String.class);
+// Results in request to "http://example.com/hotel%20list"
+
+
+String result = restTemplate.getForObject(
+        "http://example.com/hotels/{hotel}/bookings/{booking}", String.class, "42", "21");
+Map<String, String> vars = Collections.singletonMap("hotel", "42");
+
+String result = restTemplate.getForObject(
+        "http://example.com/hotels/{hotel}/rooms/{hotel}", String.class, vars);
+	
+```
+
+
+
