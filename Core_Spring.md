@@ -864,21 +864,92 @@ com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
 - @ConditionalOnExpression annotation lets configuration be included based on the result of a SpEL expression.
 
 ## Spring Boot Actuator
-• What value does Spring Boot Actuator provide?
-• What are the two protocols you can use to access actuator endpoints?
-• What are the actuator endpoints that are provided out of the box?
-• What is info endpoint for? How do you supply data?
-• How do you change logging level of a package using loggers endpoint?
-• How do you access an endpoint using a tag?
-• What is metrics for?
-• How do you create a custom metric with or without tags?
-• What is Health Indicator?
-• What are the Health Indicators that are provided out of the box?
-• What is the Health Indicator status?
-• What are the Health Indicator statuses that are provided out of the box
-• How do you change the Health Indicator status severity order?
-• Why do you want to leverage 3rd-party external monitoring system?
+### What value does Spring Boot Actuator provide?
+- help you monitor and manage your application when you push it to production. 
 
+### What are the two protocols you can use to access actuator endpoints?
+- using HTTP endpoints or with JMX
+
+### What are the actuator endpoints that are provided out of the box?
+- HTTP: endpoint along with a prefix of /actuator is mapped to a URL.
+- /actuator/
+  - auditevents
+  - bean, mappings, env, conditions
+  - caches, sessions
+  - configprops, scheduledtasks, logs
+  - flyway, liquibse
+  - health, httptrace, info, metrics, threaddump
+  - shutdown
+  - WEB: heapdump, jolokia, logfile,  prometheus
+### What is info endpoint for? How do you supply data?
+- Displays arbitrary application info
+
+### How do you change logging level of a package using loggers endpoint?
+- POST: { "configuredLevel": "DEBUG"}; reset: as null
+
+
+### How do you access an endpoint using a tag?
+-  add any number of tag=KEY:VALUE query parameters to the end of the URL to dimensionally drill down on a meter
+
+### What is metrics for?
+- quantify the health
+- Metric is a measure used to evaluate, to control and/or to select quantitatively
+### How do you create a custom metric with or without tags?
+- Having a dependency on micrometer-registry-{system} in your runtime classpath is enough for Spring Boot to configure the registry.
+- You can register any number of MeterRegistryCustomizer beans to further configure the registry, such as applying common tags, before any meters are registered with the registry:
+```java
+@Bean
+MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
+    return registry -> registry.config().commonTags("region", "us-east-1");
+}
+```
+- To register custom metrics, inject MeterRegistry into your component:
+```java
+class Dictionary {
+
+    private final List<String> words = new CopyOnWriteArrayList<>();
+
+    Dictionary(MeterRegistry registry) {
+        registry.gaugeCollectionSize("dictionary.size", Tags.empty(), this.words);
+    }
+
+    // …
+
+}
+```
+
+
+### What is Health Indicator?  What is the Health Indicator status?
+- monitoring software to alert someone when a production system goes down
+- A HealthIndicator provides actual health information, including a Status. 
+```java
+@Component
+public class MyHealthIndicator implements HealthIndicator {
+
+    @Override
+    public Health health() {
+        int errorCode = check(); // perform some specific health check
+        if (errorCode != 0) {
+            return Health.down().withDetail("Error Code", errorCode).build();
+        }
+        return Health.up().build();
+    }
+
+}
+```
+### What are the Health Indicators that are provided out of the box?
+- DataSourceHealthIndicator, DiskSpaceHealthIndicator, MongoHealthIndicator, RedisHealthIndicator if server is up
+
+
+### What are the Health Indicator statuses that are provided out of the box
+- DOWN, OUT_OF_SEVICE: 503
+- UP, UNKNOWN: 200
+
+### How do you change the Health Indicator status severity order?
+- management.endpoint.health.status.order=fatal,down,out-of-service,unknown,up
+
+### Why do you want to leverage 3rd-party external monitoring system?
+- built-in, visualizing, central metirx, traces, logs
 
 ## Spring MVC and the Web Layer
 ### MVC is an abbreviation for a design pattern. What does it stand for and what is the idea behind it?
