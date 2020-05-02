@@ -928,7 +928,7 @@ com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
 - @RequestParam, @MatrixVariable, @PathVariable, @RequestHeader, @CookieValue, @RequestPart multipart, @ModelAttribute
 
 ### What are some of the valid return types of a controller method?
-- HttpEntity<B>, ResponseEntity<B>, HttpHeaders
+- HttpEntity<E>, ResponseEntity<E>, HttpHeaders
 - String, View, ModelAndView
 - @ResponseBody, @ModelAttribute
 - void
