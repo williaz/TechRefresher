@@ -236,6 +236,8 @@ subclass of RuntimeException, are checked exceptions.
 - ResultSetExtractor: Allows for processing of an entire result set, possibly consisting multiple rows of data, at once.
 - RowCallbackHandler: Allows for processing rows in a result set one by one typically accumulating some type of result.
 - RowMapper: Allows for processing rows in a result set one by one and creating a Java object for each row.
+- The PreparedStatementCreator/PreparedStatementSetter callback interface creates a prepared statement given a Connection, providing SQL and any necessary parameters. 
+
 
 ### Can you execute a plain SQL statement with the JDBC template?
 - yes
@@ -311,7 +313,7 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
 - 3. @Transactional code
 
 ### What does @Transactional do? What is the PlatformTransactionManager?
-- PlatformTransactionManager defines A transaction strategy
+- PlatformTransactionManager defines A **transaction strategy**
   - TransactionDefinition
     - Isolation
     - Propagation: scope
@@ -319,8 +321,41 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
     - Read-only
   - PlatformTransactionManager implementations normally require knowledge of the environment in which they work: JDBC, JTA, Hibernate, and so on.
     - transactionManager drive advice
+- Programmatic transaction management
+  - Using the TransactionTemplate.
+    - write a TransactionCallback implementation to execute code in the context of a transaction. 
+  - Using a PlatformTransactionManager implementation directly.
+    - using the TransactionDefinition and TransactionStatus objects you can initiate transactions, roll back, and commit
+```java
+transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 
+    protected void doInTransactionWithoutResult(TransactionStatus status) {
+        try {
+            updateOperation1();
+            updateOperation2();
+        } catch (SomeBusinessExeption ex) {
+            status.setRollbackOnly();
+        }
+    }
+});
 
+// -----------------------------
+
+DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+// explicitly setting the transaction name is something that can only be done programmatically
+def.setName("SomeTxName");
+def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+
+TransactionStatus status = txManager.getTransaction(def);
+try {
+    // execute your business logic here
+}
+catch (MyException ex) {
+    txManager.rollback(status);
+    throw ex;
+}
+txManager.commit(status);
+```
 ### Is the JDBC template able to participate in an existing transaction?
 - yes, TransactionAwareDataSourceProxy.
 
@@ -427,11 +462,15 @@ public void resolvePosition() {
 ## Spring Data JPA
 ### What do you need to do in Spring if you would like to work with JPA? What do you have to configure to use JPA with Spring? How does Spring Boot make this easier?
 - 1. Declare the appropriate dependencies.
-- 2.  Implement entity classes with mapping metadata in the form of annotations.
+- 2. Implement entity classes with mapping metadata in the form of annotations.
 - 3. Define an EntityManagerFactory bean.
   - An entity manager factory is used to interact with a persistence unit.
   - A persistence unit is a grouping of one or more persistent classes that correspond to a single data source.
-  - @PersistenceContext to assoicate 2
+  - @PersistenceContext on EntityManagerto assoicate 2
+  - 3 setup: 
+    - LocalEntityManagerFactoryBean: only for standalone or integ test; no globale transaction
+    - LocalContainerEntityManagerFactoryBean:  full JPA capabilities
+    - Obtain an EntityManagerFactory using JNDI: JEE server
 - 4. Define a DataSource bean.
 - 5. Define a TransactionManager bean: JpaTransactionManager
 - 6. Implement repositories.
@@ -626,7 +665,9 @@ Application-layer specific contexts such as the WebApplicationContext for use in
 ### How are you going to create a new instance of an ApplicationContext?
 - new AnnotationConfigApplicationContext(MyConfiguration.class);
 - new AnnotationConfigWebApplicationContext()
-
+  - listener-class: The Spring ContextLoaderListener creates the root Spring web application context of a web
+application.
+  - servlet: DispatcherServlet
 
 ### Can you describe the lifecycle of a Spring Bean in an ApplicationContext?
 - the bean is instantiated (if it is not a pre-instantiated singleton), 
@@ -641,14 +682,23 @@ Application-layer specific contexts such as the WebApplicationContext for use in
 
 - standalone: Registering a shutdown-hook by calling the method registerShutdownHook
   - ensures a graceful shutdown and calls the relevant **destroy methods** on your singleton beans so that all resources are released.
-- Web: taken care of by the ContextLoaderListener
+- Web: taken care of by the ContextLoaderListener which implements the ServletContextListener interface
 
 
 
-### Can you describe: Dependency injection using Java configuration? Dependency injection using annotations (@Autowired)? Component scanning, Stereotypes? Scopes for Spring beans? What is the default scope?
+### Can you describe: Dependency injection using Java configuration? Dependency injection using annotations (@Autowired)? Component scanning, Stereotypes? 
 - config class with bean method
 - @Component/@Autowired + @ComponetScan
-- Singleton, prototype, request, session
+- component-scan implicitly included annotation-config for @Autowired
+
+### Scopes for Spring beans? What is the default scope?
+
+- singleton
+- prototype
+  - Spring **does not manage the complete lifecycle** of a prototype bean: the container instantiates, configures, and otherwise assembles a prototype object, and hands it to the client, with no further record of that prototype instance. 
+  - To get the Spring container to release resources held by prototype-scoped beans, try using a custom **bean post-processor**, which holds a reference to beans that need to be cleaned up.
+- web-aware: request, session, applicaton(per ServletContext), websocket
+  - DispatcherServlet, RequestContextListener, and RequestContextFilter all do exactly the same thing, namely bind the HTTP request object to the Thread that is servicing that request. This makes beans that are request- and session-scoped available further down the call chain.
 
 ### Are beans lazily or eagerly instantiated by default? How do you alter this behavior?
 - By default, ApplicationContext implementations eagerly create and configure all singleton beans as part of the initialization process.
@@ -820,6 +870,18 @@ jpa:
 ### What is the difference between an embedded container and a WAR?
 - in JAR, one app
 - WAR deployed in a (shared) web container
+- build WAR from Boot:
+  - 1. <packaging>war</packaging>
+  - 2. override configure() form SpringBootServletInitializer
+  - as long as you don't remove main() from Application, you can run java -jar on the WAR
+```java
+public class ReadingListServletInitializer extends SpringBootServletInitializer {
+    @Override
+    protected SpringApplicationBuilder configure( SpringApplicationBuilder builder) {
+	return builder.sources(Application.class);
+    }
+}
+```
 
 ### What embedded containers does Spring Boot support?
 - Tomcat, Jetty, Undertow
