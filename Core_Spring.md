@@ -20,6 +20,31 @@
 
 ## Spring Security
 
+### Security
+- web: @EnableWebSecurity
+- method: @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+
+- springSecurityFilterChain
+  - filter
+  - responsible for all the security (protecting the application URLs, validating submitted username and passwords, redirecting to the log in form, etc) within your application.
+  - to register: @EnableWebSecurity
+- UserDetailsService
+- PasswordEncoder
+- HttpSecurity
+  - antMatcher, mvcMatcher
+  
+- SecurityContextHolder, to provide access to the SecurityContext.
+- SecurityContext, to hold the Authentication and possibly request-specific security information.
+- Authentication, to represent the principal in a Spring Security-specific manner.
+- GrantedAuthority, to reflect the application-wide permissions granted to a principal.
+- UserDetails, to provide the necessary information to build an Authentication object from your application’s DAOs or other source of security data.
+- UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
+
+```java
+Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+```
+
+
 ### What are authentication and authorization? Which must come first?
 - Authentication: verify user
 - Authorization: permission
@@ -87,7 +112,10 @@ AOP pointcut
 
 
 ## AOP 
-Aspect oriented programming
+- Spring AOP defaults to using standard JDK dynamic proxies(inteface), can use CGLIB proxies(subclass)
+  - Spring JavaConfig requires CGLIB subclassing
+- aspect(advice + pointcut), joint point, waving
+- @EnableAspectJAutoProxy, @Aspect
 
 ### What is the concept of AOP? Which problem does it solve? What is a cross cutting concern?
 - a crosscutting concern: functionality that affects multiple points of an application.
@@ -225,7 +253,19 @@ subclass of RuntimeException, are checked exceptions.
 ### How do you configure a DataSource in Spring? Which bean is very useful for development/test databases?
 - a JDBC-based repository needs access to a JDBC DataSource, and a JPA-based repository needs access to an @PersistenceContext EntityManager
 - You should use the **DriverManagerDataSource and SimpleDriverDataSource** classes (as included in the Spring distribution) only for **testing** purposes! Those variants do not provide pooling and perform poorly when multiple requests for a connection are made.
+```java
+DriverManagerDataSource dataSource = new DriverManagerDataSource();
+dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
+dataSource.setUrl("jdbc:hsqldb:hsql://localhost:");
+dataSource.setUsername("sa");
+dataSource.setPassword("");
 
+
+// --------
+spring.datasource.url= jdbc:hsqldb:hsql://localhost:"
+spring.datasource.username=sa
+spring.datasource.password=
+```
 
 ### What is the Template design pattern and what is the JDBC template?
 - A template method defines the skeleton of a process.
@@ -291,6 +331,13 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
 ```
 
 ## Transaction
+- @EnableTransactionManagement
+- @Transactional
+  - value(txn manager), propagation, isolation, readonly, timeout, 
+  - rollbackFor rollbackForClassName, noRollbackFor, noRollbackForClassName: Throwable
+- progation, isolation, rollback
+
+- The combination of AOP with transactional metadata yields an AOP proxy that uses a TransactionInterceptor in conjunction with an appropriate PlatformTransactionManager implementation to drive transactions around method invocations.
 
 ### What is a transaction? What is the difference between a local and a global transaction?
 - A transaction is an operation that consists of a number of tasks that takes place as **a single unit – either all** tasks are performed or no tasks are performed.
@@ -662,6 +709,31 @@ JsonPath: XPath for JSON.
 - A JdbcTemplate is also available if you need that. 
 
 ## Container, Dependency, and IOC
+
+### Core
+- ApplicationContext
+- BeanFactoryPostProcesser
+- BeanPostProcessor
+  - @Autowared
+    - In the case of a multi-arg constructor or method, the required() attribute is applicable to all arguments. Individual parameters may be declared as Java-8 style Optional or, as of Spring Framework 5.0, also as @Nullable or a not-null parameter type in Kotlin, overriding the base 'required' semantics.
+    - 
+- @Configuration
+  - class level
+  - a source of bean definitions
+- Bean:
+  - [@Bean](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html)
+    - method-level, 
+    - used in @Configuration or @Component; 
+      - lit mode(not in @config): general-purpose factory method, cannot declare inter-bean dependencies
+    - to register bean definition in IoC
+    - @Bean({"dataSource", "subsystemA-dataSource"}) or method’s name 
+  - scope
+    - @Scope("prototype")
+    
+  - lifecycle(callback)
+  - with @Qualifier, @Profile, @Scope, @Lazy, @DependsOn, @Primary, @Order
+  - @Component: implicit
+- @Value
 
 ### What is dependency injection and what are the advantages?
 - IoC is also known as dependency injection (DI). It is a process whereby objects define their dependencies (that is, the other objects they work with) only through constructor **arguments**, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean. This process is fundamentally the inverse (hence the name, Inversion of Control) of the bean itself controlling the instantiation or location of its dependencies by using direct construction of classes or a mechanism such as the Service Locator pattern.
@@ -1038,15 +1110,88 @@ public class MyHealthIndicator implements HealthIndicator {
 - built-in, visualizing, central metirx, traces, logs
 
 ## Spring MVC and the Web Layer
+
+### Web MVC
+```xml
+<web-app>
+    <!-- Configure ContextLoaderListener to use AnnotationConfigWebApplicationContext
+        instead of the default XmlWebApplicationContext -->
+    <context-param>
+        <param-name>contextClass</param-name>
+        <param-value>
+            org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+        </param-value>
+    </context-param>
+
+    <!-- Configuration locations must consist of one or more comma- or space-delimited
+        fully-qualified @Configuration classes. Fully-qualified packages may also be
+        specified for component-scanning -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>com.acme.AppConfig</param-value>
+    </context-param>
+
+    <!-- Bootstrap the root application context as usual using ContextLoaderListener -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- Declare a Spring MVC DispatcherServlet as usual -->
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- Configure DispatcherServlet to use AnnotationConfigWebApplicationContext
+            instead of the default XmlWebApplicationContext -->
+        <init-param>
+            <param-name>contextClass</param-name>
+            <param-value>
+                org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+            </param-value>
+        </init-param>
+        <!-- Again, config locations must consist of one or more comma- or space-delimited
+            and fully-qualified @Configuration classes -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>com.acme.web.MvcConfig</param-value>
+        </init-param>
+    </servlet>
+
+    <!-- map all requests for /app/* to the dispatcher servlet -->
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/app/*</url-pattern>
+    </servlet-mapping>
+</web-app>
+```
+```java
+public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class<?>[] { RootConfig.class };
+    }
+
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class<?>[] { App1Config.class };
+    }
+
+    @Override
+    protected String[] getServletMappings() {
+        return new String[] { "/app1/*" };
+    }
+}
+
+```
 ### MVC is an abbreviation for a design pattern. What does it stand for and what is the idea behind it?
 - reusable, loose coupling, seperation of concerns
 
 
 ### What is the DispatcherServlet and what is it used for?
-- front controller
+- front controller, Servlet, can be declaed in web.xml or use WebApplicationInitializer, map URL
 - 1. receive req and delegates to handlers
 - 2. resole view and exception
-
+- each DispatcherServlet has its own WebApplicationContext
 
 
 ###  What is a web application context? What extra scopes does it offer?
