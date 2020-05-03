@@ -460,6 +460,21 @@ public void resolvePosition() {
 - JDBC AutoCommit can be disabled by calling the setAutoCommit method with the value false on a JDBC connection.
 
 ## Spring Data JPA
+### JPA
+- EntityManager: 
+  - an instance represents a **connection** to a database
+  - provides functionality for performing **operations** on a database. 
+  - as a **factory for Query** instances, which are needed for executing queries on the database.
+  
+- An EntityManagerFactory is constructed for a **specific database** as a one time operation, and by managing resources efficiently (e.g. a pool of sockets), provides an efficient way to construct multiple EntityManager instances for that database.
+  - The createEntityManagerFactory method takes as an argument a name of a persistence unit. 
+ 
+- A JPA Persistence Unit is a **logical grouping** of user defined **persistable classes** (entity classes, embeddable classes and mapped superclasses) with related settings.
+  
+- EntityTransaction: Operations that modify the content of a database require active transactions. Transactions are managed by an EntityTransaction instance obtained from the EntityManager.  
+
+
+
 ### What do you need to do in Spring if you would like to work with JPA? What do you have to configure to use JPA with Spring? How does Spring Boot make this easier?
 - 1. Declare the appropriate dependencies.
 - 2. Implement entity classes with mapping metadata in the form of annotations.
@@ -470,10 +485,19 @@ public void resolvePosition() {
   - 3 setup: 
     - LocalEntityManagerFactoryBean: only for standalone or integ test; no globale transaction
     - LocalContainerEntityManagerFactoryBean:  full JPA capabilities
+      -  It supports links to an existing JDBC DataSource, supports both local and global transactions
     - Obtain an EntityManagerFactory using JNDI: JEE server
 - 4. Define a DataSource bean.
 - 5. Define a TransactionManager bean: JpaTransactionManager
 - 6. Implement repositories.
+
+- Spring can understand @PersistenceUnit EntityManagerFactory and @PersistenceContext EntityManager both at field and method level if a PersistenceAnnotationBeanPostProcessor is enabled
+
+- Dealing with multiple persistence units
+  - For applications that rely on multiple persistence units locations, stored in various JARS in the classpath, for example, Spring offers the **PersistenceUnitManager** to act as a central repository and to avoid the persistence units discovery process, which can be expensive. The default implementation allows multiple locations to be specified that are parsed and later retrieved through the persistence unit name.
+
+- Although EntityManagerFactory instances are thread-safe, EntityManager instances are not.
+
 
 - Boot provides
   - dependencies
