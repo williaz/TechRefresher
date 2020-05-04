@@ -1052,11 +1052,17 @@ String result = restTemplate.getForObject(
 ### What is Spring Boot?
 - autoconifg
 - starter
+- Spring Boot makes it easy to create **stand-alone, production-grade Spring-based** Applications that you can run. We take an **opinionated view of the Spring platform and third-party libraries**, so that you can get started with minimum fuss. 
 
 ### What are the advantages of using Spring Boot?
 - rapid dev
 - no version conflict
 - standalone JAR
+
+- Provide a radically faster and widely accessible **getting-started experience** for all Spring development.
+- Be opinionated out of the box but get out of the way quickly as requirements start to diverge from the defaults.
+- Provide a range of **non-functional features** that are common to large classes of projects (such as embedded servers, security, metrics, health checks, and externalized configuration).
+- Absolutely no code generation and **no requirement for XML** configuration.
 
 ### Why is it “opinionated”?
 - predefined
@@ -1066,15 +1072,16 @@ String result = restTemplate.getForObject(
 - class in classpath
 
 ### What is a Spring Boot starter POM? Why is it useful?
+- ```spring-boot-starter-*```
+- Starters are a set of **convenient dependency descriptors** that you can include in your application. You get a **one-stop shop** for all the Spring and related technologies that you need without having to hunt through sample code and copy-paste loads of dependency descriptors.
 - predconfig without version conflict
+- - The **spring-boot-starter-parent** is a special starter that provides useful Maven defaults. It also provides a dependency-management section so that you can **omit version** tags for “blessed” dependencies.
+
 
 ### Spring Boot supports both properties and YML files. Would you recognize and understand them if you saw them?
 - key:value
 - YAML: space
 
-### Can you control logging with Spring Boot? How?
-- logging.level.
-- logging.pattern.
 
 • Where does Spring Boot look for property file by default?
 ### How do you define profile specific property files?
@@ -1100,6 +1107,7 @@ jpa:
 
 ### What is a fat jar? How is it different from the original jar?
 - include all dep, standalone
+- Executable jars (sometimes called “fat jars”) are archives containing your compiled classes along with all of the jar dependencies that your code needs to run.
 
 ### What is the difference between an embedded container and a WAR?
 - in JAR, one app
@@ -1120,16 +1128,38 @@ public class ReadingListServletInitializer extends SpringBootServletInitializer 
 ### What embedded containers does Spring Boot support?
 - Tomcat, Jetty, Undertow
 
+### Can you control logging with Spring Boot? How?
+- logging.level.
+- logging.pattern.
+
+- By default, if you use the “Starters”, Logback is used for logging. 
+- Console-output: By default, ERROR-level, WARN-level, and INFO-level messages are logged. 
+  - ```$ java -jar myapp.jar --debug```
+  - You can also specify debug=true in your application.properties.
+- Coloer-coded Output: ```logging.pattern.console= %d{yyyy-MMM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{15}) - %msg %n```
+- File output: logging.file.path, logging.file.name
+- logging.level
+- define logging.group.xxxx
+
 
 ## Spring Boot Auto Configuration
+
+
 ### How does Spring Boot know what to configure?
 - detects dep available in classpath and then config bean using @Condtional
-
+- @Import config class, @ImportResource XML; @ComponentScan auto from boot app root package
+- Spring Boot auto-configuration attempts to automatically configure your Spring application based on the jar dependencies that you have added.
+- define **exclusions** both at the annotation level and by using the property.
+  - ```@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})```
+  - spring.autoconfigure.exclude property
+  
 ### What does @EnableAutoConfiguration do?
 -  tells Spring Boot to “guess” how you want to configure Spring, based on the jar dependencies that you have added.
+- on one of @Configuration
 
 ### What does @SpringBootApplication do?
 - = @Configuration + @ComponentScan + @EnableAutoConfiguration
+- root packagef for scan: its place implicitly defines a base “search package” for beans
 
 ### Does Spring Boot do component scanning? Where does it look by default?
 - @ComponentScan: Either basePackageClasses() or basePackages() (or its alias value()) may be specified to define specific packages to scan. If specific packages are not defined, scanning will occur from the package of the class that declares this annotation.
