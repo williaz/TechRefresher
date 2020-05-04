@@ -1,21 +1,22 @@
+## Menu
 - [Container (20%)](#Container-Dependency-and-IOC)
 
-- AOP (8%)
-- Security (6%)
+- [AOP (8%)](#AOP)
+- [Security (6%)](#Spring-Security)
 
-- JDBC (4%)
-- Transactions (8%)
-- JPA Spring Data (4%)
+- [JDBC (4%)](#JDBC)
+- [Transactions (8%)](#Transaction)
+- [JPA Spring Data (4%)](#Spring-Data-JPA)
 
-- MVC (8%)
-- REST (6%)
+- [MVC (8%)](#Spring-MVC-and-the-Web-Layer)
+- [REST (6%)](#REST)
 
-- Boot Into (8%)
-- Boot Autoconfig (8%)
-- Boot Actuator (8%)
-- Boot Testing (8%)
+- [Boot Into (8%)](#Spring-Boot-Intro)
+- [Boot Autoconfig (8%)](#Spring-Boot-Auto-Configuration)
+- [Boot Actuator (8%)](#Spring-Boot-Actuator)
+- [Boot Testing (8%)](#Spring-Boot-Testing)
 
-- Testing (4%)
+- [Testing (4%)](#Testing)
 
 ## Container, Dependency, and IOC
 
@@ -219,101 +220,6 @@ cannot be subclassed.
 - ${} construct that surrounds the name of the property
 - SpEL surrounded by the characters #{}.
 
-////////////////////////////////
-
-## Spring Security
-
-### Security
-- web: @EnableWebSecurity
-- method: @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-
-- springSecurityFilterChain
-  - filter
-  - responsible for all the security (protecting the application URLs, validating submitted username and passwords, redirecting to the log in form, etc) within your application.
-  - to register: @EnableWebSecurity
-- UserDetailsService
-- PasswordEncoder
-- HttpSecurity
-  - antMatcher, mvcMatcher
-  
-- SecurityContextHolder, to provide access to the SecurityContext.
-- SecurityContext, to hold the Authentication and possibly request-specific security information.
-- Authentication, to represent the principal in a Spring Security-specific manner.
-- GrantedAuthority, to reflect the application-wide permissions granted to a principal.
-- UserDetails, to provide the necessary information to build an Authentication object from your application’s DAOs or other source of security data.
-- UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
-
-```java
-Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-```
-
-
-### What are authentication and authorization? Which must come first?
-- Authentication: verify user
-- Authorization: permission
-
-### Is security a cross cutting concern? How is it implemented internally?
-- Spring Security, a security framework implemented with Spring AOP and servlet filters.
-  - provides declarative security
-  - web request level: servlet filter
-    - First of all a servlet filter of the type DelegatingFilterProxy is configured.
-    - The DelegatingFilterProxy delegates to a FilterChainProxy. The FilterChainProxy is defined as a Spring bean and takes one or more SecurityFilterChain instances as constructor parameter(s).
-    - A SecurityFilterChain associates a request URL pattern with a list of (security) filters.
-  - method invocation level: AOP
-
-## What is the delegating filter proxy?
-- implement javax.servlet.Filter
-- Spring’s DelegatingFilterProxy provides the link between web.xml and the application context.
-- DelegatingFilterProxy intercept requests coming into the application and delegate them to a bean whose ID is springSecurityFilterChain.
-- Proxy for a standard Servlet Filter, delegating to a Spring-managed bean that implements the Filter interface. 
-
-
-### What is the security filter chain?
-
-- springSecurityFilterChain bean is a FilterChainProxy. It’s a single filter that chains together one or more additional filters.
-- It maps a particular URL pattern to a list of filters built up from the bean names specified in the filters element, and combines them in a bean of type SecurityFilterChain. The pattern attribute takes an Ant Paths and the most specific URIs should appear first [7]. At runtime the FilterChainProxy will locate the first URI pattern that matches the current web request and the list of filter beans specified by the filters attribute will be applied to that request. The filters will be invoked in the order they are defined, so you have complete control over the filter chain which is applied to a particular URL.
-
-### What is a security context?
-
-- SecurityContextHolder, to provide access to the SecurityContext. default: ThreadLocal 
-- SecurityContext, to hold the Authentication and possibly request-specific security information.
-- Authentication, to represent the principal in a Spring Security-specific manner.
-- GrantedAuthority, to reflect the application-wide permissions granted to a principal.
-- UserDetails, to provide the necessary information to build an Authentication object from your application’s DAOs or other source of security data.
-- UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
-
-
-### What does the ** pattern in an antMatcher or mvcMatcher do?
-- ? matches one character
-- * one level, matches zero or more characters
-- ** all leve, matches zero or more 'directories' in a path
-
-### Why is the usage of mvcMatcher recommended over antMatcher?
-- mvcMatcher uses the same rules that Spring MVC uses for matching (when using @RequestMapping annotation).
-- antMatchers("/secured") matches only the exact /secured URL
-- mvcMatchers("/secured") matches /secured as well as /secured/, /secured.html, /secured.xyz
-
-### Does Spring Security support password hashing? What is salting?
-- Password hashing is the process of calculating a hash-value for a password.
-- PasswordEncoder
-- a salt is random data that is used as an additional input to a one-way function that hashes data, a password or passphrase. Salts are used to safeguard passwords in storage. 
-  - A new salt is randomly generated for each password. 
-
-### Why do you need method security? What type of object is typically secured at the method level (think of its purpose not its Java type).
-- service layer
-
-
-### What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
-- It is recommended to use the @PreAuthorize annotation in new applications over @Secured
-- RolesAllowed: only supports role-based security.
-
-### How are these annotations implemented?
-AOP pointcut
-
-### In which security annotation are you allowed to use SpEL?
-- 4: @PreAuthoriz2, @PostAuthorize, @PreFilter, @PostFilter
-
-
 ## AOP 
 - Spring AOP defaults to using standard JDK dynamic proxies(inteface), can use CGLIB proxies(subclass)
   - Spring JavaConfig requires CGLIB subclassing
@@ -436,6 +342,101 @@ group application behavior that was once spread throughout your applications int
 reusable modules. You can then declare exactly where and how this behavior is applied.
 This reduces code duplication and lets your classes focus on their main functionality.
 ```
+
+
+## Spring Security
+
+### Security
+- web: @EnableWebSecurity
+- method: @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+
+- springSecurityFilterChain
+  - filter
+  - responsible for all the security (protecting the application URLs, validating submitted username and passwords, redirecting to the log in form, etc) within your application.
+  - to register: @EnableWebSecurity
+- UserDetailsService
+- PasswordEncoder
+- HttpSecurity
+  - antMatcher, mvcMatcher
+  
+- SecurityContextHolder, to provide access to the SecurityContext.
+- SecurityContext, to hold the Authentication and possibly request-specific security information.
+- Authentication, to represent the principal in a Spring Security-specific manner.
+- GrantedAuthority, to reflect the application-wide permissions granted to a principal.
+- UserDetails, to provide the necessary information to build an Authentication object from your application’s DAOs or other source of security data.
+- UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
+
+```java
+Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+```
+
+
+### What are authentication and authorization? Which must come first?
+- Authentication: verify user
+- Authorization: permission
+
+### Is security a cross cutting concern? How is it implemented internally?
+- Spring Security, a security framework implemented with Spring AOP and servlet filters.
+  - provides declarative security
+  - web request level: servlet filter
+    - First of all a servlet filter of the type DelegatingFilterProxy is configured.
+    - The DelegatingFilterProxy delegates to a FilterChainProxy. The FilterChainProxy is defined as a Spring bean and takes one or more SecurityFilterChain instances as constructor parameter(s).
+    - A SecurityFilterChain associates a request URL pattern with a list of (security) filters.
+  - method invocation level: AOP
+
+## What is the delegating filter proxy?
+- implement javax.servlet.Filter
+- Spring’s DelegatingFilterProxy provides the link between web.xml and the application context.
+- DelegatingFilterProxy intercept requests coming into the application and delegate them to a bean whose ID is springSecurityFilterChain.
+- Proxy for a standard Servlet Filter, delegating to a Spring-managed bean that implements the Filter interface. 
+
+
+### What is the security filter chain?
+
+- springSecurityFilterChain bean is a FilterChainProxy. It’s a single filter that chains together one or more additional filters.
+- It maps a particular URL pattern to a list of filters built up from the bean names specified in the filters element, and combines them in a bean of type SecurityFilterChain. The pattern attribute takes an Ant Paths and the most specific URIs should appear first [7]. At runtime the FilterChainProxy will locate the first URI pattern that matches the current web request and the list of filter beans specified by the filters attribute will be applied to that request. The filters will be invoked in the order they are defined, so you have complete control over the filter chain which is applied to a particular URL.
+
+### What is a security context?
+
+- SecurityContextHolder, to provide access to the SecurityContext. default: ThreadLocal 
+- SecurityContext, to hold the Authentication and possibly request-specific security information.
+- Authentication, to represent the principal in a Spring Security-specific manner.
+- GrantedAuthority, to reflect the application-wide permissions granted to a principal.
+- UserDetails, to provide the necessary information to build an Authentication object from your application’s DAOs or other source of security data.
+- UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
+
+
+### What does the ** pattern in an antMatcher or mvcMatcher do?
+- ? matches one character
+- * one level, matches zero or more characters
+- ** all leve, matches zero or more 'directories' in a path
+
+### Why is the usage of mvcMatcher recommended over antMatcher?
+- mvcMatcher uses the same rules that Spring MVC uses for matching (when using @RequestMapping annotation).
+- antMatchers("/secured") matches only the exact /secured URL
+- mvcMatchers("/secured") matches /secured as well as /secured/, /secured.html, /secured.xyz
+
+### Does Spring Security support password hashing? What is salting?
+- Password hashing is the process of calculating a hash-value for a password.
+- PasswordEncoder
+- a salt is random data that is used as an additional input to a one-way function that hashes data, a password or passphrase. Salts are used to safeguard passwords in storage. 
+  - A new salt is randomly generated for each password. 
+
+### Why do you need method security? What type of object is typically secured at the method level (think of its purpose not its Java type).
+- service layer
+
+
+### What do @PreAuthorized and @RolesAllowed do? What is the difference between them?
+- It is recommended to use the @PreAuthorize annotation in new applications over @Secured
+- RolesAllowed: only supports role-based security.
+
+### How are these annotations implemented?
+AOP pointcut
+
+### In which security annotation are you allowed to use SpEL?
+- 4: @PreAuthoriz2, @PostAuthorize, @PreFilter, @PostFilter
+
+
 
 
 ## JDBC
