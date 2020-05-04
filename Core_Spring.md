@@ -27,9 +27,11 @@
   - @Autowared
     - In the case of a multi-arg constructor or method, the required() attribute is applicable to all arguments. Individual parameters may be declared as Java-8 style Optional or, as of Spring Framework 5.0, also as @Nullable or a not-null parameter type in Kotlin, overriding the base 'required' semantics.
     - By Name: @Autowired applies to fields, constructors, and multi-argument methods, allowing for narrowing through @Qualifier annotations at the parameter level. In contrast, **@Resource** is supported only for fields and bean property setter methods with a **single argument**.
-- @Configuration
+- [@Configuration](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html)
   - class level
   - a source of bean definitions
+  - no final class as CGLIB subclassing unless proxyBeanMethods flag is set to false
+  - nested config class must be static
 - Bean:
   - [@Bean](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html)
     - method-level, 
@@ -44,6 +46,10 @@
   - with @Qualifier, @Profile, @Scope, @Lazy, @DependsOn, @Primary, @Order
   - @Component: implicit
 - @Value
+  - PropertySourcesPlaceholderConfigurer: Specialization of **PlaceholderConfigurerSupport** thatresolves ${...} placeholders within bean definition property values and **@Value** annotations against the current Spring **Environment** and its set of **PropertySources**.
+  - @PropertySources: 
+    - add K:V to Environment
+    - JVM, env, JNDI, Servlet config/context init param, prop files
 
 ### What is dependency injection and what are the advantages?
 - IoC is also known as dependency injection (DI). It is a process whereby objects define their dependencies (that is, the other objects they work with) only through constructor **arguments**, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean. This process is fundamentally the inverse (hence the name, Inversion of Control) of the bean itself controlling the instantiation or location of its dependencies by using direct construction of classes or a mechanism such as the Service Locator pattern.
@@ -199,11 +205,11 @@ instantiated early in the Spring context creation process.
 cannot be subclassed.
 
 
-• How do you configure profiles? What are possible use cases where they might be useful?
-• Can you use @Bean together with @Profile?
-• Can you use @Component together with @Profile?
-• How many profiles can you have?
-
+### How do you configure profiles? What are possible use cases where they might be useful? Can you use @Bean together with @Profile? Can you use @Component together with @Profile? How many profiles can you have?
+- ```@Profile({"p1", "!p2"})``` only format: ```!, &, |```
+- conditionally enable or disable a complete @Configuration class or even individual @Bean methods, based on some arbitrary system state.
+- built on @Conditional
+- ```@Profile("default")```The default profile represents the profile that is enabled by default. 
 
 ### How do you inject scalar/literal values into Spring beans? What is @Value used for?
 - @Value("${personservice.retry-count}")
@@ -224,7 +230,9 @@ cannot be subclassed.
 - Spring AOP defaults to using standard JDK dynamic proxies(inteface), can use CGLIB proxies(subclass)
   - Spring JavaConfig requires CGLIB subclassing
 - aspect(advice + pointcut), joint point, waving
-- @EnableAspectJAutoProxy, @Aspect
+- - to enable @AspectJ support: aspectjweaver.jar
+- @EnableAspectJAutoProxy(enable JavaConfig), @Aspect
+
 
 ### What is the concept of AOP? Which problem does it solve? What is a cross cutting concern?
 - a crosscutting concern: functionality that affects multiple points of an application.
@@ -369,7 +377,17 @@ This reduces code duplication and lets your classes focus on their main function
 ```java
 Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 ```
-
+- Filter Ordering
+  - ChannelProcessingFilter, because it might need to redirect to a different protocol
+  - SecurityContextPersistenceFilter, so a SecurityContext can be set up in the SecurityContextHolder at the beginning of a web request, and any changes to the SecurityContext can be copied to the HttpSession when the web request ends (ready for use with the next web request)
+  - ConcurrentSessionFilter, because it uses the SecurityContextHolder functionality and needs to update the SessionRegistry to reflect ongoing requests from the principal
+  - Authentication processing mechanisms - UsernamePasswordAuthenticationFilter, CasAuthenticationFilter, BasicAuthenticationFilter etc - so that the SecurityContextHolder can be modified to contain a valid Authentication request token
+  - The SecurityContextHolderAwareRequestFilter, if you are using it to install a Spring Security aware HttpServletRequestWrapper into your servlet container
+  - The JaasApiIntegrationFilter, if a JaasAuthenticationToken is in the SecurityContextHolder this will process the FilterChain as the Subject in the JaasAuthenticationToken
+  - RememberMeAuthenticationFilter, so that if no earlier authentication processing mechanism updated the SecurityContextHolder, and the request presents a cookie that enables remember-me services to take place, a suitable remembered Authentication object will be put there
+  - AnonymousAuthenticationFilter, so that if no earlier authentication processing mechanism updated the SecurityContextHolder, an anonymous Authentication object will be put there
+  - ExceptionTranslationFilter, to catch any Spring Security exceptions so that either an HTTP error response can be returned or an appropriate AuthenticationEntryPoint can be launched
+  - FilterSecurityInterceptor, to protect web URIs and raise exceptions when access is denied
 
 ### What are authentication and authorization? Which must come first?
 - Authentication: verify user
@@ -440,6 +458,22 @@ AOP pointcut
 
 
 ## JDBC
+- JdbcTemplate
+  - Connection: It handles the **creation and release of resources**, which helps you avoid common errors such as forgetting to close the connection. 
+  - CRUD: It performs the basic tasks of the **core JDBC workflow** such as statement creation and execution, leaving application code to provide SQL and extract results. The JdbcTemplate class executes SQL queries, update statements and stored procedure calls, performs iteration over ResultSets and extraction of returned parameter values. 
+  - Excepotion: It also catches JDBC exceptions and translates them to the generic, more informative, exception hierarchy defined in the org.springframework.dao package.
+  - when use, only need to implement callback interfaces
+    - PreparedStatementCreator callback interface creates a prepared statement given a Connection provided by this class, providing SQL and any necessary parameters
+    - CallableStatementCreator interface, which creates callable statements
+    - RowCallbackHandler interface extracts values from each row of a ResultSet
+  - Instances of the JdbcTemplate class are **threadsafe** once configured
+  - The JdbcTemplate is **stateful**, in that it maintains a reference to a DataSource, but this state is not conversational state.
+- DataSource
+  - url, username, password, driverClassName
+  - **DriverManagerDataSource** class should only be used for testing purposes since it provides **no pooling** and will perform poorly when multiple requests for a connection are made.
+- DataSourceTransactionManager class is a PlatformTransactionManager implementation for single JDBC datasources. It binds a JDBC connection from the specified data source to the currently executing thread, potentially allowing for one thread connection per data source.
+
+  
 ### What is the difference between checked and unchecked exceptions?
 - The class java.lang.Exception and its subclasses, except for java.lang.RuntimeException and any
 subclass of RuntimeException, are checked exceptions.
@@ -682,7 +716,10 @@ public @interface AccountTx {
 
 ### What does declarative transaction management mean?
 - It keeps transaction management out of business logic and is not difficult to configure. 
-
+- Programmatic transaction management 
+  - small tranx ops
+  - Being able to **set the transaction name explicitly** is also something that can only be done using the programmatic approach to transaction management.
+  
 ### What is the default rollback policy? How can you override it?
 
 - The recommended way to indicate to the Spring Framework’s transaction infrastructure that a transaction’s work is to be rolled back is to throw an Exception from code that is currently executing in the context of a transaction.
@@ -787,8 +824,17 @@ public void resolvePosition() {
 
 ### What is @Query used for?
 - to provide Spring Data with the query that should be performed.
+- allows for running **native queries** by setting the nativeQuery flag to true
+- By default, Spring Data JPA uses position-based parameter binding(?1), but you can use @Param annotation to give a method parameter a concrete name and bind the name in the query(:name)
 ```
-@Query("select p from Person p where p.emailAddress = ?1")
+  @Query(value = "SELECT * FROM USERS WHERE EMAIL_ADDRESS = ?1", nativeQuery = true)
+  User findByEmailAddress(String emailAddress);
+  
+  @Query("select p from Person p where p.emailAddress = ?1")
+
+  @Query("select u from User u where u.firstname = :firstname or u.lastname = :lastname")
+  User findByLastnameOrFirstname(@Param("lastname") String lastname,
+                                 @Param("firstname") String firstname);
 ```
 ## Testing
 
