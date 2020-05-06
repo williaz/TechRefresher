@@ -18,6 +18,8 @@
 
 - [Testing (4%)](#Testing)
 
+- One of the central tenets of the Spring Framework is that of non-invasiveness
+
 ## Container, Dependency, and IOC
 
 ### Core
@@ -46,6 +48,7 @@
   - with @Qualifier, @Profile, @Scope, @Lazy, @DependsOn, @Primary, @Order
   - @Component: implicit
 - @Value
+  - at the field or method/constructor parameter level
   - PropertySourcesPlaceholderConfigurer: Specialization of **PlaceholderConfigurerSupport** thatresolves ${...} placeholders within bean definition property values and **@Value** annotations against the current Spring **Environment** and its set of **PropertySources**.
   - @PropertySources: 
     - add K:V to Environment
@@ -227,12 +230,31 @@ cannot be subclassed.
 - SpEL surrounded by the characters #{}.
 
 ## AOP 
-- Spring AOP defaults to using standard JDK dynamic proxies(inteface), can use CGLIB proxies(subclass)
+- Spring AOP uses either JDK dynamic proxies or CGLIB to create the proxy for a given target object. JDK dynamic proxies are built into the JDK, whereas CGLIB is a common open-source class definition library (repackaged into spring-core).
+  - If the target object to be proxied implements at least one interface, a JDK dynamic proxy is used. All of the interfaces implemented by the target type are proxied. If the target object does not implement any interfaces, a CGLIB proxy is created.
+  - force use CGLIB: ```<aop:config proxy-target-class="true">```
+  - due to the proxy-based nature of Spring’s AOP framework, **calls within** the target object are, by definition, not intercepted. 
+    - For JDK proxies, only **public** interface method calls on the proxy can be intercepted. 
+    - With CGLIB, **public and protected** method calls on the proxy are intercepted (and even package-visible methods, if necessary). 
+    - common interactions through proxies should always be designed through public signatures.
   - Spring JavaConfig requires CGLIB subclassing
-- aspect(advice + pointcut), joint point, waving
-- - to enable @AspectJ support: aspectjweaver.jar
+
+- Aspect
+  - A modularization of a concern that cuts across multiple classes
+  - (advice + pointcut)
+    - Advice: interceptor
+    - [Pointcut](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#aop-pointcuts-examples): predicate, the method serving as the pointcut signature must have a **void** return type
+    
+- Joint point
+ - A point during the execution of a program
+ - Spring AOP: always emthod execution
+- waving: linking aspects to adviced obj
+  - Spring AOP: at runtime
+- to enable @AspectJ support: aspectjweaver.jar
 - @EnableAspectJAutoProxy(enable JavaConfig), @Aspect
 
+- Using the most specific(leasst powerful) advice type provides a simpler programming model with less potential for errors. For example, you do not need to invoke the proceed() method on the JoinPoint used for around advice, and, hence, you cannot fail to invoke it.
+- All advice parameters are statically typed
 
 ### What is the concept of AOP? Which problem does it solve? What is a cross cutting concern?
 - a crosscutting concern: functionality that affects multiple points of an application.
@@ -247,10 +269,14 @@ cannot be subclassed.
 - Inheritance can lead to a **brittle object hierarchy** if the same base class is used throughout an application
 - Delegation can be **cumbersome** because complicated calls to the delegate object may be required.
 
+- 1. code tangling: a coupling of concerns
+- 2. code scattering: same concern spread across modules
+
 ### What is a pointcut, a join point, an advice, an aspect, weaving?
 - Advice: the **task** of an aspect
   - Advice defines both the what and the when of an aspect
   - Spring: Advice take place when: Before, After, After-returning, After-throwing, Around
+    - After-throwing won't stop exception from propagating, Around can
   - The ordering of advice is controlled through the Ordered interface.
 - A join point is a point in the execution of the application where an aspect can be plugged in.
   - These are the points where your aspect’s code can be **inserted** into the normal flow of your application to add new behavior.
@@ -288,7 +314,8 @@ cannot be subclassed.
   - only piblic or protected method got proxied
 
 ### What visibility must Spring bean methods have to be proxied using Spring AOP?
-- public, from ooutside bean
+- public, from outside bean
+- only apply aspects to Bean
 
 ### How many advice types does Spring support. Can you name each one? What are they used for? Which two advices can you use if you would like to try and catch exceptions?
 - @After; return or throw
@@ -336,7 +363,7 @@ trackCounts.put(trackNumber, currentCount + 1);
 ```java
 execution(* concert.Performance.perform(..)&& within(concert.*)))  // * any return type; .. any args; in concert package
 ```
-
+- externalizing expressions into one dedicated class like SystemArchitecture
 ### What is the JoinPoint argument used for?
 - first arg for @After, @AfterReturning, @AfterThrowing, @Before if use
 - get JoinPoint method info like joinPoint.getSignature(), Object[] joinPoint.getArgs()
@@ -564,7 +591,10 @@ this.jdbcTemplate.update(
 this.jdbcTemplate.update(
         "delete from t_actor where id = ?",
         Long.valueOf(actorId));	
-	
+// stored procedure
+this.jdbcTemplate.update(
+        "call SUPPORT.REFRESH_ACTORS_SUMMARY(?)",
+        Long.valueOf(unionId));	
 this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))");
 ```
 
@@ -1323,6 +1353,13 @@ JsonPath: XPath for JSON.
 - mostly not, but with some Spring mock obj
 - POJO with new and mock for insolation
 - quick as  there is no runtime infrastructure to set up
+
+- Mock obj
+  - Environment
+  - JNDI
+  - Servlet API
+  - Reactive
+
 - MockEnvironment and MockPropertySource are useful for developing out-of-container tests for code that depends on environment-specific properties.
 - To unit test your Spring MVC Controller classes as POJOs, use ModelAndViewAssert combined with MockHttpServletRequest, MockHttpSession
 
