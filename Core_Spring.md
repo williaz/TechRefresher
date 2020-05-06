@@ -1349,6 +1349,26 @@ JsonPath: XPath for JSON.
 
 ## Testing
 
+- TDD
+  - dev with well defined requirement in the test form
+  - faster, confidence, refactoring, make you think about your design(if hard to test, reconsider), focus on what matters, find bug quick and early
+- Unit Testing
+  - tests on func, minimal dep, env isolation(like spring)
+  - impl:
+    - Stubs: sample test impl
+    - Mocks: gen on startup time
+    
+  
+- Integration testing
+  - interaction of units
+  - intg infrastructure
+  - Spring:
+    - spring-test.jar
+    - SpringJUnit4ClassRunner: caches a shared ApplicatonContext across test methods
+      - @DirtiesContext on method
+    - @ActiveProfiles inside Test class, @Profile in @Configuration
+
+
 ### Do you use Spring in a unit test?
 - mostly not, but with some Spring mock obj
 - POJO with new and mock for insolation
@@ -1389,7 +1409,13 @@ To supply Spring-specific base classes that assist developers in writing integra
 - Mockito and EasyMock allows for dynamic creation of mock objects that can be used to mock collaborators of class(es) under test that are external to the system or trusted.
 - you may have a facade over some remote service that is unavailable during development. Mocking can also be useful when you want to simulate failures that might be hard to trigger in a real environment.
 
-
+- 1. used a mocking lib to genrate a mock
+  - impl the dep interface on-the-fly
+- 2. record the mock with expoectation of how be used for a scenario
+  - what method will be called
+  - what return value
+- 3. exercise the scenario
+- 4. verify mock expectation were met
 
 ### How is @ContextConfiguration used?
 - @ContextConfiguration defines **class-level** metadata that is used to determine how to load and configure an **ApplicationContext** for integration tests. Specifically, @ContextConfiguration declares the application context **resource locations or the component classes** used to load the context.
