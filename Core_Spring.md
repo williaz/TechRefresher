@@ -1308,10 +1308,14 @@ public class MyHealthIndicator implements HealthIndicator {
 - built-in, visualizing, central metirx, traces, logs
 
 ### Spring Boot Testing
+- Test support is provided by two modules: spring-boot-test contains core items, and spring-boot-test-autoconfigure supports auto-configuration for tests.
 
-• When do you want to use @SpringBootTest annotation?
 
-• What does @SpringBootTest auto-configure?
+### When do you want to use @SpringBootTest annotation?
+- an alternative to the standard spring-test @ContextConfiguration annotation when you need Spring Boot features. 
+- works by creating the ApplicationContext used in your tests through SpringApplication.
+
+### What does @SpringBootTest auto-configure?
 
 ### What dependencies does spring-boot-starter-test brings to the classpath?
 ```
@@ -1403,6 +1407,7 @@ To supply Spring-specific base classes that assist developers in writing integra
 
 ### When and where do you use @Transactional in testing?
 - Annotating a test method with @Transactional causes the test to be run within a transaction that is, by default, automatically rolled back after completion of the test. If a test class is annotated with @Transactional, each test method within that class hierarchy runs within a transaction. 
+- If your test is @Transactional, it rolls back the transaction at the end of each test method by default. However, as using this arrangement with either RANDOM_PORT or DEFINED_PORT implicitly provides a real servlet environment, the HTTP client and server run in separate threads and, thus, in separate transactions. Any transaction initiated on the server does not roll back in this case.
 
 ### How are mock frameworks such as Mockito or EasyMock used?
 - A mock object produces **predetermined results** when methods on the object are invoked.
