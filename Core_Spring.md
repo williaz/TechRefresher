@@ -29,6 +29,8 @@
   - @Autowared
     - In the case of a multi-arg constructor or method, the required() attribute is applicable to all arguments. Individual parameters may be declared as Java-8 style Optional or, as of Spring Framework 5.0, also as @Nullable or a not-null parameter type in Kotlin, overriding the base 'required' semantics.
     - By Name: @Autowired applies to fields, constructors, and multi-argument methods, allowing for narrowing through @Qualifier annotations at the parameter level. In contrast, **@Resource** is supported only for fields and bean property setter methods with a **single argument**.
+    - can apply to Map as long as String key type
+    - only 1 attr: required
 - [@Configuration](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html)
   - class level
   - a source of bean definitions
@@ -135,6 +137,9 @@ application.
 - When defining a BeanPostProcessor or a BeanFactoryPostProcessor using an @Bean annotated
 method, it is recommended that the method is static, in order for the post-processor to be
 instantiated early in the Spring context creation process.
+- you may declare @Bean methods as static, allowing for them to be **called without creating their containing configuration** class as an instance. This makes particular sense when defining post-processor beans, e.g. of type BeanFactoryPostProcessor or BeanPostProcessor, since such beans will get initialized early in the container lifecycle and should avoid triggering other parts of the configuration at that point.
+
+- Note that calls to static @Bean methods will **never get intercepted** by the container, not even within @Configuration classes (see above). This is due to technical limitations: CGLIB subclassing can only override non-static methods.As a consequence, a direct call to another @Bean method will have standard Java semantics, resulting in an independent instance being returned straight from the factory method itself.
 
 ### What is a ProperySourcesPlaceholderConfigurer used for?
 - Spring bean configuration can be externalized into property files.
@@ -243,10 +248,13 @@ cannot be subclassed.
   - A modularization of a concern that cuts across multiple classes
   - (advice + pointcut)
     - Advice: interceptor
+      - Around
+        - The **first parameter** of the advice method must be of type ProceedingJoinPoint.
+	- Note that proceed may be invoked **once, many times, or not at all** within the body of the around advice, all of these are quite legal.
     - [Pointcut](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#aop-pointcuts-examples): predicate, the method serving as the pointcut signature must have a **void** return type
     
 - Joint point
- - A point during the execution of a program
+ - A stage during the execution of a program
  - Spring AOP: always emthod execution
 - waving: linking aspects to adviced obj
   - Spring AOP: at runtime
@@ -384,6 +392,7 @@ This reduces code duplication and lets your classes focus on their main function
 ### Security
 - web: @EnableWebSecurity
 - method: @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+  - @Secured, @RolesAllowed, @PreAuthoriz, @PostAuthorize, @PreFilter, @PostFilter
 
 - springSecurityFilterChain
   - filter
@@ -479,7 +488,7 @@ Object principal = SecurityContextHolder.getContext().getAuthentication().getPri
 AOP pointcut
 
 ### In which security annotation are you allowed to use SpEL?
-- 4: @PreAuthoriz2, @PostAuthorize, @PreFilter, @PostFilter
+- 4: @PreAuthoriz, @PostAuthorize, @PreFilter, @PostFilter
 
 
 
@@ -636,6 +645,8 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
     - Read-only
   - PlatformTransactionManager implementations normally require knowledge of the environment in which they work: JDBC, JTA, Hibernate, and so on.
     - transactionManager drive advice
+    - The **DataSourceTransactionManager** class is a PlatformTransactionManager implementation for single JDBC datasources. It binds a JDBC connection from the specified data source to the currently executing thread, potentially allowing for one thread connection per data source.
+    - **JpaTransactionManager**: ```txManager.setEntityManagerFactory(entityManagerFactory)```
 - Programmatic transaction management
   - Using the TransactionTemplate.
     - write a TransactionCallback implementation to execute code in the context of a transaction. 
@@ -854,7 +865,9 @@ public void resolvePosition() {
 
 ### What is @Query used for?
 - to provide Spring Data with the query that should be performed.
+- Queries annotated to the query method take precedence over queries defined using **@NamedQuery** or named queries declared in **orm.xml**.
 - allows for running **native queries** by setting the nativeQuery flag to true
+  - **can't use Sort, but Pageable**: Spring Data JPA does not currently support dynamic sorting for native queries, because it would have to manipulate the actual query declared, which it cannot do reliably for native SQL. You can, however, use native queries for pagination by specifying the count query yourself
 - By default, Spring Data JPA uses position-based parameter binding(?1), but you can use @Param annotation to give a method parameter a concrete name and bind the name in the query(:name)
 ```
   @Query(value = "SELECT * FROM USERS WHERE EMAIL_ADDRESS = ?1", nativeQuery = true)
@@ -870,6 +883,7 @@ public void resolvePosition() {
 ## Spring MVC and the Web Layer
 
 ### Web MVC
+- InternalResourceViewResolver: JSP
 ```xml
 <web-app>
     <!-- Configure ContextLoaderListener to use AnnotationConfigWebApplicationContext
@@ -999,6 +1013,9 @@ public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServl
 
 
 ## REST
+- PUT and DELETE is idempotent, not safe
+- POST and PATCH not idepotent
+
 ### What does REST stand for? What is a resource?
 
 - REpresentational State Transfer
@@ -1017,6 +1034,20 @@ style allows for scaling a REST web service.
 
 ### Which HTTP methods does REST use?
 - POST, GET, PUT, DELETE
+
+```
+
+Method	Idempotent	Safe
+OPTIONS	yes	yes
+GET	yes	yes
+HEAD	yes	yes
+PUT	yes	no
+POST	no	no
+DELETE	yes	no
+PATCH	no	no
+
+```
+
 
 ### What is an HttpMessageConverter?
 - Convert a HttpInputMessage to an object of specified type.
@@ -1162,7 +1193,8 @@ public class ReadingListServletInitializer extends SpringBootServletInitializer 
 - logging.level.
 - logging.pattern.
 
-- By default, if you use the “Starters”, Logback is used for logging. 
+- Spring Boot uses Commons Logging(abstraction) for all internal logging but leaves the underlying log implementation open.
+- By default, if you use the “Starters”, Logback is used for logging. (support impl like Java Util Logging, Log4J2 and Logback.)
 - Console-output: By default, ERROR-level, WARN-level, and INFO-level messages are logged. 
   - ```$ java -jar myapp.jar --debug```
   - You can also specify debug=true in your application.properties.
