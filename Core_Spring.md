@@ -32,10 +32,11 @@
     - can apply to Map as long as String key type
     - only 1 attr: required
 - [@Configuration](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html)
-  - class level
+  - a class level @Component
   - a source of bean definitions
   - no final class as CGLIB subclassing unless proxyBeanMethods flag is set to false
   - nested config class must be static
+  - ```@Import({ServiceConfig.class, RepositoryConfig.class})```
 - Bean:
   - [@Bean](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html)
     - method-level, 
@@ -48,6 +49,12 @@
     
   - lifecycle(callback)
   - with @Qualifier, @Profile, @Scope, @Lazy, @DependsOn, @Primary, @Order
+    - @Profile({"p1", "production & (us-east | eu-central)", "!p2"}): You cannot mix the & and | operators without using parentheses. 
+    - Your target beans can implement the org.springframework.core.Ordered interface or use the @Order or standard @Priority annotation if you want items in the array or list to be sorted in a specific order. 
+    - @Priority not on method level
+    - @Order
+      - class or method level
+      - may influence priorities at injection points, but not influence singleton startup order 
   - @Component: implicit
 - @Value
   - at the field or method/constructor parameter level
@@ -85,7 +92,11 @@ Application-layer specific contexts such as the WebApplicationContext for use in
   - listener-class: The Spring ContextLoaderListener creates the root Spring web application context of a web
 application.
   - servlet: DispatcherServlet
-
+- Boot: ```ConfigurableApplicationContext context = SpringApplication.run(MySpringConfiguration.class, args);``` with config in application.properties
+```
+ctx.getBean(name, Type.class)
+ctx.getBean(Type.class)
+```
 ### Can you describe the lifecycle of a Spring Bean in an ApplicationContext?
 - the bean is instantiated (if it is not a pre-instantiated singleton), 
 - its dependencies are set
@@ -153,6 +164,21 @@ instantiated early in the Spring context creation process.
   - Applies exception translation to Spring beans annotated with the @Repository annotation.
 - @Autowired, @Inject, @Resource, and @Value annotations are handled by Spring BeanPostProcessor implementations which in turn means that you cannot apply these annotations within your own BeanPostProcessor or BeanFactoryPostProcessor types 
 
+- the Spring Framework uses BeanPostProcessor implementations to process bean lifecycle callback
+- scoped per-container
+```java
+public interface BeanPostProcessor {
+    @Nullable
+    default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Nullable
+    default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+}
+```
 ### What is an initialization method and how is it declared on a Spring bean?
 - after all prop set and before in use, 3 options in order
 - 1. @PostConstruct
