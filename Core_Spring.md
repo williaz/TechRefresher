@@ -711,7 +711,7 @@ txManager.commit(status);
 - yes, TransactionAwareDataSourceProxy.
 
 ###  What is a transaction isolation level? How many do we have and how are they ordered?
-- determine how the changes within a transaction are visible to other users and systems accessing the database prior to the transaction being committed.
+- determine how the changes within a transaction are **visible to other users** and systems accessing the database prior to the transaction being committed.
 - Serializable
   - highest isolcation level
   - read, write, range-lock(if have select where)
@@ -880,7 +880,7 @@ public void resolvePosition() {
   - property expression: And Or
   - comparison opt: LessThan, GreaterThans, Between, like
   - orderer: OrderBy, Asc, desc
-- Spring Data allows for four verbs in the method name: get, read, find, and count.
+- Spring Data allows for four verbs in the method name: **get, read, find, and count**.
 - parameter names are irrelevant, but they must be ordered to match up with the method name’s comparators
 
 
@@ -894,6 +894,7 @@ public void resolvePosition() {
 - allows for running **native queries** by setting the nativeQuery flag to true
   - **can't use Sort, but Pageable**: Spring Data JPA does not currently support dynamic sorting for native queries, because it would have to manipulate the actual query declared, which it cannot do reliably for native SQL. You can, however, use native queries for pagination by specifying the count query yourself
 - By default, Spring Data JPA uses position-based parameter binding(?1), but you can use @Param annotation to give a method parameter a concrete name and bind the name in the query(:name)
+  - As of version 4, Spring fully supports Java 8’s parameter name discovery based on the **-parameters** compiler flag. By using this flag in your build as an alternative to debug information, you can **omit** the @Param annotation for named parameters.
 ```
   @Query(value = "SELECT * FROM USERS WHERE EMAIL_ADDRESS = ?1", nativeQuery = true)
   User findByEmailAddress(String emailAddress);
@@ -993,7 +994,7 @@ public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServl
 
 ###  What is a web application context? What extra scopes does it offer?
 - DispatcherServlet expects a WebApplicationContext, an extension of a plain ApplicationContext, for its own configuration. WebApplicationContext has a link to the ServletContext and Servlet it is associated with. It is also bound to the ServletContext such that applications can use static methods on RequestContextUtils to look up the WebApplicationContext if they need access to it.
-- request, session, applcation(per ServletContext)
+- request, session, applcation(per ServletContext), websocket
 
 ### What is the @Controller annotation used for?
 - stereotype of @Component
@@ -1005,13 +1006,6 @@ public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServl
 ### What is the difference between @RequestMapping and @GetMapping?
 - @RequestMapping: by default matches to all HTTP methods, class level
 - @GetMapping: shortcut for GET
-```
-? matches one character
-
-* matches zero or more characters within a path segment
-
-** match zero or more path segments
-```
 
 
 ### What is @RequestParam used for?
@@ -1020,15 +1014,18 @@ public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServl
 ### What are the differences between @RequestParam and @PathVariable?
 - map different parts of request URLs: query param VS url
 
-### What are some of the parameter types for a controller method? What other annotations might you use on a controller method parameter? (You can ignore form-handling annotations for this exam)
+### [What are some of the parameter types for a controller method? What other annotations might you use on a controller method parameter? (You can ignore form-handling annotations for this exam)](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/web.html#mvc-ann-arguments)
 
 - javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.http.HttpSession, java.security.Principal
 - java.io.InputStream, java.io.Reader, java.io.OutputStream, java.io.Writer: raw req/respo body
+- Map, Model, ModelMap
+- Errors, BindingResult
 - @RequestParam, @MatrixVariable, @PathVariable, @RequestHeader, @CookieValue, @RequestPart multipart, @ModelAttribute
 
 ### What are some of the valid return types of a controller method?
 - HttpEntity<E>, ResponseEntity<E>, HttpHeaders
 - String, View, ModelAndView
+- Map, Model, ModelAndView
 - @ResponseBody, @ModelAttribute
 - void
   - A method with a void return type (or null return value) is considered to have fully handled the response if it also has a ServletResponse, or an OutputStream argument, or an @ResponseStatus annotation. The same is true also if the controller has made a positive ETag or lastModified timestamp check (see Controllers for details).
@@ -1085,7 +1082,7 @@ PATCH	no	no
 - server however is not aware of state
 
 ### What does @RequestMapping do?
-- consumes, headers, method(HTTP), params, path, produces
+- consumes, headers, method(HTTP), params, path(value), produces
 
 ### Is @Controller a stereotype? Is @RestController a stereotype? What is a stereotype annotation? What does that mean? What is the difference between @Controller and @RestController?
 - yes
@@ -1114,7 +1111,7 @@ PATCH	no	no
 - spring-boot-starter-web
 
 ### What are the advantages of the RestTemplate?
-- synchronous HTTP client that simplifies sending requests and also enforces RESTful principles.
+- **synchronous** HTTP client that simplifies sending requests and also enforces RESTful principles.
 
 ### If you saw an example using RestTemplate would you understand what it is doing?
 - URI templates are automatically encoded
@@ -1518,7 +1515,7 @@ class MyWebTests {
 - used as an alternative to the standard spring-test @ContextConfiguration annotation when you need Spring Boot features. The annotation works by creating the ApplicationContext used in your tests through SpringApplication. 
 - Searches for a @SpringBootConfiguration
 - custom Environment properties to be defined using the properties attribute
-- if with JUnit4, also add @RunWith(SpringRunner.class); 5 not need
+- if with JUnit4, also add **@RunWith(SpringRunner.class)**; 5 not need
 - webEnvironment
   - MOCK(default): mocj web env
   - RANDOM_PORT, DEFINED_PORT: embedded server started
