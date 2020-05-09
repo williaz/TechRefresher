@@ -27,9 +27,9 @@
 - BeanFactoryPostProcesser
 - BeanPostProcessor
   - @Autowared
-    - In the case of a multi-arg constructor or method, the required() attribute is applicable to all arguments. Individual parameters may be declared as Java-8 style Optional or, as of Spring Framework 5.0, also as @Nullable or a not-null parameter type in Kotlin, overriding the base 'required' semantics.
-    - By Name: @Autowired applies to fields, constructors, and multi-argument methods, allowing for narrowing through @Qualifier annotations at the parameter level. In contrast, **@Resource** is supported only for fields and bean property setter methods with a **single argument**.
-    - can apply to Map as long as String key type
+    - In the case of a multi-arg constructor or method, the required() attribute is applicable to **all arguments**. Individual parameters may be declared as Java-8 style Optional or, as of Spring Framework 5.0, also as @Nullable or a not-null parameter type in Kotlin, overriding the base 'required' semantics.
+    - By Name: @Autowired applies to fields, constructors, and multi-argument methods, allowing for narrowing through @Qualifier annotations at the parameter level. In contrast, **@Resource**（by name） is supported only for fields and bean property setter methods with a **single argument**.
+    - can apply to Map as long as **String key** type
     - only 1 attr: required
 - [@Configuration](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html)
   - a class level @Component
@@ -41,7 +41,7 @@
   - [@Bean](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html)
     - method-level, 
     - used in @Configuration or @Component; 
-      - lit mode(not in @config): general-purpose factory method, cannot declare inter-bean dependencies
+      - lite mode(not in @config): general-purpose factory method, cannot declare inter-bean dependencies
     - to register bean definition in IoC
     - @Bean({"dataSource", "subsystemA-dataSource"}) or method’s name 
   - scope
@@ -58,7 +58,7 @@
   - @Component: implicit
 - @Value
   - at the field or method/constructor parameter level
-  - PropertySourcesPlaceholderConfigurer: Specialization of **PlaceholderConfigurerSupport** thatresolves ${...} placeholders within bean definition property values and **@Value** annotations against the current Spring **Environment** and its set of **PropertySources**.
+  - PropertySourcesPlaceholderConfigurer: Specialization of **PlaceholderConfigurerSupport** that resolves ${...} placeholders within bean definition property values and **@Value** annotations against the current Spring **Environment** and its set of **PropertySources**.
   - @PropertySources: 
     - add K:V to Environment
     - JVM, env, JNDI, Servlet config/context init param, prop files
@@ -92,10 +92,11 @@ Application-layer specific contexts such as the WebApplicationContext for use in
   - listener-class: The Spring ContextLoaderListener creates the root Spring web application context of a web
 application.
   - servlet: DispatcherServlet
-- Boot: ```ConfigurableApplicationContext context = SpringApplication.run(MySpringConfiguration.class, args);``` with config in application.properties
+- Boot: SpringApplication.run() with config in application.properties
 ```
-ctx.getBean(name, Type.class)
-ctx.getBean(Type.class)
+ConfigurableApplicationContext context = SpringApplication.run(MySpringConfiguration.class, args);
+context.getBean(name, Type.class)
+context.getBean(Type.class)
 ```
 ### Can you describe the lifecycle of a Spring Bean in an ApplicationContext?
 - the bean is instantiated (if it is not a pre-instantiated singleton), 
@@ -140,14 +141,12 @@ ctx.getBean(Type.class)
 ### What is a BeanFactoryPostProcessor and what is it used for? When is it invoked? 
 - only modify bean meta-data
 - scoped per-container
-- the Spring IoC container allows a BeanFactoryPostProcessor to read the configuration metadata and potentially change it **before the container instantiates any beans** other than BeanFactoryPostProcessors.
+- the Spring IoC container allows a BeanFactoryPostProcessor to read the configuration metadata and potentially change it **before the container instantiates any beans** other than BeanPostProcessors.
 - ex: PropertySourcesPlaceholderConfigurer
 
 ### Why would you define a static @Bean method?
 - to be created before other beans
-- When defining a BeanPostProcessor or a BeanFactoryPostProcessor using an @Bean annotated
-method, it is recommended that the method is static, in order for the post-processor to be
-instantiated early in the Spring context creation process.
+- When defining a BeanPostProcessor or a BeanFactoryPostProcessor using an @Bean annotated method, it is recommended that the method is static, in order for the post-processor to be instantiated early in the Spring context creation process.
 - you may declare @Bean methods as static, allowing for them to be **called without creating their containing configuration** class as an instance. This makes particular sense when defining post-processor beans, e.g. of type BeanFactoryPostProcessor or BeanPostProcessor, since such beans will get initialized early in the container lifecycle and should avoid triggering other parts of the configuration at that point.
 
 - Note that calls to static @Bean methods will **never get intercepted** by the container, not even within @Configuration classes (see above). This is due to technical limitations: CGLIB subclassing can only override non-static methods.As a consequence, a direct call to another @Bean method will have standard Java semantics, resulting in an independent instance being returned straight from the factory method itself.
@@ -287,7 +286,7 @@ cannot be subclassed.
 - to enable @AspectJ support: aspectjweaver.jar
 - @EnableAspectJAutoProxy(enable JavaConfig), @Aspect
 
-- Using the most specific(leasst powerful) advice type provides a simpler programming model with less potential for errors. For example, you do not need to invoke the proceed() method on the JoinPoint used for around advice, and, hence, you cannot fail to invoke it.
+- Using the most specific(least powerful) advice type provides a simpler programming model with less potential for errors. For example, you do not need to invoke the proceed() method on the JoinPoint used for around advice, and, hence, you cannot fail to invoke it.
 - All advice parameters are statically typed
 
 ### What is the concept of AOP? Which problem does it solve? What is a cross cutting concern?
@@ -474,7 +473,7 @@ Object principal = SecurityContextHolder.getContext().getAuthentication().getPri
 ### What is the security filter chain?
 
 - springSecurityFilterChain bean is a FilterChainProxy. It’s a single filter that chains together one or more additional filters.
-- It maps a particular URL pattern to a list of filters built up from the bean names specified in the filters element, and combines them in a bean of type SecurityFilterChain. The pattern attribute takes an Ant Paths and the most specific URIs should appear first [7]. At runtime the FilterChainProxy will locate the first URI pattern that matches the current web request and the list of filter beans specified by the filters attribute will be applied to that request. The filters will be invoked in the order they are defined, so you have complete control over the filter chain which is applied to a particular URL.
+- It maps a particular URL pattern to a list of filters built up from the bean names specified in the filters element, and combines them in a bean of type SecurityFilterChain. The pattern attribute takes an Ant Paths and the most specific URIs should appear first. At runtime the FilterChainProxy will locate the first URI pattern that matches the current web request and the list of filter beans specified by the filters attribute will be applied to that request. The filters will be invoked in the order they are defined, so you have complete control over the filter chain which is applied to a particular URL.
 
 ### What is a security context?
 
@@ -572,7 +571,7 @@ spring.datasource.password=
 - The process itself is fixed; it never changes.
 
 ### What is a callback? What are the three JdbcTemplate callback interfaces that can be used with queries? What is each used for? (You would not have to remember the interface names in the exam, but you should know what they do if you see them in a code sample).
-- a callback, also known as a "call-after"[1] function, is any executable code that is passed as an argument to other code; that other code is expected to call back (execute) the argument at a given time. This execution may be immediate as in a synchronous callback, or it might happen at a later time as in an asynchronous callback.
+- a callback, also known as a "call-after" function, is any executable code that is passed as an argument to other code; that other code is expected to call back (execute) the argument at a given time. This execution may be immediate as in a synchronous callback, or it might happen at a later time as in an asynchronous callback.
 - ResultSetExtractor: Allows for processing of an entire result set, possibly consisting multiple rows of data, at once.
 - RowCallbackHandler: Allows for processing rows in a result set one by one typically accumulating some type of result.
 - RowMapper: Allows for processing rows in a result set one by one and creating a Java object for each row.
@@ -637,13 +636,13 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
 - @EnableTransactionManagement
 - @Transactional
   - value(txn manager), propagation, isolation, readonly, timeout, 
-  - rollbackFor rollbackForClassName, noRollbackFor, noRollbackForClassName: Throwable
+  - rollbackFor rollbackForClassName, noRollbackFor, noRollbackForClassName: for Throwable
 - progation, isolation, rollback
 
 - The combination of AOP with transactional metadata yields an AOP proxy that uses a TransactionInterceptor in conjunction with an appropriate PlatformTransactionManager implementation to drive transactions around method invocations.
 
 ### What is a transaction? What is the difference between a local and a global transaction?
-- A transaction is an operation that consists of a number of tasks that takes place as **a single unit – either all** tasks are performed or no tasks are performed.
+- A transaction is an operation that consists of a number of tasks that takes place as **a single unit – either all or no**  tasks  are performed.
   - ACID
     - Atomicity: all or nothing
     - Consistency: no violation
