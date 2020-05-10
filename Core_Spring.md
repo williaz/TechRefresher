@@ -31,6 +31,7 @@
     - By Name: @Autowired applies to fields, constructors, and multi-argument methods, allowing for narrowing through @Qualifier annotations at the parameter level. In contrast, **@Resource**（by name） is supported only for fields and bean property setter methods with a **single argument**.
     - can apply to Map as long as **String key** type
     - only 1 attr: required
+    - @Inject always required
 - [@Configuration](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html)
   - a class level @Component
   - a source of bean definitions
@@ -62,6 +63,20 @@
   - @PropertySources: 
     - add K:V to Environment
     - JVM, env, JNDI, Servlet config/context init param, prop files
+- Lifecycle
+  - 1. Load Bean definitions
+    - process @Configuration, scan @Component
+    - Beand def added to BeanFactory
+    - invoke BeanFactoryPostProcessor to modify bean def before obj created
+  - 2. Initialize bean instance (for each bean)
+    - instantiated in right orser
+    - dep injection
+    - BeanPostProcessor
+    - Initializer i.e @PostConstruct
+    - BPP
+  - 3. Ready to use
+
+
 
 ### What is dependency injection and what are the advantages?
 - IoC is also known as dependency injection (DI). It is a process whereby objects define their dependencies (that is, the other objects they work with) only through constructor **arguments**, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean. This process is fundamentally the inverse (hence the name, Inversion of Control) of the bean itself controlling the instantiation or location of its dependencies by using direct construction of classes or a mechanism such as the Service Locator pattern.
@@ -132,7 +147,7 @@ context.getBean(Type.class)
 ### Are beans lazily or eagerly instantiated by default? How do you alter this behavior?
 - By default, ApplicationContext implementations eagerly create and configure all singleton beans as part of the initialization process.
 - A lazy-initialized bean tells the IoC container to create a bean instance when it is first requested, rather than at startup.
-- @Lazy
+- @Lazy(false)
 
 ### What is a property source? How would you use @PropertySource?
 - A PropertySource is a simple abstraction over any source of key-value pairs, and Spring’s StandardEnvironment is configured with two PropertySource objects — one representing the set of JVM system properties (System.getProperties()) and one representing the set of system environment variables (System.getenv()).
@@ -181,11 +196,15 @@ public interface BeanPostProcessor {
 ### What is an initialization method and how is it declared on a Spring bean?
 - after all prop set and before in use, 3 options in order
 - 1. @PostConstruct
+  - no param, must void
+  - need @ComponentScan
 - 2. InitializingBean.afterPropertiesSet()
 - 3. @Bean(initMethod="")
 ### What is a destroy method, how is it declared and when is it called?
 - before out of use, in order:
 - 1. @PreDestroy
+  - when context.close; normally exit
+  - not called for prototype bean 
 - 2. DisposableBean.destroy()
 - 3. @Bean(destroyMethod="")
 
@@ -251,13 +270,26 @@ cannot be subclassed.
 • What is Spring Expression Language (SpEL for short)?
 
 
-• What is the Environment abstraction in Spring?
+### What is the Environment abstraction in Spring?
+- prop
+- add @PropertySource
 • Where can properties in the environment come from – there are many sources for properties – check the documentation if not sure. Spring Boot adds even more.
 
-• What can you reference using SpEL?
+### What can you reference using SpEL?
+- Named Spring bean
+- Implicit Ref:
+  - sustemProperties and systemEnvironment,  available by default
+
 ### What is the difference between $ and # in @Value expressions?
 - ${} construct that surrounds the name of the property
 - SpEL surrounded by the characters #{}.
+
+
+
+
+
+
+
 
 ## AOP 
 - Spring AOP uses either JDK dynamic proxies or CGLIB to create the proxy for a given target object. JDK dynamic proxies are built into the JDK, whereas CGLIB is a common open-source class definition library (repackaged into spring-core).
@@ -526,7 +558,12 @@ AOP pointcut
   - when use, only need to implement callback interfaces
     - PreparedStatementCreator callback interface creates a prepared statement given a Connection provided by this class, providing SQL and any necessary parameters
     - CallableStatementCreator interface, which creates callable statements
-    - RowCallbackHandler interface extracts values from each row of a ResultSet
+    - RowCallbackHandler:
+      - no return object, to file 
+    - ResultSetExtractor
+      - processing an entire ResultSet at once
+      - your have to iterate the result set to map entire to a obj
+    - RowMapper: each row of a ResultSet maps to a obj  
   - Instances of the JdbcTemplate class are **threadsafe** once configured
   - The JdbcTemplate is **stateful**, in that it maintains a reference to a DataSource, but this state is not conversational state.
 - DataSource
@@ -632,6 +669,14 @@ this.jdbcTemplate.update(
 this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))");
 ```
 
+
+
+
+
+
+
+
+
 ## Transaction
 - @EnableTransactionManagement
 - @Transactional
@@ -649,7 +694,7 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
     - Isolation: no effect on others
     - Durablility: change is durable
 
-- Global transactions enable you to work with multiple transactional resources, typically relational databases and message queues. The application server manages global transactions through the JTA,
+- Global transactions enable you to work with multiple transactional resources, typically relational databases and message queues. The application server manages global transactions through the **JTA**,
 - Local transactions are resource-specific, such as a transaction associated with a JDBC connection
   - it cannot help ensure correctness across multiple resources.
 
@@ -672,6 +717,7 @@ this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))"
     - transactionManager drive advice
     - The **DataSourceTransactionManager** class is a PlatformTransactionManager implementation for single JDBC datasources. It binds a JDBC connection from the specified data source to the currently executing thread, potentially allowing for one thread connection per data source.
     - **JpaTransactionManager**: ```txManager.setEntityManagerFactory(entityManagerFactory)```
+    - Jta, Hibernate, WebSphere TM
 - Programmatic transaction management
   - Using the TransactionTemplate.
     - write a TransactionCallback implementation to execute code in the context of a transaction. 
@@ -707,6 +753,8 @@ catch (MyException ex) {
 }
 txManager.commit(status);
 ```
+
+
 ### Is the JDBC template able to participate in an existing transaction?
 - yes, TransactionAwareDataSourceProxy.
 
@@ -766,10 +814,10 @@ Any RuntimeException triggers rollback, and any checked Exception does not.
 ```
 public class TransactionalService {
 
-    @Transactional("order")
+    @Transactional("orderTxnMgr")
     public void setSomething(String name) { ... }
 
-    @Transactional("account")
+    @Transactional("accountTxnMgr")
     public void doSomething() { ... }
 }
 
@@ -813,6 +861,13 @@ public void resolvePosition() {
 - JDBC AutoCommit will cause each individual SQL statement as to be executed in its own transaction and the transaction committed when each statement is completed.
 - JDBC AutoCommit can be disabled by calling the setAutoCommit method with the value false on a JDBC connection.
 
+
+
+
+
+
+
+
 ## Spring Data JPA
 ### JPA
 - EntityManager: 
@@ -826,7 +881,7 @@ public void resolvePosition() {
 - A JPA Persistence Unit is a **logical grouping** of user defined **persistable classes** (entity classes, embeddable classes and mapped superclasses) with related settings.
   
 - EntityTransaction: Operations that modify the content of a database require active transactions. Transactions are managed by an EntityTransaction instance obtained from the EntityManager.  
-
+- **@PersistenceUnit EntityManagerFactory and @PersistenceContext EntityManager**
 
 
 ### What do you need to do in Spring if you would like to work with JPA? What do you have to configure to use JPA with Spring? How does Spring Boot make this easier?
@@ -909,6 +964,8 @@ public void resolvePosition() {
 ## Spring MVC and the Web Layer
 
 ### Web MVC
+
+- root context instantiated by ContextLoader Listener
 - InternalResourceViewResolver: JSP
 ```xml
 <web-app>
@@ -1021,7 +1078,7 @@ public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServl
 - Map, Model, ModelMap
 - Errors, BindingResult
 - @RequestParam, @MatrixVariable, @PathVariable, @RequestHeader, @CookieValue, @RequestPart multipart, @ModelAttribute
-
+- @Value("#request.requestURL") StringBuffer url
 ### What are some of the valid return types of a controller method?
 - HttpEntity<E>, ResponseEntity<E>, HttpHeaders
 - String, View, ModelAndView
@@ -1035,7 +1092,7 @@ public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServl
 
 
 ## REST
-- PUT and DELETE is idempotent, not safe
+- PUT and DELETE is idempotent, not safe, 204(no content)
 - POST and PATCH not idepotent
 
 ### What does REST stand for? What is a resource?
@@ -1093,7 +1150,7 @@ PATCH	no	no
 - indicates a method return value should be bound to the web response body, like REST
 
 ### What are the HTTP status return codes for a successful GET, POST, PUT or DELETE operation?
-- 200, 201, 200, 404
+- 200, 201, 200, 404/204
 
 ### When do you need @ResponseStatus?
 - annotate exception classes
