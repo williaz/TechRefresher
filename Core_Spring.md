@@ -1307,7 +1307,7 @@ public class ReadingListServletInitializer extends SpringBootServletInitializer 
 ### What does @SpringBootApplication do?
 - = @Configuration + @ComponentScan + @EnableAutoConfiguration
 - root packagef for scan: its place implicitly defines a base “search package” for beans
-
+- @SpringBootConfiguration
 ### Does Spring Boot do component scanning? Where does it look by default?
 - @ComponentScan: Either basePackageClasses() or basePackages() (or its alias value()) may be specified to define specific packages to scan. If specific packages are not defined, scanning will occur from the package of the class that declares this annotation.
 
