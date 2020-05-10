@@ -874,13 +874,19 @@ public void resolvePosition() {
   - an instance represents a **connection** to a database
   - provides functionality for performing **operations** on a database. 
   - as a **factory for Query** instances, which are needed for executing queries on the database.
-  
+  - 3 Options for JPA Setup in a Spring Environment
+    - Using LocalEntityManagerFactoryBean
+    - Obtaining an EntityManagerFactory from JNDI
+    - Using LocalContainerEntityManagerFactoryBean
 - An EntityManagerFactory is constructed for a **specific database** as a one time operation, and by managing resources efficiently (e.g. a pool of sockets), provides an efficient way to construct multiple EntityManager instances for that database.
   - The createEntityManagerFactory method takes as an argument a name of a persistence unit. 
  
 - A JPA Persistence Unit is a **logical grouping** of user defined **persistable classes** (entity classes, embeddable classes and mapped superclasses) with related settings.
   
 - EntityTransaction: Operations that modify the content of a database require active transactions. Transactions are managed by an EntityTransaction instance obtained from the EntityManager.  
+
+
+
 - **@PersistenceUnit EntityManagerFactory and @PersistenceContext EntityManager**
 
 
