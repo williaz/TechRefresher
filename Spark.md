@@ -39,7 +39,24 @@ Introduction to Apache Hadoop and the Hadoop Ecosystem
 
 ### Apache Spark Basics
 
-- What is Apache Spark?
+#### What is Apache Spark?
+- Apache Spark is a unified **computing engine** and a set of libraries for **parallel data processing** on computer clusters.  
+
+```bash
+which python
+vim ~/.bash_profile
+vim .bash_profile.pysave
+
+python3 get-pip.py --force-reinstall
+pip install pyspark
+
+
+# echo "alias python=/usr/local/bin/python3" >> ~/.bashrc
+export PYSPARK_PYTHON=/usr/local/bin/python3
+
+py3.7
+```
+
 - Starting the Spark Shell
 - Using the Spark Shell 
 - Getting Started with Datasets and DataFrames
