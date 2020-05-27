@@ -56,12 +56,39 @@ export PYSPARK_PYTHON=/usr/local/bin/python3
 
 py3.7
 ```
+- SparkSession
+  - one-to-one to Spark app
+- Driver, Executor
+- Spark core data structures are immutable
+- DataFrame
+  - mulitple partition
+  
 
-- Starting the Spark Shell
-- Using the Spark Shell 
-- Getting Started with Datasets and DataFrames
-- DataFrame Operations
+#### Starting the Spark Shell
+#### Using the Spark Shell 
+#### Getting Started with Datasets and DataFrames
 
+#### DataFrame Operations
+  - Transformation
+    - narrow depedendcy: 
+      - pipelining: filter
+      - in-memory
+      - one output partition
+    - wide dep: 
+      - shuffle: aggregation
+      - to disk
+      - default 200 shuffle partition
+    ```py
+    spark.conf.set ( "spark.sql.shuffle.partitions" , "5" ) 
+    ```
+  - Lazy evalution:
+    - Spark optimize data flow based on your plan
+  - Action
+    - to trigger compututaion for a result from multiple transformation\
+    - 3 kinds: view, collect to object, persist
+
+- spark.sql function
+  - returns a new DataFrame. 
 
 
 ### Working with DataFrames and Schemas
@@ -118,6 +145,7 @@ py3.7
 - Building and Running an Application
 - Application Deployment Mode 
 - The Spark Application Web UI
+  - Spark UI on port 4040 to see the physical and logical execution characteristics of your jobs. 
 - Configuring Application Properties 
 
 ### Spark Distributed Processing
