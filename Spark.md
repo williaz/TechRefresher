@@ -42,6 +42,9 @@ Introduction to Apache Hadoop and the Hadoop Ecosystem
 #### What is Apache Spark?
 - Apache Spark is a unified **computing engine** and a set of libraries for **parallel data processing** on computer clusters.  
 
+- Spark is a distributed programming model in which the user specifies transformations . Multiple transformations build up a directed acyclic graph of instructions. An action begins the process of executing that graph of instructions, as a single job, by breaking it down into stages and tasks to execute across the cluster. The logical structures that we manipulate with transformations and actions are DataFrames and Datasets. To create a new DataFrame or Dataset, you call a transformation. To start computation or convert to native language types, you call an action. 
+
+
 ```bash
 which python
 vim ~/.bash_profile
@@ -63,10 +66,50 @@ py3.7
 - DataFrame
   - mulitple partition
   
+- Running production applications with spark-submit 
+  - lets you send your application code to a cluster and launch it to execute there. 
+  - master arg
+- Datasets: type-safe APIs for structured data
+  - for Java and Scala to manipulate it as a **collection** of typed objects, 
+  - classes following the **JavaBean** pattern 
+  
+- Structured Streaming
+- Machine learning and advanced analytics
+  - centroid
+- Resilient Distributed Datasets (RDD): Spark’s low level APIs
+  - you might use RDDs when you’re reading or manipulating raw data
+    - parallelize raw data that you have stored in memory on the driver machine. 
+  - RDDs are lower level than DataFrames because they reveal physical execution characteristics (like partitions) to end users. 
+
+- SparkR
+- The third-party package ecosystem
 
 #### Starting the Spark Shell
 #### Using the Spark Shell 
 #### Getting Started with Datasets and DataFrames
+- unstructured log files to semi-structured CSV files and highly structured Parquet files. 
+  - Datasets
+  - DataFrames
+  - SQL tables and views
+
+
+- DataFrames and Datasets are (distributed) table-like collections with well-defined rows and columns. 
+- To Spark, DataFrames and Datasets represent immutable, lazily evaluated plans that specify what operations to apply to data residing at a location to generate some output. 
+
+- A schema defines the column **names and types** of a DataFrame. 
+  - define manually OR schema on read
+- Column
+- Row
+  - Each record in a DataFrame must be of type Row 
+- Spark Type
+```py
+from pyspark.sql.types import * 
+b = ByteType () 
+ 
+```
+
+
+
 
 #### DataFrame Operations
   - Transformation
@@ -89,6 +132,16 @@ py3.7
 
 - spark.sql function
   - returns a new DataFrame. 
+
+
+- Structured API Execution steps:
+  - Write DataFrame/Dataset/SQL Code.
+  - If valid code, Spark converts this to a Logical Plan .
+    - convert the user’s set of expressions into the most optimized version by converting user code into an unresolved logical plan . 
+  - Spark transforms this Logical Plan to a Physical Plan , checking for optimizations along the way.
+    - Spark, as a compiler to take queries in DataFrames, Datasets, and SQL and compiles them into RDD transformations for you. 
+
+  - Spark then executes this Physical Plan (RDD manipulations) on the cluster.
 
 
 ### Working with DataFrames and Schemas
