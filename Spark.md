@@ -45,6 +45,62 @@ Introduction to Apache Hadoop and the Hadoop Ecosystem
 - Spark is a distributed programming model in which the user specifies transformations . Multiple transformations build up a directed acyclic graph of instructions. An action begins the process of executing that graph of instructions, as a single job, by breaking it down into stages and tasks to execute across the cluster. The logical structures that we manipulate with transformations and actions are DataFrames and Datasets. To create a new DataFrame or Dataset, you call a transformation. To start computation or convert to native language types, you call an action. 
 
 
+
+```bash
+# AWS setup for spark
+# a sep security group for InBound SSH 22 myIP
+chmod 0400 key.pem
+ssh -i key.pem ec2-user@IPv4
+whoami
+ping google.com
+
+# lib
+sudo su
+yum update -y
+
+# yum install -y httpd.x86_64
+# start httpd.service
+# systemctl enable httpd.service
+# curl localhost:80
+
+yum install python3.7
+python3 --version
+pip3 --version
+pip3 install pyspark
+
+exit
+```
+
+
+- SparkSession
+  - one-to-one to Spark app
+- Driver, Executor
+- Spark core data structures are immutable
+- DataFrame
+  - mulitple partition
+  - Partitioning of the DataFrame defines the **layout** of the DataFrame or Dataset’s **physical** distribution across the cluster. 
+
+  
+- Running production applications with spark-submit 
+  - lets you send your application code to a cluster and launch it to execute there. 
+  - master arg
+- Datasets: type-safe APIs for structured data
+  - for Java and Scala to manipulate it as a **collection** of typed objects, 
+  - classes following the **JavaBean** pattern 
+  
+- Structured Streaming
+- Machine learning and advanced analytics
+  - centroid
+- Resilient Distributed Datasets (RDD): Spark’s low level APIs
+  - you might use RDDs when you’re reading or manipulating raw data
+    - parallelize raw data that you have stored in memory on the driver machine. 
+  - RDDs are lower level than DataFrames because they reveal physical execution characteristics (like partitions) to end users. 
+
+- SparkR
+- The third-party package ecosystem
+
+#### Starting the Spark Shell
+#### Using the Spark Shell 
 ```bash
 # local setup
 # py3.7 for spark version 2.4.5
@@ -86,61 +142,8 @@ head flight-data/csv/2015-summary.csv
 >>> flightData2015.sort('count').take(3)
 ```
 
-```bash
-# AWS setup for spark
-# a sep security group for InBound SSH 22 myIP
-chmod 0400 key.pem
-ssh -i key.pem ec2-user@IPv4
-whoami
-ping google.com
-
-# lib
-sudo su
-yum update -y
-
-# yum install -y httpd.x86_64
-# start httpd.service
-# systemctl enable httpd.service
-# curl localhost:80
-
-yum install python3.7
-python3 --version
-pip3 --version
-pip3 install pyspark
-
-exit
-```
-
-
-- SparkSession
-  - one-to-one to Spark app
-- Driver, Executor
-- Spark core data structures are immutable
-- DataFrame
-  - mulitple partition
-  
-- Running production applications with spark-submit 
-  - lets you send your application code to a cluster and launch it to execute there. 
-  - master arg
-- Datasets: type-safe APIs for structured data
-  - for Java and Scala to manipulate it as a **collection** of typed objects, 
-  - classes following the **JavaBean** pattern 
-  
-- Structured Streaming
-- Machine learning and advanced analytics
-  - centroid
-- Resilient Distributed Datasets (RDD): Spark’s low level APIs
-  - you might use RDDs when you’re reading or manipulating raw data
-    - parallelize raw data that you have stored in memory on the driver machine. 
-  - RDDs are lower level than DataFrames because they reveal physical execution characteristics (like partitions) to end users. 
-
-- SparkR
-- The third-party package ecosystem
-
-#### Starting the Spark Shell
-#### Using the Spark Shell 
 #### Getting Started with Datasets and DataFrames
-- unstructured log files to semi-structured CSV files and highly structured Parquet files. 
+- unstructured log files to semi-structured CSV files and highly structured Parquet files (DB with types). 
   - Datasets
   - DataFrames
   - SQL tables and views
@@ -160,12 +163,114 @@ from pyspark.sql.types import *
 b = ByteType () 
  
 ```
+```py
+>>> mySchema = StructType([\
+... StructField('num', LongType(), False),\
+... StructField('word', StringType(), True),\
+... StructField('name', StringType(), True),\
+... ])
+>>> myRow = Row(1, "hello world", 'Will')
 
+>>> myDf = spark.createDataFrame([myRow], mySchema)
+>>> myDf.show()
++---+-----------+----+                                                          
+|num|       word|name|
++---+-----------+----+
+|  1|hello world|Will|
++---+-----------+----+
+
+
+```
 
 
 
 #### DataFrame Operations
-  - Transformation
+- We can add rows or columns
+- We can remove rows or columns
+- We can transform a row into a column (or vice versa)
+- We can change the order of rows based on the values in columns
+
+```py
+>>> df.columns
+['DEST_COUNTRY_NAME', 'ORIGIN_COUNTRY_NAME', 'count']
+>>> df.select('ORIGIN_COUNTRY_NAME').show(3)
++-------------------+
+|ORIGIN_COUNTRY_NAME|
++-------------------+
+|            Romania|
+|            Croatia|
+|            Ireland|
++-------------------+
+only showing top 3 rows
+
+>>> df.createOrReplaceTempView('dfTable')
+
+>>> df.select(\
+... expr("ORIGIN_COUNTRY_NAME as home"),\
+... col('ORIGIN_COUNTRY_NAME'),\
+... column("DEST_COUNTRY_NAME" ))\
+... .show(3)
++-------+-------------------+-----------------+
+|   home|ORIGIN_COUNTRY_NAME|DEST_COUNTRY_NAME|
++-------+-------------------+-----------------+
+|Romania|            Romania|    United States|
+|Croatia|            Croatia|    United States|
+|Ireland|            Ireland|    United States|
++-------+-------------------+-----------------+
+only showing top 3 rows
+
+
+>>> df.selectExpr('ORIGIN_COUNTRY_NAME', 'DEST_COUNTRY_NAME', '(ORIGIN_COUNTRY_NAME != DEST_COUNTRY_NAME) as is_abroad').show(3)
++-------------------+-----------------+---------+
+|ORIGIN_COUNTRY_NAME|DEST_COUNTRY_NAME|is_abroad|
++-------------------+-----------------+---------+
+|            Romania|    United States|     true|
+|            Croatia|    United States|     true|
+|            Ireland|    United States|     true|
++-------------------+-----------------+---------+
+
+>>> df.selectExpr('avg(count)', 'count(distinct(DEST_COUNTRY_NAME))').show(1)
++-----------+---------------------------------+                                 
+| avg(count)|count(DISTINCT DEST_COUNTRY_NAME)|
++-----------+---------------------------------+
+|1770.765625|                              132|
++-----------+---------------------------------+
+
+>>> df.selectExpr('*', '1 as dummy').show(3)
+>>> df.select(expr('*'),\
+... lit(1).alias("dummy")).show(3)
+
+
+>>> df.selectExpr('ORIGIN_COUNTRY_NAME', 'DEST_COUNTRY_NAME', '(ORIGIN_COUNTRY_NAME = DEST_COUNTRY_NAME) as same_country').show(3)
+
+>>> df.withColumn('same_country', expr('DEST_COUNTRY_NAME = ORIGIN_COUNTRY_NAME')).show(3)
+
+>>> df1 = df.withColumnRenamed('ORIGIN_COUNTRY_NAME', 'where are you from')
+>>> df1.select(col('where are you from')).show(2)
+>>> df1.selectExpr('`where are you from`').show(2)
++------------------+
+|where are you from|
++------------------+
+|           Romania|
+|           Croatia|
++------------------+
+only showing top 2 rows
+
+```
+- select()
+- selectExpr()
+  - add non-aggregating SQL statement
+  - use sql.functions
+
+- lit(): literals
+- withColumn(name, expr): adding col
+- withColumnRenamed(old, new)
+- backtick(`): escape expressions that use reserved characters or keywords
+
+
+
+
+- Transformation
     - narrow depedendcy: 
       - pipelining: filter
       - in-memory
@@ -199,17 +304,92 @@ b = ByteType ()
 
 ### Working with DataFrames and Schemas
 
-- Creating DataFrames from Data Sources
-- Saving DataFrames to Data Sources
-- DataFrame Schemas 
-- Eager and Lazy Execution
+
+
+#### Creating DataFrames from Data Sources
+
+
+
+#### Saving DataFrames to Data Sources
+
+
+
+#### DataFrame Schemas 
+
+```py
+>>> df = spark.read.format('json').load("flight-data/json/2015-summary.json")
+>>> df.printSchema()
+root
+ |-- DEST_COUNTRY_NAME: string (nullable = true)
+ |-- ORIGIN_COUNTRY_NAME: string (nullable = true)
+ |-- count: long (nullable = true)
+
+>>> spark.read.format('json').load("flight-data/json/2015-summary.json").schema
+StructType(
+List(
+StructField(DEST_COUNTRY_NAME,StringType,true),
+StructField(ORIGIN_COUNTRY_NAME,StringType,true),
+StructField(count,LongType,true)))
+
+from pyspark.sql.types import StructField , StructType , StringType , LongType 
+
+myManualSchema = StructType ([ StructField ( "DEST_COUNTRY_NAME" , StringType (), True ), StructField ( "ORIGIN_COUNTRY_NAME" , StringType (), True ), StructField ( "count" , LongType (), False , metadata = { "hello" : "world" }) ]) 
+df = spark . read . format ( "json" ) . schema ( myManualSchema ) \
+. load ( "/data/flight-data/json/2015-summary.json" ) 
+
+```
+- A schema defines the column names and types of a DataFrame. 
+  - schema-on-read: ad hoc analysis; precision issue
+  - explicitly define: production ETL: untyped data sources like csv, json
+- A schema is a **StructType** made up of a number of fields, **StructFields**, that have a name, type, a **Boolean flag** which specifies whether that column can contain missing or **null** values, and, finally, users can **optionally** specify associated metadata with that column. 
+- runtime error if data unmatch with schema
+
+
+```py
+>>> df.columns
+['DEST_COUNTRY_NAME', 'ORIGIN_COUNTRY_NAME', 'count']
+```
+- Column
+  - To Spark, columns are logical constructions that simply represent a value computed on a per-record basis by means of an expression. 
+  - col/column: to construct and refer to columns 
+    - Column and table resolution happens in the analyzer phase, 
+- Expression
+  - expressions to create a single value for each record like array or map
+  - Columns provide a subset of expression functionality. 
+  - created via the expr function, is just a DataFrame column reference. 
+  - Columns are just expressions.
+  - Columns and transformations of those columns compile to the **same logical plan** as parsed expressions.
+
+```py
+>>> df.first()
+Row(DEST_COUNTRY_NAME='United States', ORIGIN_COUNTRY_NAME='Romania', count=15)
+
+>>> myRow = Row("CB", True, 12, None)
+>>> myRow[1]
+True
+>>> myRow[3]
+>>> myRow[2]
+12
+```
+- Row
+  - only DataFrames have schemas. Rows themselves do not have schemas. 
+    - if you create a Row manually, you must specify the values in the same order as the schema of the DataFrame 
+
+
+
+
+#### Eager and Lazy Execution
 
 
 ### Analyzing Data with DataFrame Queries
 
-- Querying DataFrames Using Column Expressions
-- Grouping and Aggregation Queries
-- Joining DataFrames 
+#### Querying DataFrames Using Column Expressions
+
+
+#### Grouping and Aggregation Queries
+
+
+#### Joining DataFrames 
 
 
 ### RDD Overview
