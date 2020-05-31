@@ -46,18 +46,44 @@ Introduction to Apache Hadoop and the Hadoop Ecosystem
 
 
 ```bash
-which python
-vim ~/.bash_profile
-vim .bash_profile.pysave
+# local setup
+# py3.7 for spark version 2.4.5
+which python3
+# mac installer
 
-python3 get-pip.py --force-reinstall
-pip install pyspark
+vim ~/.bash_profile # then open new command prompt
+# vim .bash_profile.pysave
+echo $PATH
 
+python3 --version
+pip3 --version
+pip3 install pyspark
 
 # echo "alias python=/usr/local/bin/python3" >> ~/.bashrc
 export PYSPARK_PYTHON=/usr/local/bin/python3
 
-py3.7
+pyspark
+
+# 
+>>> myRange = spark.range(1000).toDF("num")
+>>> myRange.show()
+>>> divisBy2 = myRange.where("num % 2 = 0")
+>>> divisBy2.show()
+
+
+#
+
+head flight-data/csv/2015-summary.csv
+>>> flightData2015 = spark\
+... .read\
+... .option('inferSchema', 'true')\
+... .option('header', 'true')\
+... .csv('flight-data/csv/2015-summary.csv')
+
+>>> flightData2015.take(3)
+>>> flightData2015.sort('count').explain()
+>>> spark.conf.set('spark.sql.shuffle.partitions', '5')
+>>> flightData2015.sort('count').take(3)
 ```
 
 ```bash
