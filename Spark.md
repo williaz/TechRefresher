@@ -59,6 +59,33 @@ export PYSPARK_PYTHON=/usr/local/bin/python3
 
 py3.7
 ```
+
+```bash
+# AWS setup for spark
+# a sep security group for InBound SSH 22 myIP
+chmod 0400 key.pem
+ssh -i key.pem ec2-user@IPv4
+whoami
+ping google.com
+
+# lib
+sudo su
+yum update -y
+
+# yum install -y httpd.x86_64
+# start httpd.service
+# systemctl enable httpd.service
+# curl localhost:80
+
+yum install python3.7
+python3 --version
+pip3 --version
+pip3 install pyspark
+
+exit
+```
+
+
 - SparkSession
   - one-to-one to Spark app
 - Driver, Executor
