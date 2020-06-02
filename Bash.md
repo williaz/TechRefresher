@@ -1,3 +1,16 @@
+
+
+#### folder size
+```bash
+du -sh $Folder
+```
+
+
+
+
+
+
+
 ```bash
 #!/path/to/interpreter
 
