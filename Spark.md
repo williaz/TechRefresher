@@ -191,6 +191,9 @@ b = ByteType ()
 - We can change the order of rows based on the values in columns
 
 ```py
+export PYSPARK_PYTHON=/usr/local/bin/python3
+>>> df = spark.read.format('json').load("flight-data/json/2015-summary.json")
+
 >>> df.columns
 ['DEST_COUNTRY_NAME', 'ORIGIN_COUNTRY_NAME', 'count']
 >>> df.select('ORIGIN_COUNTRY_NAME').show(3)
@@ -243,8 +246,10 @@ only showing top 3 rows
 
 >>> df.selectExpr('ORIGIN_COUNTRY_NAME', 'DEST_COUNTRY_NAME', '(ORIGIN_COUNTRY_NAME = DEST_COUNTRY_NAME) as same_country').show(3)
 
+# adding col
 >>> df.withColumn('same_country', expr('DEST_COUNTRY_NAME = ORIGIN_COUNTRY_NAME')).show(3)
 
+# alter column name
 >>> df1 = df.withColumnRenamed('ORIGIN_COUNTRY_NAME', 'where are you from')
 >>> df1.select(col('where are you from')).show(2)
 >>> df1.selectExpr('`where are you from`').show(2)
@@ -256,6 +261,74 @@ only showing top 3 rows
 +------------------+
 only showing top 2 rows
 
+
+# drop, immutable
+>>> df1.drop('is_aboard').columns
+['DEST_COUNTRY_NAME', 'ORIGIN_COUNTRY_NAME', 'count']
+>>> df1
+DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: bigint, is_aboard: boolean]
+
+# cast
+>>> df2 = df1.withColumn('count2', col('count').cast('string'))
+>>> df2.columns
+['DEST_COUNTRY_NAME', 'ORIGIN_COUNTRY_NAME', 'count', 'is_aboard', 'count2']
+>>> df2.schema
+StructType(List(StructField(DEST_COUNTRY_NAME,StringType,true),StructField(ORIGIN_COUNTRY_NAME,StringType,true),StructField(count,LongType,true),StructField(is_aboard,BooleanType,true),StructField(count2,StringType,true)))
+
+# filter
+>>> df.where('count < 2').show(3)
+>>> df.where('count < 2').where('DEST_COUNTRY_NAME != "United States"').show(3)
+
+# distinct
+>>> df.select('DEST_COUNTRY_NAME').distinct().count()
+132 
+
+# sampling
+>>> df.count()
+256
+>>> df.sample(False, 0.5, 5).count()
+126
+
+# split
+>>> df1 = df.randomSplit([0.4, 0.4], 5)
+>>> df1[0].count()
+126
+>>> df1[1].count()
+130
+
+# union
+>>> from pyspark.sql import *
+>>> schema = df.schema
+>>> newRows = [\
+... Row("home", "France", 1L),\
+  File "<stdin>", line 2
+    Row("home", "France", 1L),\
+                           ^
+SyntaxError: invalid syntax
+>>> newRows = [\
+... Row("home", "France", 1),\
+... Row("US", "France", 4)\
+... ]
+>>> parellRows = spark.sparkContext.parallelize(newRows)
+>>> df2 = spark.createDataFrame(parellRows, schema)
+>>> df2.show(2)
++-----------------+-------------------+-----+                                   
+|DEST_COUNTRY_NAME|ORIGIN_COUNTRY_NAME|count|
++-----------------+-------------------+-----+
+|             home|             France|    1|
+|               US|             France|    4|
++-----------------+-------------------+-----+
+
+>>> df.union(df2)\
+... .where('ORIGIN_COUNTRY_NAME = "France"').show(5)
++-----------------+-------------------+-----+
+|DEST_COUNTRY_NAME|ORIGIN_COUNTRY_NAME|count|
++-----------------+-------------------+-----+
+|    United States|             France|  952|
+|             home|             France|    1|
+|               US|             France|    4|
++-----------------+-------------------+-----+
+
 ```
 - select()
 - selectExpr()
@@ -266,6 +339,19 @@ only showing top 2 rows
 - withColumn(name, expr): adding col
 - withColumnRenamed(old, new)
 - backtick(`): escape expressions that use reserved characters or keywords
+
+- drop(..):
+- cast(): col().cast()
+- where/filter(expr)
+  - chain: spark auto perform all filtering in same time regardless of their ordering
+- distinct()
+- sample(withReplacement, fraction, seed)
+- randomSplit(arr, seed)
+  - will normalize proportion to sum as 1
+
+- union
+  - make sure same schema and number of col
+  - currently performed based on location, not on the schema
 
 
 
