@@ -300,12 +300,6 @@ StructType(List(StructField(DEST_COUNTRY_NAME,StringType,true),StructField(ORIGI
 >>> from pyspark.sql import *
 >>> schema = df.schema
 >>> newRows = [\
-... Row("home", "France", 1L),\
-  File "<stdin>", line 2
-    Row("home", "France", 1L),\
-                           ^
-SyntaxError: invalid syntax
->>> newRows = [\
 ... Row("home", "France", 1),\
 ... Row("US", "France", 4)\
 ... ]
@@ -329,6 +323,61 @@ SyntaxError: invalid syntax
 |               US|             France|    4|
 +-----------------+-------------------+-----+
 
+# sort
+>>> df.orderBy('count').show(5)
++--------------------+-------------------+-----+
+|   DEST_COUNTRY_NAME|ORIGIN_COUNTRY_NAME|count|
++--------------------+-------------------+-----+
+|               Malta|      United States|    1|
+|Saint Vincent and...|      United States|    1|
+|       United States|            Croatia|    1|
+|       United States|          Gibraltar|    1|
+|       United States|          Singapore|    1|
++--------------------+-------------------+-----+
+
+>>> df.orderBy(col('count').desc()).show(5) 
++-----------------+-------------------+------+
+|DEST_COUNTRY_NAME|ORIGIN_COUNTRY_NAME| count|
++-----------------+-------------------+------+
+|    United States|      United States|370002|
+|    United States|             Canada|  8483|
+|           Canada|      United States|  8399|
+|    United States|             Mexico|  7187|
+|           Mexico|      United States|  7140|
++-----------------+-------------------+------+
+# desc not working in df.sort(expr('count desc')).show(5), 
+
+# limit
+>>> df.orderBy(col('count').desc()).limit(5).show()
++-----------------+-------------------+------+
+|DEST_COUNTRY_NAME|ORIGIN_COUNTRY_NAME| count|
++-----------------+-------------------+------+
+|    United States|      United States|370002|
+|    United States|             Canada|  8483|
+|           Canada|      United States|  8399|
+|    United States|             Mexico|  7187|
+|           Mexico|      United States|  7140|
++-----------------+-------------------+------+
+
+# repartition/coalesce
+>>> df.rdd.getNumPartitions()
+1
+>>> df.repartition(4)
+
+>>> df.repartition(col('DEST_COUNTRY_NAME'))
+DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: bigint]
+
+>>> df.repartition(5, col('DEST_COUNTRY_NAME')).coalesce(2)
+DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: bigint]
+
+
+# collect/take
+>>> df.take(3)
+[Row(DEST_COUNTRY_NAME='United States', ORIGIN_COUNTRY_NAME='Romania', count=15), Row(DEST_COUNTRY_NAME='United States', ORIGIN_COUNTRY_NAME='Croatia', count=1), Row(DEST_COUNTRY_NAME='United States', ORIGIN_COUNTRY_NAME='Ireland', count=344)]
+>>> df.limit(2).collect()
+[Row(DEST_COUNTRY_NAME='United States', ORIGIN_COUNTRY_NAME='Romania', count=15), Row(DEST_COUNTRY_NAME='United States', ORIGIN_COUNTRY_NAME='Croatia', count=1)]
+
+
 ```
 - select()
 - selectExpr()
@@ -349,9 +398,26 @@ SyntaxError: invalid syntax
 - randomSplit(arr, seed)
   - will normalize proportion to sum as 1
 
-- union
+- union(df)
   - make sure same schema and number of col
   - currently performed based on location, not on the schema
+
+- orderBy(col)/sort()
+  - asc(), desc()
+  - asc_nulls_first , desc_nulls_first , asc_nulls_last , or desc_nulls_last
+  - sortWithinPartitions(): for performance: sort within each partition before another set of transformations
+  
+- limit()
+
+- repartition()
+  - full shuffle
+  - when new parition num is greater or partition key
+- coalesce()
+  - not shuffle, will try to combine partitions
+
+- collect()/take(n)
+  - as list of Row
+  - expensive operation! -> crash drive
 
 
 
