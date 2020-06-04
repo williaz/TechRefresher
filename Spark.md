@@ -579,15 +579,33 @@ DataFrame[5: int, five: string, 5.0: double]
 only showing top 5 rows
 
 
+>>> priceFlt = col('UnitPrice') > 500
+>>> descFlt = instr(df.Description, 'POSTAGE') >= 1
+>>> df.where(df.StockCode.isin('DOT')).where(priceFlt | descFlt).select('StockCode', 'UnitPrice', 'Description').show(3, False)
++---------+---------+--------------+
+|StockCode|UnitPrice|Description   |
++---------+---------+--------------+
+|DOT      |569.77   |DOTCOM POSTAGE|
+|DOT      |607.49   |DOTCOM POSTAGE|
++---------+---------+--------------+
 
-
+>>> DotFlt = col('StockCode') == 'DOT'
+>>> df.withColumn('isExpensive', DotFlt & (priceFlt | descFlt))\
+... .where('isExpensive').select('UnitPrice', 'isExpensive').show(5)
++---------+-----------+
+|UnitPrice|isExpensive|
++---------+-----------+
+|   569.77|       true|
+|   607.49|       true|
++---------+-----------+
 
 ```
 
 
 - lit(): convert to spark type
 
-Booleans
+- Booleans
+  - eqNullSafe()
 Numbers
 Strings
 Dates and timestamps
