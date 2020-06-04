@@ -537,6 +537,65 @@ True
 
 #### Querying DataFrames Using Column Expressions
 
+- DataFrame ( Dataset ) Methods 
+  - DataFrame is just a Dataset of Row types, 
+  - DataFrameStatFunctions: statistically related functions
+  - DataFrameNaFunctions: working with null data. 
+
+- Column Methods 
+  - org.apache.spark.sql.functions : Analytic func: transform rows of data in one format or structure to another. 
+
+```py
+
+>>> df = spark.read.format('csv').option('header', 'true').option('inferSchema', 'true')\ 
+... .load('retail-data/by-day/2010-12-01.csv')                                           >>> df.printSchema()
+root
+ |-- InvoiceNo: string (nullable = true)
+ |-- StockCode: string (nullable = true)
+ |-- Description: string (nullable = true)
+ |-- Quantity: integer (nullable = true)
+ |-- InvoiceDate: timestamp (nullable = true)
+ |-- UnitPrice: double (nullable = true)
+ |-- CustomerID: double (nullable = true)
+ |-- Country: string (nullable = true)
+
+>>> df.createOrReplaceTempView('dfTable')
+
+# lit
+>>> df.select(lit(5), lit('five'), lit(5.0))
+DataFrame[5: int, five: string, 5.0: double]
+
+# Boolean for filtering
+>>> df.where('InvoiceNo != 536365').select('InvoiceNo', 'Description').show(5, False) # no truncate
++---------+-----------------------------+
+|InvoiceNo|Description                  |
++---------+-----------------------------+
+|536366   |HAND WARMER UNION JACK       |
+|536366   |HAND WARMER RED POLKA DOT    |
+|536367   |ASSORTED COLOUR BIRD ORNAMENT|
+|536367   |POPPY'S PLAYHOUSE BEDROOM    |
+|536367   |POPPY'S PLAYHOUSE KITCHEN    |
++---------+-----------------------------+
+only showing top 5 rows
+
+
+
+
+
+```
+
+
+- lit(): convert to spark type
+
+Booleans
+Numbers
+Strings
+Dates and timestamps
+Handling null
+Complex types
+User-defined functions
+
+
 
 #### Grouping and Aggregation Queries
 
