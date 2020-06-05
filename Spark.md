@@ -599,6 +599,76 @@ only showing top 5 rows
 |   607.49|       true|
 +---------+-----------+
 
+# number
+>>> fabQ = pow(col('Quantity') * col('UnitPrice'), 2) + 5
+>>> df.select('CustomerID', fabQ.alias('fabQ')).show(3)
++----------+------------------+
+|CustomerID|              fabQ|
++----------+------------------+
+|   17850.0|239.08999999999997|
+|   17850.0|          418.7156|
+|   17850.0|             489.0|
++----------+------------------+
+only showing top 3 rows
+
+>>> df.select(round(lit("2.5")), bround(lit("2.5"))).show(1)
++-------------+--------------+
+|round(2.5, 0)|bround(2.5, 0)|
++-------------+--------------+
+|          3.0|           2.0|
++-------------+--------------+
+
+>>> df.stat.corr('Quantity', 'UnitPrice')
+-0.04112314436835551
+>>> df.select(corr('Quantity', 'UnitPrice')).show()
++-------------------------+
+|corr(Quantity, UnitPrice)|
++-------------------------+
+|     -0.04112314436835551|
++-------------------------+
+
+>>> df.select('UnitPrice', 'Quantity').describe().show()
++-------+------------------+------------------+
+|summary|         UnitPrice|          Quantity|
++-------+------------------+------------------+
+|  count|              3108|              3108|
+|   mean| 4.151946589446603| 8.627413127413128|
+| stddev|15.638659854603892|26.371821677029203|
+|    min|               0.0|               -24|
+|    max|            607.49|               600|
++-------+------------------+------------------+
+
+>>> df.select(stddev_pop('UnitPrice'), stddev_pop('Quantity')).show()
++---------------------+--------------------+
+|stddev_pop(UnitPrice)|stddev_pop(Quantity)|
++---------------------+--------------------+
+|   15.636143780280698|  26.367578764657278|
++---------------------+--------------------+
+
+>>> colName = 'UnitPrice'
+>>> quantile = [0.5, 0.95]
+>>> relErr = 0.05
+>>> df.stat.approxQuantile(colName, quantile, relErr)
+[2.51, 607.49]
+
+>>> df.stat.freqItems(['StockCode', 'UnitPrice']).show()
++--------------------+--------------------+
+| StockCode_freqItems| UnitPrice_freqItems|
++--------------------+--------------------+
+|[90214E, 20728, 2...|[1.95, 14.95, 0.4...|
++--------------------+--------------------+
+
+
+>>> df.select(monotonically_increasing_id()).show(5)
++-----------------------------+
+|monotonically_increasing_id()|
++-----------------------------+
+|                            0|
+|                            1|
+|                            2|
+|                            3|
+|                            4|
++-----------------------------+
 ```
 
 
@@ -606,8 +676,18 @@ only showing top 5 rows
 
 - Booleans
   - eqNullSafe()
-Numbers
-Strings
+- Numbers
+  - pow(col)
+  - round(col), bround(round down if .5)
+  - stat.corr(): between 2 col; stat.approxQuantile()
+  - df.describe(): summary statistics
+  - monotonically_increasing_id()
+
+- Strings
+  - initcap(): words sep by space
+  - upper(), lower()
+  - lpad(), rpad(); ltrim(), rtrim(); trim()
+
 Dates and timestamps
 Handling null
 Complex types
