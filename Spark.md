@@ -669,6 +669,75 @@ only showing top 3 rows
 |                            3|
 |                            4|
 +-----------------------------+
+
+
+# String
+>>> df.select('Description', initcap('Description'), lower(col('Description'))).show(10)
++--------------------+--------------------+--------------------+
+|         Description|initcap(Description)|  lower(Description)|
++--------------------+--------------------+--------------------+
+|WHITE HANGING HEA...|White Hanging Hea...|white hanging hea...|
+| WHITE METAL LANTERN| White Metal Lantern| white metal lantern|
+|CREAM CUPID HEART...|Cream Cupid Heart...|cream cupid heart...|
+|KNITTED UNION FLA...|Knitted Union Fla...|knitted union fla...|
+|RED WOOLLY HOTTIE...|Red Woolly Hottie...|red woolly hottie...|
+|SET 7 BABUSHKA NE...|Set 7 Babushka Ne...|set 7 babushka ne...|
+|GLASS STAR FROSTE...|Glass Star Froste...|glass star froste...|
+|HAND WARMER UNION...|Hand Warmer Union...|hand warmer union...|
+|HAND WARMER RED P...|Hand Warmer Red P...|hand warmer red p...|
+|ASSORTED COLOUR B...|Assorted Colour B...|assorted colour b...|
++--------------------+--------------------+--------------------+
+only showing top 10 rows
+
+>>> df . select ( ltrim ( lit ( " HELLO " )) . alias ( "ltrim" ), rtrim ( lit ( " HELLO " )) . alias ( "rtrim" ), trim ( lit ( " HELLO " )) . alias ( "trim" ), lpad ( lit ( "HELLO" ), 3 , " " ) . alias ( "lp" ), rpad ( lit ( "HELLO" ), 10 , " " ) . alias ( "rp" )) . show ( 2 ) 
++------+------+-----+---+----------+
+| ltrim| rtrim| trim| lp|        rp|
++------+------+-----+---+----------+
+|HELLO | HELLO|HELLO|HEL|HELLO     |
+|HELLO | HELLO|HELLO|HEL|HELLO     |
++------+------+-----+---+----------+
+
+
+>>> reg_str = 'BLACK|WHITE|RED|GREEN|BLUE'
+>>> df.select(regexp_replace(col('Description'), reg_str, 'COLOR').alias('color_clean'), col('Description')).show(2)
++--------------------+--------------------+
+|         color_clean|         Description|
++--------------------+--------------------+
+|COLOR HANGING HEA...|WHITE HANGING HEA...|
+| COLOR METAL LANTERN| WHITE METAL LANTERN|
++--------------------+--------------------+
+
+>>> df.select(regexp_extract(col('Description'), '(WHITE|BLACK)', 1).alias('color'), col('Description')).show(2) # first occurance
++-----+--------------------+
+|color|         Description|
++-----+--------------------+
+|WHITE|WHITE HANGING HEA...|
+|WHITE| WHITE METAL LANTERN|
++-----+--------------------+
+only showing top 2 rows
+
+>>> df.select(translate(col('Description'), 'WHITE', '1337'), col('Description')).
++-----------------------------------+--------------------+
+|translate(Description, WHITE, 1337)|         Description|
++-----------------------------------+--------------------+
+|               1337 3ANG3NG 3AR7...|WHITE HANGING HEA...|
+|                   1337 M7AL LAN7RN| WHITE METAL LANTERN|
+|               CRAM CUP3D 3AR7S ...|CREAM CUPID HEART...|
++-----------------------------------+--------------------+
+
+>>> containsWhite = instr(col('Description'), 'WHITE') >= 1
+>>> df.withColumn('hasWhite', containsWhite).where('hasWhite')\
+... .select('Description').show(3, False)
++----------------------------------+
+|Description                       |
++----------------------------------+
+|WHITE HANGING HEART T-LIGHT HOLDER|
+|WHITE METAL LANTERN               |
+|RED WOOLLY HOTTIE WHITE HEART.    |
++----------------------------------+
+
+
+
 ```
 
 
@@ -687,12 +756,17 @@ only showing top 3 rows
   - initcap(): words sep by space
   - upper(), lower()
   - lpad(), rpad(); ltrim(), rtrim(); trim()
+  - Regex: 
+    - regexp_extract()
+    - regexp_replace()
+    - translate()
+  - instr()
+  - locate()
 
 Dates and timestamps
 Handling null
 Complex types
 User-defined functions
-
 
 
 #### Grouping and Aggregation Queries
