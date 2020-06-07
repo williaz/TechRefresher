@@ -963,6 +963,145 @@ DataFrame[InvoiceNo: string, StockCode: string, Description: string, Quantity: i
 >>> df1 = df.na.fill(5, subset=['Description'])
 >>> df.na.replace([""], ['UNKNOWN'], 'Description').where('Description = "UNKNOWN"').show(3)
 
+
+>>> df1 = df.select(\
+... struct('InvoiceNo', 'Description').alias('complex')\ 
+... )
+>>> df1.select('complex.Description').show(2)
++--------------------+
+|         Description|
++--------------------+
+|WHITE HANGING HEA...|
+| WHITE METAL LANTERN|
++--------------------+
+only showing top 2 rows
+
+>>> df1.select('complex').show(2)
++--------------------+
+|             complex|
++--------------------+
+|[536365, WHITE HA...|
+|[536365, WHITE ME...|
++--------------------+
+only showing top 2 rows
+
+>>> df.select(split(col('Description'), " ").alias('descArr'))\
+... .selectExpr('descArr[0]').show(2)                   
++----------+
+|descArr[0]|
++----------+
+|     WHITE|
+|     WHITE|
++----------+
+only showing top 2 rows
+
+>>> df.select(size(split(col('Description'), " "))).show(2)
++---------------------------+
+|size(split(Description,  ))|
++---------------------------+
+|                          5|
+|                          3|
++---------------------------+
+only showing top 2 rows
+
+>>> df.select(array_contains(split(col('Description'), " "), 'WHITE')).show(2)
++--------------------------------------------+
+|array_contains(split(Description,  ), WHITE)|
++--------------------------------------------+
+|                                        true|
+|                                        true|
++--------------------------------------------+
+only showing top 2 rows
+
+>>> df.withColumn('splitted', split(col('Description'), ' '))\
+... .withColumn('exploded', explode(col('splitted')))\
+... .select('Description', 'InvoiceNo', 'exploded').show(5)
++--------------------+---------+--------+
+|         Description|InvoiceNo|exploded|
++--------------------+---------+--------+
+|WHITE HANGING HEA...|   536365|   WHITE|
+|WHITE HANGING HEA...|   536365| HANGING|
+|WHITE HANGING HEA...|   536365|   HEART|
+|WHITE HANGING HEA...|   536365| T-LIGHT|
+|WHITE HANGING HEA...|   536365|  HOLDER|
++--------------------+---------+--------+
+only showing top 5 rows
+
+
+>>> df.select(create_map(col('Description'), col('InvoiceNo')).alias('cMap')).show(3, False)
++----------------------------------------------+
+|cMap                                          |
++----------------------------------------------+
+|[WHITE HANGING HEART T-LIGHT HOLDER -> 536365]|
+|[WHITE METAL LANTERN -> 536365]               |
+|[CREAM CUPID HEARTS COAT HANGER -> 536365]    |
++----------------------------------------------+
+only showing top 3 rows
+
+>>> df.select(create_map(col('Description'), col('InvoiceNo')).                                                TERN"]').show(3, False)
++-------------------------+
+|cMap[WHITE METAL LANTERN]|
++-------------------------+
+|null                     |
+|536365                   |
+|null                     |
++-------------------------+
+only showing top 3 rows
+
+>>> df.select(create_map(col('Description'), col('InvoiceNo')).alias('cMap')).selectExpr('explode(cMap)').show(3, False)
++----------------------------------+------+
+|key                               |value |
++----------------------------------+------+
+|WHITE HANGING HEART T-LIGHT HOLDER|536365|
+|WHITE METAL LANTERN               |536365|
+|CREAM CUPID HEARTS COAT HANGER    |536365|
++----------------------------------+------+
+only showing top 3 rows
+
+
+>>> jsonDF = spark.range(1).selectExpr("""\
+... '{"myJSONKey" : {"myJSONVal" : [1, 2, 3]}}' as jsonStr"""\
+... )
+
+>>> jsonDF.show(1, False)
++------------------------------------------+
+|jsonStr                                   |
++------------------------------------------+
+|{"myJSONKey" : {"myJSONVal" : [1, 2, 3]}}|
++------------------------------------------+
+
+>>> jsonDF.withColumn('jCol',\                          
+... get_json_object(col('jsonStr'), "$.myJSONKey.myJSONVal[1]")).show(1)
++--------------------+----+
+|             jsonStr|jCol|
++--------------------+----+
+|{"myJSONKey" : {"...|   2|
++--------------------+----+
+
+>>> jsonDF.select(\                                     
+... get_json_object(col('jsonStr'), "$.myJSONKey.myJSONVal[1]").alias("vCol"),\
+... json_tuple(col('jsonStr'), "myJSONKey"))\
+... .show(2)
++----+--------------------+
+|vCol|                  c0|
++----+--------------------+
+|   2|{"myJSONVal":[1,2...|
++----+--------------------+
+
+# favor withColumn over as and alias
+
+>>> df.selectExpr('(InvoiceNo, Description) as myStt')\
+... .withColumn('nJson', to_json(col('myStt')))\
+... .select(from_json(col('nJson'), pSchema),\
+... col('nJson')).show(2)
++--------------------+--------------------+
+|jsontostructs(nJson)|               nJson|
++--------------------+--------------------+
+|[536365, WHITE HA...|{"InvoiceNo":"536...|
+|[536365, WHITE ME...|{"InvoiceNo":"536...|
++--------------------+--------------------+
+only showing top 2 rows
+
 ```
 
 
@@ -998,8 +1137,6 @@ DataFrame[InvoiceNo: string, StockCode: string, Description: string, Quantity: i
     - Implicit type casting is an easy way to shoot yourself in the foot, 
 
 
-
-  
   
 - Handling null
   - coalesce(): first not null col
@@ -1007,8 +1144,22 @@ DataFrame[InvoiceNo: string, StockCode: string, Description: string, Quantity: i
   - na.drop()/drop('any'): if any col /drop('all'): if all col are null
   - 
 
-Complex types
-User-defined functions
+- Complex types
+  - Struct: DF within DF
+  - array
+    - split, size, array_contains
+    - explode(): col array to rows
+  - map
+    - create_map
+    - explode
+- JSON
+  - get_json_object
+  - json_tuple: one level of nesting
+  - to_json, from_json
+  
+- User-defined functions
+
+
 
 
 #### Grouping and Aggregation Queries
