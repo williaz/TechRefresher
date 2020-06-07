@@ -70,6 +70,7 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 
 - **Filter** data using Spark
 ```py
+# where/filter chain
 >>> df.where('count < 2').show(3)
 >>> df.where('count < 2').where('DEST_COUNTRY_NAME != "United States"').show(3)
 
@@ -824,7 +825,143 @@ only showing top 2 rows
 |RED WOOLLY HOTTIE WHITE HEART.    |
 +----------------------------------+
 
+# Date
+>>> dataDf = spark.range(10)\
+... .withColumn('today', current_date())\
+... .withColumn('now', current_timestamp())
+>>> dataDf.printSchema()
+root
+ |-- id: long (nullable = false)
+ |-- today: date (nullable = false)
+ |-- now: timestamp (nullable = false)
 
+>>> dataDf.show(4)
++---+----------+--------------------+
+| id|     today|                 now|
++---+----------+--------------------+
+|  0|2020-06-07|2020-06-07 10:55:...|
+|  1|2020-06-07|2020-06-07 10:55:...|
+|  2|2020-06-07|2020-06-07 10:55:...|
+|  3|2020-06-07|2020-06-07 10:55:...|
++---+----------+--------------------+
+only showing top 4 rows
+
+>>> dataDf.select(date_sub(col('today'), 5), date_add(col('today'), 5)).show(1)
++------------------+------------------+
+|date_sub(today, 5)|date_add(today, 5)|
++------------------+------------------+
+|        2020-06-02|        2020-06-12|
++------------------+------------------+
+only showing top 1 row
+
+
+
+
+>>> dataDf.withColumn('week_ago',\                       
+... date_sub(col('today'), 7))\
+... .select(datediff(col('week_ago'), col('today')))\
+... .show(1)
++-------------------------+
+|datediff(week_ago, today)|
++-------------------------+
+|                       -7|
++-------------------------+
+only showing top 1 row
+
+>>> dateFmt = 'yyyy-MM-dd'
+>>> dataDf.select(\
+... to_date(lit('2019-01-01'), dateFmt).alias('start'),\
+... to_date(lit('2020-02-28'), dateFmt).alias('end')\
+... )\
+... .select(months_between(col('start'), col('end') ))\
+... .show(1)
++--------------------------------+
+|months_between(start, end, true)|
++--------------------------------+
+|                    -13.87096774|
++--------------------------------+
+only showing top 1 row
+
+>>> dataDf.select(\
+... to_date(lit('2019-01-01')),\
+... to_date(lit('2020-06-06')))\
+... .show(1)
++---------------------+---------------------+
+|to_date('2019-01-01')|to_date('2020-06-06')|
++---------------------+---------------------+
+|           2019-01-01|           2020-06-06|
++---------------------+---------------------+
+only showing top 1 row
+
+
+>>> dateFmt = 'yyyy-dd-MM'
+>>> dataDf.select(\
+... to_date(lit('2019-01-01')),\
+... to_date(lit('2020-06-06')))\
+... .printSchema()
+root
+ |-- to_date('2019-01-01'): date (nullable = true)
+ |-- to_date('2020-06-06'): date (nullable = true)
+ 
+ >>> cleanDateDf = spark.range(1)\
+... .select(\
+... to_date(lit('2019-01-01'), dateFmt).alias('start'),\ ... to_date(lit('2020-28-02'), dateFmt).alias('end'))\
+... 
+>>> cleanDateDf.show()
++----------+----------+
+|     start|       end|
++----------+----------+
+|2019-01-01|2020-02-28|
++----------+----------+
+
+>>> cleanDateDf.select(to_timestamp(col('start'), dateFmt)).show()
++-----------------------------------+
+|to_timestamp(`start`, 'yyyy-dd-MM')|
++-----------------------------------+
+|                2019-01-01 00:00:00|
++-----------------------------------+
+
+>>> cleanDateDf.where(col('end') > lit('2019-06-30')).show()
++----------+----------+
+|     start|       end|
++----------+----------+
+|2019-01-01|2020-02-28|
++----------+----------+
+
+
+# NULL
+>>> df.select(coalesce(col('Description'), col('CustomerId'))).show(4)
++---------------------------------+
+|coalesce(Description, CustomerId)|
++---------------------------------+
+|             WHITE HANGING HEA...|
+|              WHITE METAL LANTERN|
+|             CREAM CUPID HEART...|
+|             KNITTED UNION FLA...|
++---------------------------------+
+only showing top 4 rows
+
+# na.drop
+>>> df1 = df.na.drop('all', subset=['StockCode', 'InvoiceNo'])
+>>> df1.count()
+3108
+>>> df.na.drop('any')
+DataFrame[InvoiceNo: string, StockCode: string, Description: string, Quantity: int, InvoiceDate: timestamp, UnitPrice: double, CustomerID: double, Country: string]
+>>> df.count()
+3108
+>>> df.na.drop('any').count()
+1968
+>>> df.count()
+3108
+>>> df.na.drop('all').count()
+3108
+>>> df1 = df.na.drop()
+>>> df1.count()
+1968
+
+# ?
+>>> df1 = df.na.fill(5, subset=['Description'])
+>>> df.na.replace([""], ['UNKNOWN'], 'Description').where('Description = "UNKNOWN"').show(3)
 
 ```
 
@@ -851,8 +988,25 @@ only showing top 2 rows
   - instr()
   - locate()
 
-Dates and timestamps
-Handling null
+- Dates and timestamps
+  - spark.conf.sessionLocalTimeZone: Java format
+  - TimestampType class supports only second-level precision, 
+  - date_sub(), date_add()
+  - datediff(), months_between()
+  - to_timestamp() : always requires a format 
+  - specify our string according to the right format of yyyy-MM-dd if we’re comparing a date
+    - Implicit type casting is an easy way to shoot yourself in the foot, 
+
+
+
+  
+  
+- Handling null
+  - coalesce(): first not null col
+  - SQL: ifnull, nullif, nvl, nvl2
+  - na.drop()/drop('any'): if any col /drop('all'): if all col are null
+  - 
+
 Complex types
 User-defined functions
 
