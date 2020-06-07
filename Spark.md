@@ -4,16 +4,104 @@ Convert a set of data values in a given format stored in HDFS into new data valu
 - **Load** data from HDFS for use in Spark applications
 - **Write** the results back into HDFS using Spark
 - Read and write files in a variety of file **formats**
+```py
+
+head flight-data/csv/2015-summary.csv
+>>> flightData2015 = spark\
+... .read\
+... .option('inferSchema', 'true')\
+... .option('header', 'true')\
+... .csv('flight-data/csv/2015-summary.csv')
+
+>>> df = spark.read.format('json').load("flight-data/json/2015-summary.json")
+
+
+>>> flightData2015.take(3)
+>>> flightData2015.sort('count').explain()
+>>> spark.conf.set('spark.sql.shuffle.partitions', '5')
+>>> flightData2015.sort('count').take(3)
+
+```
+
+
 - Perform standard extract, transform, load (**ETL**) processes on data using the Spark API
 
 ### Data Analysis
 Use Spark SQL to interact with the metastore programmatically in your applications. Generate reports by using queries against loaded data.
 - Use **metastore** tables as an input source or an output sink for Spark applications
+
 - Understand the fundamentals of **querying** datasets in Spark
+```py
+
+>>> df = spark.read.format('json').load("flight-data/json/2015-summary.json")
+
+>>> df.columns
+['DEST_COUNTRY_NAME', 'ORIGIN_COUNTRY_NAME', 'count']
+>>> df.select('ORIGIN_COUNTRY_NAME').show(3)
+
+
+>>> df.createOrReplaceTempView('dfTable')
+
+>>> df.select(\
+... expr("ORIGIN_COUNTRY_NAME as home"),\
+... col('ORIGIN_COUNTRY_NAME'),\
+... column("DEST_COUNTRY_NAME" ))\
+... .show(3)
+
+
+
+
+>>> df.selectExpr('ORIGIN_COUNTRY_NAME', 'DEST_COUNTRY_NAME', '(ORIGIN_COUNTRY_NAME != DEST_COUNTRY_NAME) as is_abroad').show(3)
+
+>>> df.selectExpr('avg(count)', 'count(distinct(DEST_COUNTRY_NAME))').show(1)
+
+>>> df.selectExpr('*', '1 as dummy').show(3)
+>>> df.select(expr('*'),\
+... lit(1).alias("dummy")).show(3)
+
+>>> df.selectExpr('ORIGIN_COUNTRY_NAME', 'DEST_COUNTRY_NAME', '(ORIGIN_COUNTRY_NAME = DEST_COUNTRY_NAME) as same_country').show(3)
+
+# return list fo row
+>>> df.take(3)
+
+>>> df.limit(2).collect()
+```
+
+
 - **Filter** data using Spark
+```py
+>>> df.where('count < 2').show(3)
+>>> df.where('count < 2').where('DEST_COUNTRY_NAME != "United States"').show(3)
+
+# Boolean col for filtering
+>>> df.where('InvoiceNo != 536365').select('InvoiceNo', 'Description').show(5, False) # no truncate
+
+>>> priceFlt = col('UnitPrice') > 500
+>>> descFlt = instr(df.Description, 'POSTAGE') >= 1
+>>> df.where(df.StockCode.isin('DOT')).where(priceFlt | descFlt).select('StockCode', 'UnitPrice', 'Description').show(3, False)
+
+>>> DotFlt = col('StockCode') == 'DOT'
+>>> df.withColumn('isExpensive', DotFlt & (priceFlt | descFlt))\
+... .where('isExpensive').select('UnitPrice', 'isExpensive').show(5)
+```
+
+
 - Write queries that calculate **aggregate** statistics
 - **Join** disparate datasets using Spark
 - Produce **ranked or sorted** data
+```py
+
+>>> df.orderBy('count').show(5)
+
+>>> df.orderBy(col('count').desc()).show(5) 
+
+# desc not working in df.sort(expr('count desc')).show(5), 
+
+>>> df.orderBy(col('count').desc()).limit(5).show()
+```
+
+
+
 ### Configuration
 This is a practical exam and the candidate should be familiar with all aspects of generating a result, not just writing code.
 - Supply command-line options to change your application **configuration**, such as increasing available memory
