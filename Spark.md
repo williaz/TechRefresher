@@ -1197,7 +1197,105 @@ only showing top 3 rows
 
 
 #### Grouping and Aggregation Queries
-- agg func
+
+```py
+
+>>> df.select(\
+... count('StockCode'),\
+... countDistinct('StockCode'),\
+... approx_count_distinct('StockCode', 0.1),\
+... first('StockCode'),\
+... last('StockCode')).show(1)
+
++----------------+-------------------------+--------------------------------+-----------------------+----------------------+
+|count(StockCode)|count(DISTINCT StockCode)|approx_count_distinct(StockCode)|first(StockCode, false)|last(StockCode, false)|
++----------------+-------------------------+--------------------------------+-----------------------+----------------------+
+|            3108|                     1351|                            1382|                  21249|                85226A|
++----------------+-------------------------+--------------------------------+-----------------------+----------------------+
+
+>>> df.select(min('UnitPrice').alias('min'),\
+... max('UnitPrice').alias('max'))\
+... .show(1)
++---+------+
+|min|   max|
++---+------+
+|0.0|607.49|
++---+------+
+
+>>> df.select(sum('UnitPrice').alias('sum'),\
+... sumDistinct('UnitPrice').alias('sumDist'),\
+... avg('UnitPrice').alias('avg'))\
+... .show(1)
++------------------+------------------+-----------------+
+|               sum|           sumDist|              avg|
++------------------+------------------+-----------------+
+|12904.249999999998|2302.7200000000003|4.151946589446589|
++------------------+------------------+-----------------+
+
+
+>>> df.select(var_pop('UnitPrice').alias('var_pop'),\
+... var_samp('UnitPrice').alias('var_samp'),\
+... stddev_samp('UnitPrice').alias('std_samp'),\
+... stddev_pop('UnitPrice').alias('std_pop'),\
+... skewness('UnitPrice').alias('skew'),\
+... kurtosis('UnitPrice').alias('kurt'))\
+... .show(1)
++------------------+------------------+------------------+------------------+-----------------+------------------+
+|           var_pop|          var_samp|          std_samp|           std_pop|             skew|              kurt|
++------------------+------------------+------------------+------------------+-----------------+------------------+
+|244.48899231761075|244.56768204799943|15.638659854603892|15.636143780280698|34.12992647682192|1264.9297964102832|
++------------------+------------------+------------------+------------------+-----------------+------------------+
+
+>>> df.select(corr('Quantity', 'UnitPrice'),\
+... covar_pop('Quantity', 'UnitPrice'),\
+... covar_samp('Quantity', 'UnitPrice'))\
+... .show(1)
++-------------------------+------------------------------+-------------------------------+
+|corr(Quantity, UnitPrice)|covar_pop(Quantity, UnitPrice)|covar_samp(Quantity, UnitPrice)|
++-------------------------+------------------------------+-------------------------------+
+|     -0.04112314436835551|            -16.95454821409937|            -16.960005101197567|
++-------------------------+------------------------------+-------------------------------+
+
+>>> df.agg(collect_set('Country'),\
+... collect_list('Country'))\
+... .show()
++--------------------+---------------------+
+|collect_set(Country)|collect_list(Country)|
++--------------------+---------------------+
+|[France, Australi...| [United Kingdom, ...|
++--------------------+---------------------+
+
+>>> df.agg(collect_set('Country').alias('region')).select(size('region')).show()
++------------+
+|size(region)|
++------------+
+|           7|
++------------+
+
+>>> df.agg(collect_set('Country').alias('region')).show(1, False)
++-----------------------------------------------------------------------+
+|region                                                                 |
++-----------------------------------------------------------------------+
+|[France, Australia, Norway, EIRE, Germany, United Kingdom, Netherlands]|
++-----------------------------------------------------------------------+
+
+```
+
+- Agg Func
+  - count(): 
+    - count(*) inlcude null; count(col) exclude null
+  - countDistinct()
+  - approx_count_distinct(col, max_err/rsd)
+  - first(), last(): based on row, not val
+  - min(), max()
+  - sum()
+  - sumDistinct()
+  - avg(), mean()
+  - var_samp, var_pop, stddev_pop, stddev_samp
+  - corr, covar_pop, covar_samp
+  - skewness, kurtosis
+  - Complex types: agg(): collect_set, collect_list
+  
 - group by
 - window
 - grouping set: rollup, cube
