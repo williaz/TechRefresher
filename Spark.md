@@ -1102,6 +1102,36 @@ only showing top 3 rows
 +--------------------+--------------------+
 only showing top 2 rows
 
+# UDF
+# DF func
+>>> udfDat = spark.range(5).toDF('num')
+>>> def pow3(dd):
+...     return dd ** 3
+... 
+>>> pow3udf = udf(pow3)
+>>> udfDat.select(pow3udf(col('num'))).show(3)
++---------+
+|pow3(num)|
++---------+
+|        0|
+|        1|
+|        8|
++---------+
+only showing top 3 rows
+
+# register as Spark SQL func
+>>> spark.udf.register('pow3py', pow3, IntegerType())
+<function pow3 at 0x102632950>
+>>> udfDat.selectExpr('pow3py(num)').show(3)
++-----------+
+|pow3py(num)|
++-----------+
+|          0|
+|          1|
+|          8|
++-----------+
+only showing top 3 rows
+
 ```
 
 
@@ -1157,13 +1187,21 @@ only showing top 2 rows
   - json_tuple: one level of nesting
   - to_json, from_json
   
-- User-defined functions
-
+- User-defined functions (UDF)
+  - operate on data, record by record
+  - register as temp func in SparkSession or Context
+  - better write UDF in Scala or Java for performance
+  - spark.udf.register()
+  - udf()
 
 
 
 #### Grouping and Aggregation Queries
-
+- agg func
+- group by
+- window
+- grouping set: rollup, cube
+-
 
 #### Joining DataFrames 
 
