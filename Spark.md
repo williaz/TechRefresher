@@ -1279,9 +1279,34 @@ only showing top 3 rows
 |[France, Australia, Norway, EIRE, Germany, United Kingdom, Netherlands]|
 +-----------------------------------------------------------------------+
 
+## groupBy
+
+>>> df.groupBy('InvoiceNo', 'CustomerId').count().show(5)
++---------+----------+-----+
+|InvoiceNo|CustomerId|count|
++---------+----------+-----+
+|   536596|      null|    6|
+|   536530|   17905.0|   23|
+|   536414|      null|    1|
+|   536400|   13448.0|    1|
+|   536550|      null|    1|
++---------+----------+-----+
+
+>>> df.groupBy('InvoiceNo').agg(\
+... count('Quantity').alias('quan'),\
+... expr('count(Quantity)')).show(3)
++---------+----+---------------+
+|InvoiceNo|quan|count(Quantity)|
++---------+----+---------------+
+|   536596|   6|              6|
+|   536597|  28|             28|
+|   536414|   1|              1|
++---------+----+---------------+
+only showing top 3 rows
+
 ```
 
-- Agg Func
+- DF-level Agg Func
   - count(): 
     - count(*) inlcude null; count(col) exclude null
   - countDistinct()
@@ -1297,6 +1322,9 @@ only showing top 3 rows
   - Complex types: agg(): collect_set, collect_list
   
 - group by
+  - agg(): pass in arbitrary expr
+  - with expr
+  - with mapping
 - window
 - grouping set: rollup, cube
 -
