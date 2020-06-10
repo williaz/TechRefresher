@@ -1304,6 +1304,88 @@ only showing top 3 rows
 +---------+----+---------------+
 only showing top 3 rows
 
+# rollup
+>>> rolledUpDf = df.rollup('StockCode', 'InvoiceNo')\
+... .agg(sum('Quantity').alias('total'))\
+... .select('StockCode', 'InvoiceNo', 'total')
+
+>>> rolledUpDf.show()
++---------+---------+-----+
+|StockCode|InvoiceNo|total|
++---------+---------+-----+
+|    22914|   536368|    3|
+|    71053|   536396|    6|
+|    22111|   536423|   16|
+|    21123|   536520|    1|
+|    21742|   536522|    1|
+|    21774|   536544|    2|
+|    48194|   536562|    2|
+|   15056P|   536575|   48|
+|    22771|   536582|   24|
+|    22775|   536592|    3|
+|    21556|     null|    6|
+|    82552|     null|   14|
+|    20711|     null|   20|
+|    22477|     null|    2|
+|    22145|     null|    1|
+|    37446|     null|   17|
+|    21164|     null|    1|
+|    22184|     null|    1|
+|    22224|   536384|    6|
+|    22730|   536395|    4|
++---------+---------+-----+
+only showing top 20 rows
+
+>>> rolledUpDf.where('StockCode is NULL and InvoiceNo is null').show()
++---------+---------+-----+
+|StockCode|InvoiceNo|total|
++---------+---------+-----+
+|     null|     null|26814|
++---------+---------+-----+
+
+>>> cubeDf = df.cube('StockCode', 'InvoiceNo')\
+... .agg(grouping_id().alias('level'), sum('Quantity').alias('total'))\
+... .select('level', 'StockCode', 'InvoiceNo', 'total')
+>>> cubeDf.show()
++-----+---------+---------+-----+
+|level|StockCode|InvoiceNo|total|
++-----+---------+---------+-----+
+|    0|    22914|   536368|    3|
+|    0|    71053|   536396|    6|
+|    0|    22111|   536423|   16|
+|    0|    21123|   536520|    1|
+|    0|    21742|   536522|    1|
+|    0|    21774|   536544|    2|
+|    0|    48194|   536562|    2|
+|    0|   15056P|   536575|   48|
+|    0|    22771|   536582|   24|
+|    0|    22775|   536592|    3|
+|    2|     null|   536365|   40|
+|    1|    21556|     null|    6|
+|    1|    82552|     null|   14|
+|    1|    20711|     null|   20|
+|    1|    22477|     null|    2|
+|    1|    22145|     null|    1|
+|    1|    37446|     null|   17|
+|    1|    21164|     null|    1|
+|    1|    22184|     null|    1|
+|    0|    22224|   536384|    6|
++-----+---------+---------+-----+
+only showing top 20 rows
+
+
+
+# pivot
+>>> pivoted = df.groupBy('StockCode').pivot('Country').sum('Quantity')
+>>> pivoted.show(3)
++---------+---------+----+------+-------+-----------+------+--------------+
+|StockCode|Australia|EIRE|France|Germany|Netherlands|Norway|United Kingdom|
++---------+---------+----+------+-------+-----------+------+--------------+
+|    22728|     null|null|    24|   null|       null|  null|            13|
+|    21259|     null|null|  null|   null|       null|  null|             8|
+|    21889|     null|  24|  null|   null|       null|  null|            28|
++---------+---------+----+------+-------+-----------+------+--------------+
+only showing top 3 rows
 ```
 
 - DF-level Agg Func
@@ -1326,8 +1408,15 @@ only showing top 3 rows
   - with expr
   - with mapping
 - window
-- grouping set: rollup, cube
--
+- grouping set: an agg across multiple groups
+  - Grouping sets depend on null values for aggregation levels. If you do not filter-out null values, you will get incorrect results. This applies to cubes, rollups, and grouping sets. 
+  - rollup: subtotal, grant total
+  - cube: all combination's 
+  - grouping_id
+    - gives us a column specifying the level of aggregation 
+    - cube: 0: any comb; 1 by col1, 2 by col2; max: total
+    - rollup: 0: anyl 1 by col1; nax: total
+  - pivot
 
 #### Joining DataFrames 
 
