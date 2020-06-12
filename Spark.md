@@ -1386,6 +1386,54 @@ only showing top 20 rows
 |    21889|     null|  24|  null|   null|       null|  null|            28|
 +---------+---------+----+------+-------+-----------+------+--------------+
 only showing top 3 rows
+
+# Window
+>>> from pyspark.sql.functions import *
+>>> dfWithDate = df.withColumn('date', \
+... to_date(col('InvoiceDate'), 'MM/d/yyy H;mm')
+... )
+>>> from pyspark.sql.window import Window
+>>> winSpec = Window\
+... .partitionBy('CustomerId', 'date')\
+... .orderBy(desc('Quantity'))\
+... .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+>>> maxQ = max(col('Quantity')).over(winSpec)
+>>> pDenseRank = dense_rank().over(winSpec)
+>>> pRank = rank().over(winSpec)
+
+>>> dfWithDate.where('customerId is NOT NULL')\
+... .orderBy('customerId')\
+... .select(\
+... col('customerId'),\
+... col('date'),\
+... col('Quantity'),\
+... pDenseRank.alias('qDR'),\
+... pRank.alias('qR'),\
+... maxQ.alias('mP')).show()
++----------+----------+--------+---+---+---+
+|customerId|      date|Quantity|qDR| qR| mP|
++----------+----------+--------+---+---+---+
+|   12431.0|2010-12-01|      24|  1|  1| 24|
+|   12431.0|2010-12-01|      24|  1|  1| 24|
+|   12431.0|2010-12-01|      12|  2|  3| 24|
+|   12431.0|2010-12-01|       8|  3|  4| 24|
+|   12431.0|2010-12-01|       6|  4|  5| 24|
+|   12431.0|2010-12-01|       6|  4|  5| 24|
+|   12431.0|2010-12-01|       6|  4|  5| 24|
+|   12431.0|2010-12-01|       4|  5|  8| 24|
+|   12431.0|2010-12-01|       4|  5|  8| 24|
+|   12431.0|2010-12-01|       4|  5|  8| 24|
+|   12431.0|2010-12-01|       3|  6| 11| 24|
+|   12431.0|2010-12-01|       2|  7| 12| 24|
+|   12431.0|2010-12-01|       2|  7| 12| 24|
+|   12431.0|2010-12-01|       2|  7| 12| 24|
+|   12433.0|2010-12-01|      96|  1|  1| 96|
+|   12433.0|2010-12-01|      72|  2|  2| 96|
+|   12433.0|2010-12-01|      72|  2|  2| 96|
+|   12433.0|2010-12-01|      50|  3|  4| 96|
+|   12433.0|2010-12-01|      48|  4|  5| 96|
+|   12433.0|2010-12-01|      48|  4|  5| 96|
++----------+----------+--------+---+---+---+
 ```
 
 - DF-level Agg Func
@@ -1408,6 +1456,14 @@ only showing top 3 rows
   - with expr
   - with mapping
 - window
+  - rolling agg
+  - VS group by:
+    - A group-by takes data, and every row can go only into **one grouping**. 
+    - A window function calculates a return value for every input row of a table based on a group of rows, called a frame. Each row can fall into one or **more frames**. 
+  - 3 kinds func: ranking, analytic, agg
+  
+
+
 - grouping set: an agg across multiple groups
   - Grouping sets depend on null values for aggregation levels. If you do not filter-out null values, you will get incorrect results. This applies to cubes, rollups, and grouping sets. 
   - rollup: subtotal, grant total
