@@ -675,15 +675,68 @@ DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: bigint]
 
 ### Working with DataFrames and Schemas
 
+- lazy evaluation: In general, Spark will fail only at job execution time rather than DataFrame definition time 
 
 
 #### Creating DataFrames from Data Sources
+```py
+>>> csvFile = spark.read.format('csv')\
+... .option('header', 'true')\
+... .option('mode', 'FAILFAST')\
+... .option('inferSchema', 'true')\
+... .load('flight-data/csv/2010-summary.csv')
+>>> csvFile.write.format('csv').mode('overwrite')\
+... .option('sep', '\t').save('tmp/tsv-temp.tsv')
+
+tsv-temp.tsv williaz$ ls -ltr
+total 16
+-rw-r--r--  1 williaz  staff  7073 Jun 13 18:36 part-00000-a00a7f42-0d49-49d4-a7ae-46240f5a4939-c000.csv
+-rw-r--r--  1 williaz  staff     0 Jun 13 18:36 _SUCCESS
+
+```
 
 
+- 6 core data sources
+  - CSV
+  - JSON
+  - Rarquet
+  - ORC
+  - JDBC
+  - text
+
+```py
+DataFrameReader.format(...).option("key", "value").schema(...).load() 
+```
+- Read
+  - optional: format default Parquest 
+  - opional schema: from ds or schemaInference
+  - required path option, or pass map
+  - spark.read
+
+- read mode: deal with malformed records
+  - permissive
+    - default
+    - set null
+    - _corrupt_records column
+  - dropMalformed
+  - failFast
 
 #### Saving DataFrames to Data Sources
 
+```py
+DataFrameWriter.format(...).option(...).partitionBy(...).bucketBy(...).sortBy(...).save() 
+```
+- Write
+  - PartitionBy , bucketBy , and sortBy work only for file-based data sources; 
+  - required path option
+  - df.write
 
+- save mode
+  - append: if exist file
+  - overwrite: discard exist one
+  - errorIfExists
+    - default
+  - ignore: do nothing
 
 #### DataFrame Schemas 
 
