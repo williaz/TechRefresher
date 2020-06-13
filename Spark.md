@@ -1434,6 +1434,9 @@ only showing top 3 rows
 |   12433.0|2010-12-01|      48|  4|  5| 96|
 |   12433.0|2010-12-01|      48|  4|  5| 96|
 +----------+----------+--------+---+---+---+
+
+
+
 ```
 
 - DF-level Agg Func
@@ -1476,6 +1479,138 @@ only showing top 3 rows
 
 #### Joining DataFrames 
 
+```py
+
+person = spark . createDataFrame ([ ( 0 , "Bill Chambers" , 0 , [ 100 ]), ( 1 , "Matei Zaharia" , 1 , [ 500 , 250 , 100 ]), ( 2 , "Michael Armbrust" , 1 , [ 250 , 100 ])]) \
+. toDF ( "id" , "name" , "graduate_program" , "spark_status" ) 
+
+graduateProgram = spark . createDataFrame ([ ( 0 , "Masters" , "School of Information" , "UC Berkeley" ), ( 2 , "Masters" , "EECS" , "UC Berkeley" ), ( 1 , "Ph.D." , "EECS" , "UC Berkeley" )]) \
+. toDF ( "id" , "degree" , "department" , "school" ) 
+
+sparkStatus = spark . createDataFrame ([ ( 500 , "Vice President" ), ( 250 , "PMC Member" ), ( 100 , "Contributor" )]) \
+. toDF ( "id" , "status" ) 
+
+# inner join
+>>> joinExpr = person['graduate_program'] == graduateProgram['id']
+>>> person.join(graduateProgram, joinExpr).show(3)
++---+----------------+----------------+---------------+---+-------+--------------------+-----------+
+| id|            name|graduate_program|   spark_status| id| degree|          department|     school|
++---+----------------+----------------+---------------+---+-------+--------------------+-----------+
+|  0|   Bill Chambers|               0|          [100]|  0|Masters|School of Informa...|UC Berkeley|
+|  1|   Matei Zaharia|               1|[500, 250, 100]|  1|  Ph.D.|                EECS|UC Berkeley|
+|  2|Michael Armbrust|               1|     [250, 100]|  1|  Ph.D.|                EECS|UC Berkeley|
++---+----------------+----------------+---------------+---+-------+--------------------+-----------+
+
+# outer
+>>> person.join(graduateProgram, joinExpr, 'outer').show(5)
++----+----------------+----------------+---------------+---+-------+--------------------+-----------+
+|  id|            name|graduate_program|   spark_status| id| degree|          department|     school|
++----+----------------+----------------+---------------+---+-------+--------------------+-----------+
+|   0|   Bill Chambers|               0|          [100]|  0|Masters|School of Informa...|UC Berkeley|
+|   1|   Matei Zaharia|               1|[500, 250, 100]|  1|  Ph.D.|                EECS|UC Berkeley|
+|   2|Michael Armbrust|               1|     [250, 100]|  1|  Ph.D.|                EECS|UC Berkeley|
+|null|            null|            null|           null|  2|Masters|                EECS|UC Berkeley|
++----+----------------+----------------+---------------+---+-------+--------------------+-----------+
+
+# left_ outer
+>>> person.join(graduateProgram, joinExpr, 'left_outer').show(5)
++---+----------------+----------------+---------------+---+-------+--------------------+-----------+
+| id|            name|graduate_program|   spark_status| id| degree|          department|     school|
++---+----------------+----------------+---------------+---+-------+--------------------+-----------+
+|  0|   Bill Chambers|               0|          [100]|  0|Masters|School of Informa...|UC Berkeley|
+|  1|   Matei Zaharia|               1|[500, 250, 100]|  1|  Ph.D.|                EECS|UC Berkeley|
+|  2|Michael Armbrust|               1|     [250, 100]|  1|  Ph.D.|                EECS|UC Berkeley|
++---+----------------+----------------+---------------+---+-------+--------------------+-----------+
+
+# right_outer
+>>> person.join(graduateProgram, joinExpr, 'right_outer').show(5)
++----+----------------+----------------+---------------+---+-------+--------------------+-----------+
+|  id|            name|graduate_program|   spark_status| id| degree|          department|     school|
++----+----------------+----------------+---------------+---+-------+--------------------+-----------+
+|   0|   Bill Chambers|               0|          [100]|  0|Masters|School of Informa...|UC Berkeley|
+|   1|   Matei Zaharia|               1|[500, 250, 100]|  1|  Ph.D.|                EECS|UC Berkeley|
+|   2|Michael Armbrust|               1|     [250, 100]|  1|  Ph.D.|                EECS|UC Berkeley|
+|null|            null|            null|           null|  2|Masters|                EECS|UC Berkeley|
++----+----------------+----------------+---------------+---+-------+--------------------+-----------+
+
+# left_semi
+>>> person.join(graduateProgram, joinExpr, 'left_semi').show(5)
++---+----------------+----------------+---------------+
+| id|            name|graduate_program|   spark_status|
++---+----------------+----------------+---------------+
+|  0|   Bill Chambers|               0|          [100]|
+|  1|   Matei Zaharia|               1|[500, 250, 100]|
+|  2|Michael Armbrust|               1|     [250, 100]|
++---+----------------+----------------+---------------+
+
+# left_anti
+>>> graduateProgram.join(person, joinExpr, 'left_anti').show(5)
++---+-------+----------+-----------+
+| id| degree|department|     school|
++---+-------+----------+-----------+
+|  2|Masters|      EECS|UC Berkeley|
++---+-------+----------+-----------+
+
+# cross
+>>> graduateProgram.join(person, joinExpr, 'cross').show(5)
++---+-------+--------------------+-----------+---+----------------+----------------+---------------+
+| id| degree|          department|     school| id|            name|graduate_program|   spark_status|
++---+-------+--------------------+-----------+---+----------------+----------------+---------------+
+|  0|Masters|School of Informa...|UC Berkeley|  0|   Bill Chambers|               0|          [100]|
+|  1|  Ph.D.|                EECS|UC Berkeley|  1|   Matei Zaharia|               1|[500, 250, 100]|
+|  1|  Ph.D.|                EECS|UC Berkeley|  2|Michael Armbrust|               1|     [250, 100]|
++---+-------+--------------------+-----------+---+----------------+----------------+---------------+
+
+>>> graduateProgram.crossJoin(person).show()
++---+-------+--------------------+-----------+---+----------------+----------------+---------------+
+| id| degree|          department|     school| id|            name|graduate_program|   spark_status|
++---+-------+--------------------+-----------+---+----------------+----------------+---------------+
+|  0|Masters|School of Informa...|UC Berkeley|  0|   Bill Chambers|               0|          [100]|
+|  0|Masters|School of Informa...|UC Berkeley|  1|   Matei Zaharia|               1|[500, 250, 100]|
+|  0|Masters|School of Informa...|UC Berkeley|  2|Michael Armbrust|               1|     [250, 100]|
+|  2|Masters|                EECS|UC Berkeley|  0|   Bill Chambers|               0|          [100]|
+|  2|Masters|                EECS|UC Berkeley|  1|   Matei Zaharia|               1|[500, 250, 100]|
+|  2|Masters|                EECS|UC Berkeley|  2|Michael Armbrust|               1|     [250, 100]|
+|  1|  Ph.D.|                EECS|UC Berkeley|  0|   Bill Chambers|               0|          [100]|
+|  1|  Ph.D.|                EECS|UC Berkeley|  1|   Matei Zaharia|               1|[500, 250, 100]|
+|  1|  Ph.D.|                EECS|UC Berkeley|  2|Michael Armbrust|               1|     [250, 100]|
++---+-------+--------------------+-----------+---+----------------+----------------+---------------+
+
+# broadcast
+>>> graduateProgram.join(broadcast(person), joinExpr, 'left_outer').explain()
+== Physical Plan ==
+*(2) BroadcastHashJoin [id#171L], [graduate_program#157L], LeftOuter, BuildRight
+:- *(2) Project [_1#163L AS id#171L, _2#164 AS degree#172, _3#165 AS department#173, _4#166 AS school#174]
+:  +- Scan ExistingRDD[_1#163L,_2#164,_3#165,_4#166]
++- BroadcastExchange HashedRelationBroadcastMode(List(input[2, bigint, true]))
+   +- *(1) Project [_1#147L AS id#155L, _2#148 AS name#156, _3#149L AS graduate_program#157L, _4#150 AS spark_status#158]
+      +- *(1) Filter isnotnull(_3#149L)
+         +- Scan ExistingRDD[_1#147L,_2#148,_3#149L,_4#150]
+```
+- join expression
+  - Complex type: Any expression is a valid join expression, assuming that it returns a Boolean: 
+
+- join types: determines what should be in the result set
+  - inner join
+    - default
+  - outer
+  - left_outer
+  - right_outer
+  - left_semi
+    - filter
+    - keep duplicate key
+  - left_anti
+    - NOT IN
+  - natural join
+  - cross join: cartesian product, m X n
+    - spark.sql.crossJoin.enable 
+
+- join strategy
+  - big table to big table: shuffle join
+  - big to small: broadcast/copy small to all nodes
+  - small to small: let spark decide
+
+- partition your data like 2 diff df in same machine to acoide shuffle
 
 ### RDD Overview
 
