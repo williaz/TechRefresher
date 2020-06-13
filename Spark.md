@@ -84,11 +84,119 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 >>> DotFlt = col('StockCode') == 'DOT'
 >>> df.withColumn('isExpensive', DotFlt & (priceFlt | descFlt))\
 ... .where('isExpensive').select('UnitPrice', 'isExpensive').show(5)
+
+# left_semi
+>>> person.join(graduateProgram, joinExpr, 'left_semi').show(5)
++---+----------------+----------------+---------------+
+| id|            name|graduate_program|   spark_status|
++---+----------------+----------------+---------------+
+|  0|   Bill Chambers|               0|          [100]|
+|  1|   Matei Zaharia|               1|[500, 250, 100]|
+|  2|Michael Armbrust|               1|     [250, 100]|
++---+----------------+----------------+---------------+
+
+# left_anti
+>>> graduateProgram.join(person, joinExpr, 'left_anti').show(5)
++---+-------+----------+-----------+
+| id| degree|department|     school|
++---+-------+----------+-----------+
+|  2|Masters|      EECS|UC Berkeley|
++---+-------+----------+-----------+
+
 ```
 
 
 - Write queries that calculate **aggregate** statistics
+```py
+>>> df.select(min('UnitPrice').alias('min'),\
+... max('UnitPrice').alias('max'))\
+... .show(1)
+
+>>> df.select(sum('UnitPrice').alias('sum'),\
+... sumDistinct('UnitPrice').alias('sumDist'),\
+... avg('UnitPrice').alias('avg'))\
+... .show(1)
+
+>>> df.select(var_pop('UnitPrice').alias('var_pop'),\
+... var_samp('UnitPrice').alias('var_samp'),\
+... stddev_samp('UnitPrice').alias('std_samp'),\
+... stddev_pop('UnitPrice').alias('std_pop'),\
+... skewness('UnitPrice').alias('skew'),\
+... kurtosis('UnitPrice').alias('kurt'))\
+... .show(1)
+
+>>> df.select(corr('Quantity', 'UnitPrice'),\
+... covar_pop('Quantity', 'UnitPrice'),\
+... covar_samp('Quantity', 'UnitPrice'))\
+... .show(1)
+
+>>> df.agg(collect_set('Country'),\
+... collect_list('Country'))\
+... .show()
+
+>>> df.agg(collect_set('Country').alias('region')).select(size('region')).show()
+
+>>> df.agg(collect_set('Country').alias('region')).show(1, False)
+
+## groupBy
+
+>>> df.groupBy('InvoiceNo', 'CustomerId').count().show(5)
+>>> df.groupBy('InvoiceNo').agg(\
+... count('Quantity').alias('quan'),\
+... expr('count(Quantity)')).show(3)
+
+# rollup
+>>> rolledUpDf = df.rollup('StockCode', 'InvoiceNo')\
+... .agg(sum('Quantity').alias('total'))\
+... .select('StockCode', 'InvoiceNo', 'total')
+
+>>> rolledUpDf.show()
+
+>>> rolledUpDf.where('StockCode is NULL and InvoiceNo is null').show()
+# cube
+>>> cubeDf = df.cube('StockCode', 'InvoiceNo')\
+... .agg(grouping_id().alias('level'), sum('Quantity').alias('total'))\
+... .select('level', 'StockCode', 'InvoiceNo', 'total')
+>>> cubeDf.show()
+
+# pivot
+>>> pivoted = df.groupBy('StockCode').pivot('Country').sum('Quantity')
+>>> pivoted.show(3)
+
+# Window
+>>> from pyspark.sql.window import Window
+>>> winSpec = Window\
+... .partitionBy('CustomerId', 'date')\
+... .orderBy(desc('Quantity'))\
+... .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+>>> maxQ = max(col('Quantity')).over(winSpec)
+>>> pDenseRank = dense_rank().over(winSpec)
+>>> pRank = rank().over(winSpec)
+
+>>> dfWithDate.where('customerId is NOT NULL')\
+... .orderBy('customerId')\
+... .select(\
+... col('customerId'),\
+... col('date'),\
+... col('Quantity'),\
+... pDenseRank.alias('qDR'),\
+... pRank.alias('qR'),\
+... maxQ.alias('mP')).show()
+
+```
 - **Join** disparate datasets using Spark
+```py
+>>> joinExpr = person['graduate_program'] == graduateProgram['id']
+>>> person.join(graduateProgram, joinExpr).show(3)
+>>> person.join(graduateProgram, joinExpr, 'outer').show(5)
+>>> person.join(graduateProgram, joinExpr, 'left_outer').show(5)
+>>> person.join(graduateProgram, joinExpr, 'right_outer').show(5)
+>>> person.join(graduateProgram, joinExpr, 'left_semi').show(5)
+>>> graduateProgram.join(person, joinExpr, 'left_anti').show(5)
+>>> graduateProgram.join(person, joinExpr, 'cross').show(5)
+>>> graduateProgram.crossJoin(person).show()
+
+```
 - Produce **ranked or sorted** data
 ```py
 
@@ -99,6 +207,28 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 # desc not working in df.sort(expr('count desc')).show(5), 
 
 >>> df.orderBy(col('count').desc()).limit(5).show()
+
+# Window
+>>> from pyspark.sql.window import Window
+>>> winSpec = Window\
+... .partitionBy('CustomerId', 'date')\
+... .orderBy(desc('Quantity'))\
+... .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+>>> maxQ = max(col('Quantity')).over(winSpec)
+>>> pDenseRank = dense_rank().over(winSpec)
+>>> pRank = rank().over(winSpec)
+
+>>> dfWithDate.where('customerId is NOT NULL')\
+... .orderBy('customerId')\
+... .select(\
+... col('customerId'),\
+... col('date'),\
+... col('Quantity'),\
+... pDenseRank.alias('qDR'),\
+... pRank.alias('qR'),\
+... maxQ.alias('mP')).show()
+
+
 ```
 
 
