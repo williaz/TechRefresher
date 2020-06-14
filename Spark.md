@@ -737,6 +737,62 @@ DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: bigint]
 ... .save('tmp/orc-temp.orc'
 
 
+## JDBC
+$ pyspark --driver-class-path sqlite-jdbc-3.30.1.jar --jars sqlite-jdbc-3.30.1.jar
+
+>>> driver = 'org.sqlite.JDBC'
+>>> path = '/XXXX/flight-data/jdbc/my-sqlite.db'
+>>> url = 'jdbc:sqlite:'+ path
+>>> tableName = 'flight_info'
+>>> dbDf = spark.read.format('jdbc')\
+... .option('url', url)\
+... .option('dbtable', tableName)\
+... .option('driver', driver).load()
+
+>>> dbDf
+DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: decimal(20,0)]
+>>> dbDf.show(3)
+[Stage 0:>                                                                                                +-----------------+-------------------+-----+
+|DEST_COUNTRY_NAME|ORIGIN_COUNTRY_NAME|count|
++-----------------+-------------------+-----+
+|    United States|            Romania|    1|
+|    United States|            Ireland|  264|
+|    United States|              India|   69|
++-----------------+-------------------+-----+
+
+>>> dbDf.filter('DEST_COUNTRY_NAME = "United States"').explain()
+== Physical Plan ==
+*(1) Scan JDBCRelation(flight_info) [numPartitions=1] [DEST_COUNTRY_NAME#6,ORIGIN_COUNTRY_NAME#7,count#8] PushedFilters: [*IsNotNull(DEST_COUNTRY_NAME), *EqualTo(DEST_COUNTRY_NAME,United States)], ReadSchema: struct<DEST_COUNTRY_NAME:string,ORIGIN_COUNTRY_NAME:string,count:decimal(20,0)>
+
+
+>> props = {'driver': 'org.sqlite.JDBC'}
+>>> predicates = [ "DEST_COUNTRY_NAME != 'Sweden' OR ORIGIN_COUNTRY_NAME != 'Sweden'" , "DEST_COUNTRY_NAME != 'Anguilla' OR ORIGIN_COUNTRY_NAME != 'Anguilla'" ] 
+>>> colName = 'count'
+>>> lowerBound = 0
+>>> upperBound = 40000
+>>> spark.read.jdbc(url, tableName, column= colName,\
+... properties=props, lowerBound=lowerBound, upperBound=upperBound, numPartitions=10).count()
+255
+
+# JDBC write
+>>> csvFile = spark.read.format('csv')\
+... .option('header', 'true')\
+... .option('mode', 'FAILFAST')\
+... .option('inferSchema', 'true')\
+... .load('flight-data/csv/2010-summary.csv')
+>>> newPath = 'jdbc:sqlite://tmp/sqlite-tmp.db'
+
+>>> csvFile.write.jdbc(newPath, tableName,\
+... mode='overwrite', properties=props)
+20/06/14 11:55:44 WARN JdbcUtils: Requested isolation level 1 is not supported; falling back to default isolation level 8
+>>> spark.read.jdbc(newPath, tableName, properties=props).count()
+255
+>>> csvFile.write.jdbc(newPath, tableName,\
+... mode='append', properties=props)              
+20/06/14 11:57:21 WARN JdbcUtils: Requested isolation level 1 is not supported; falling back to default isolation level 8
+>>> spark.read.jdbc(newPath, tableName, properties=props).count()
+510
+
 
 
 ```
@@ -757,9 +813,17 @@ DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: bigint]
     - be aware of incompatible due to Spark versions
   - ORC
     - optimized for Hive
-    - 
   - JDBC
+    - classpath + jars
+    - option: url, dbtable, driver, user, password
+    - option: numPartitions => how much r/w in parallel
+    - Spark gather schema from dbtable itself and map to its data types
+    - PushedFilters: 
+      - it translate
+      - use query as dbtable
   - text
+    - textFile: ignore partitioned dir name
+    - text
 
 ```py
 DataFrameReader.format(...).option("key", "value").schema(...).load() 
