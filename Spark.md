@@ -793,6 +793,37 @@ DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: decimal
 >>> spark.read.jdbc(newPath, tableName, properties=props).count()
 510
 
+# text
+>>> spark.read.text('flight-data/csv/2010-summary.csv')\
+... .selectExpr('split(value, ",") as rows').show(4) 
++--------------------+
+|                rows|
++--------------------+
+|[DEST_COUNTRY_NAM...|
+|[United States, R...|
+|[United States, I...|
+|[United States, I...|
++--------------------+
+
+
+>>> csvFile.limit(10).select('DEST_COUNTRY_NAME', 'count')\
+... .write.partitionBy('count')\
+... .text('tmp/txt-temp3.txt')
+
+$ cd txt-temp3.txt/
+:txt-temp3.txt williaz$ ls -ltr
+total 0
+drwxr-xr-x  4 williaz  staff  128 Jun 14 15:18 count=1
+drwxr-xr-x  4 williaz  staff  128 Jun 14 15:18 count=24
+drwxr-xr-x  4 williaz  staff  128 Jun 14 15:18 count=25
+drwxr-xr-x  4 williaz  staff  128 Jun 14 15:18 count=29
+drwxr-xr-x  4 williaz  staff  128 Jun 14 15:18 count=44
+drwxr-xr-x  4 williaz  staff  128 Jun 14 15:18 count=54
+drwxr-xr-x  4 williaz  staff  128 Jun 14 15:18 count=69
+drwxr-xr-x  4 williaz  staff  128 Jun 14 15:18 count=264
+drwxr-xr-x  4 williaz  staff  128 Jun 14 15:18 count=477
+-rw-r--r--  1 williaz  staff    0 Jun 14 15:18 _SUCCESS
+
 
 
 ```
@@ -822,8 +853,12 @@ DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: decimal
       - it translate
       - use query as dbtable
   - text
-    - textFile: ignore partitioned dir name
-    - text
+    - textFile: ignore partitioned dir name[404]
+    - text: partitioning on read and write
+    - write
+      - only one string column
+      - partitionBy: partition col as folder
+      - option: maxRecordsPerFile
 
 ```py
 DataFrameReader.format(...).option("key", "value").schema(...).load() 
