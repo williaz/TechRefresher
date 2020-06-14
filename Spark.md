@@ -1974,9 +1974,43 @@ sparkStatus = spark . createDataFrame ([ ( 500 , "Vice President" ), ( 250 , "PM
 
 ### Querying Tables and Views with SQL
 
-- Querying Tables in Spark Using SQL 
-- Querying Files and Views
-- The Catalog API 
+
+```py
+>>> spark.sql('select 1 + 1').show()
++-------+
+|(1 + 1)|
++-------+
+|      2|
++-------+
+
+>>> spark.read.json('flight-data/json/2015-summary.json')\
+... .createOrReplaceTempView('summary_view')
+>>> spark.sql("""\
+... select DEST_COUNTRY_NAME, sum(count)
+... from summary_view
+... group by DEST_COUNTRY_NAME
+... """)\
+... .show(4)
+20/06/14 15:50:04 WARN ObjectStore: Failed to get database global_temp, returning NoSuchObjectException
++-----------------+----------+
+|DEST_COUNTRY_NAME|sum(count)|
++-----------------+----------+
+|         Anguilla|        41|
+|           Russia|       176|
+|         Paraguay|        60|
+|          Senegal|        40|
++-----------------+----------+
+
+```
+- Spark
+  - OLAP, not for low-latency queries
+  - can connect Hive metastores
+- spark-sql
+- spark.sql
+
+#### Querying Tables in Spark Using SQL 
+#### Querying Files and Views
+#### The Catalog API 
 
 
 ### Working with Datasets in Scala
