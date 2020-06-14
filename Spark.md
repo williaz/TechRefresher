@@ -680,6 +680,7 @@ DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: bigint]
 
 #### Creating DataFrames from Data Sources
 ```py
+# CSV
 >>> csvFile = spark.read.format('csv')\
 ... .option('header', 'true')\
 ... .option('mode', 'FAILFAST')\
@@ -693,14 +694,70 @@ total 16
 -rw-r--r--  1 williaz  staff  7073 Jun 13 18:36 part-00000-a00a7f42-0d49-49d4-a7ae-46240f5a4939-c000.csv
 -rw-r--r--  1 williaz  staff     0 Jun 13 18:36 _SUCCESS
 
+# JSON
+>>> spark.read.format('json')\                       
+... .option('mode', 'FAILFAST')\
+... .option('inferSchema', 'true')\                  
+... .load('flight-data/json/2010-summary.json').show(5)
++-----------------+-------------------+-----+
+|DEST_COUNTRY_NAME|ORIGIN_COUNTRY_NAME|count|
++-----------------+-------------------+-----+
+|    United States|            Romania|    1|
+|    United States|            Ireland|  264|
+|    United States|              India|   69|
+|            Egypt|      United States|   24|
+|Equatorial Guinea|      United States|    1|
++-----------------+-------------------+-----+
+only showing top 5 rows
+
+>>> cvsvFile.write.format('json')\
+... .mode('overwrite')\
+... .save('tmp/json-temp.json')
+
+
+{"DEST_COUNTRY_NAME":"United States","ORIGIN_COUNTRY_NAME":"India","count":69}
+{"DEST_COUNTRY_NAME":"Egypt","ORIGIN_COUNTRY_NAME":"United States","count":24}
+{"DEST_COUNTRY_NAME":"Equatorial Guinea","ORIGIN_COUNTRY_NAME":"United States","count":1}
+
+
+# parquet
+>>> spark.read.format('parquet')\
+... .load('flight-data/parquet/2010-summary.parquet') 
+DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: bigint]
+>>> cvsvFile.write.format('parquet').mode('overwrite')\
+... .save('tmp/parquet-temp.parquet')
+
+# orc
+>>> spark.read.format('orc')\
+... .load('flight-data/orc/2010-summary.orc')
+DataFrame[DEST_COUNTRY_NAME: string, ORIGIN_COUNTRY_NAME: string, count: bigint]
+
+>>> cvsvFile.write.format('orc')\
+... .mode('overwrite')\
+... .save('tmp/orc-temp.orc'
+
+
+
+
 ```
 
 
 - 6 core data sources
   - CSV
   - JSON
+    - in spark, line-delimited JSON as more stable(appendable) 
+    - multiLine . When you set this option to true , you can read an entire file as one json object 
+
   - Rarquet
+    - spark default
+    - colum-oriented with columnar compression
+    - more efficient ready than JSON/CSV
+    - supports complex type
+    - schema is built into the file itself
+    - be aware of incompatible due to Spark versions
   - ORC
+    - optimized for Hive
+    - 
   - JDBC
   - text
 
@@ -730,6 +787,8 @@ DataFrameWriter.format(...).option(...).partitionBy(...).bucketBy(...).sortBy(..
   - PartitionBy , bucketBy , and sortBy work only for file-based data sources; 
   - required path option
   - df.write
+  - one file **per partition** will be written out, and the entire DataFrame will be written out as a folder. 
+
 
 - save mode
   - append: if exist file
