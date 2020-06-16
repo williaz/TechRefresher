@@ -5,21 +5,77 @@ Convert a set of data values in a given format stored in HDFS into new data valu
 - **Write** the results back into HDFS using Spark
 - Read and write files in a variety of file **formats**
 ```py
+DataFrameReader.format(...).option("key", "value").schema(...).load() 
+DataFrameWriter.format(...).option(...).partitionBy(...).bucketBy(...).sortBy(...).save() 
 
-head flight-data/csv/2015-summary.csv
->>> flightData2015 = spark\
-... .read\
-... .option('inferSchema', 'true')\
+# CSV
+>>> csvFile = spark.read.format('csv')\
 ... .option('header', 'true')\
-... .csv('flight-data/csv/2015-summary.csv')
+... .option('mode', 'FAILFAST')\
+... .option('inferSchema', 'true')\
+... .load('flight-data/csv/2010-summary.csv')
 
->>> df = spark.read.format('json').load("flight-data/json/2015-summary.json")
+>>> csvFile.write.format('csv').mode('overwrite')\
+... .option('sep', '\t').save('tmp/tsv-temp.tsv')
+
+# JSON
+>>> spark.read.format('json')\                       
+... .option('mode', 'FAILFAST')\
+... .option('inferSchema', 'true')\                  
+... .load('flight-data/json/2010-summary.json').show(5)
+
+>>> cvsvFile.write.format('json')\
+... .mode('overwrite')\
+... .save('tmp/json-temp.json')
 
 
->>> flightData2015.take(3)
->>> flightData2015.sort('count').explain()
->>> spark.conf.set('spark.sql.shuffle.partitions', '5')
->>> flightData2015.sort('count').take(3)
+# parquet
+>>> spark.read.format('parquet')\
+... .load('flight-data/parquet/2010-summary.parquet') 
+
+>>> cvsvFile.write.format('parquet').mode('overwrite')\
+... .save('tmp/parquet-temp.parquet')
+
+# orc
+>>> spark.read.format('orc')\
+... .load('flight-data/orc/2010-summary.orc')
+
+>>> cvsvFile.write.format('orc')\
+... .mode('overwrite')\
+... .save('tmp/orc-temp.orc'
+
+
+## JDBC
+$ pyspark --driver-class-path sqlite-jdbc-3.30.1.jar --jars sqlite-jdbc-3.30.1.jar
+
+>>> driver = 'org.sqlite.JDBC'
+>>> path = '/XXXX/flight-data/jdbc/my-sqlite.db'
+>>> url = 'jdbc:sqlite:'+ path
+>>> tableName = 'flight_info'
+>>> dbDf = spark.read.format('jdbc')\
+... .option('url', url)\
+... .option('dbtable', tableName)\
+... .option('driver', driver).load()
+
+
+>> props = {'driver': 'org.sqlite.JDBC'}
+>>> predicates = [ "DEST_COUNTRY_NAME != 'Sweden' OR ORIGIN_COUNTRY_NAME != 'Sweden'" , "DEST_COUNTRY_NAME != 'Anguilla' OR ORIGIN_COUNTRY_NAME != 'Anguilla'" ] 
+>>> colName = 'count'
+>>> lowerBound = 0
+>>> upperBound = 40000
+>>> spark.read.jdbc(url, tableName, column= colName,\
+... properties=props, lowerBound=lowerBound, upperBound=upperBound, numPartitions=10).count()
+
+>>> csvFile.write.jdbc(newPath, tableName,\
+... mode='append', properties=props)              
+
+# text
+>>> spark.read.text('flight-data/csv/2010-summary.csv')\
+... .selectExpr('split(value, ",") as rows').show(4) 
+
+>>> csvFile.limit(10).select('DEST_COUNTRY_NAME', 'count')\
+... .write.partitionBy('count')\
+... .text('tmp/txt-temp3.txt')
 
 ```
 
