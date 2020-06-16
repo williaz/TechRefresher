@@ -8,6 +8,8 @@ Convert a set of data values in a given format stored in HDFS into new data valu
 DataFrameReader.format(...).option("key", "value").schema(...).load() 
 DataFrameWriter.format(...).option(...).partitionBy(...).bucketBy(...).sortBy(...).save() 
 
+# export PYSPARK_PYTHON=/usr/local/bin/python3
+
 # CSV
 >>> csvFile = spark.read.format('csv')\
 ... .option('header', 'true')\
@@ -17,6 +19,15 @@ DataFrameWriter.format(...).option(...).partitionBy(...).bucketBy(...).sortBy(..
 
 >>> csvFile.write.format('csv').mode('overwrite')\
 ... .option('sep', '\t').save('tmp/tsv-temp.tsv')
+
+# validation
+>>> import os
+>>> os.system('ls -ltr tmp/tsv-temp.tsv')
+>>> os.system('head -3 tmp/tsv-temp.tsv/part*')
+>>> os.system('tail -3 tmp/tsv-temp.tsv/part*')
+>>> os.system('vim tmp/tsv-temp.tsv/part*')
+
+
 
 # JSON
 >>> spark.read.format('json')\                       
