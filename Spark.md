@@ -121,6 +121,17 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 >>> df.take(3)
 
 >>> df.limit(2).collect()
+
+# sql
+>>> spark.read.json('flight-data/json/2015-summary.json')\
+... .createOrReplaceTempView('summary_view')
+>>> spark.sql("""\
+... select DEST_COUNTRY_NAME, sum(count)
+... from summary_view
+... group by DEST_COUNTRY_NAME
+... """)\
+... .show(4)
+
 ```
 
 
