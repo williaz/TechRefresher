@@ -92,6 +92,21 @@ $ pyspark --driver-class-path sqlite-jdbc-3.30.1.jar --jars sqlite-jdbc-3.30.1.j
 
 
 - Perform standard extract, transform, load (**ETL**) processes on data using the Spark API
+```py
+>>> type(spark.read)
+<class 'pyspark.sql.readwriter.DataFrameReader'>
+>>> csvFile = spark.read.schema("""destination STRING, home STRING, count INT""")\
+... .csv('flight-data/csv/2010-summary.csv', inferSchema=True, header=True)
+
+>>> csvFile.printSchema()
+root
+ |-- destination: string (nullable = true)
+ |-- home: string (nullable = true)
+ |-- count: integer (nullable = true)
+
+>>> csvFile.write.csv('tmp/csv-mydata.csv', header=True, mode='overwrite')
+
+```
 
 ### Data Analysis
 Use Spark SQL to interact with the metastore programmatically in your applications. Generate reports by using queries against loaded data.
@@ -107,7 +122,7 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 >>> df.select('ORIGIN_COUNTRY_NAME').show(3)
 
 
->>> df.createOrReplaceTempView('dfTable')
+>>> df.createOrReplaceTempView('2015_summary')
 
 >>> df.select(\
 ... expr("ORIGIN_COUNTRY_NAME as home"),\
@@ -115,7 +130,15 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 ... column("DEST_COUNTRY_NAME" ))\
 ... .show(3)
 
-
+>>> spark.sql("""select ORIGIN_COUNTRY_NAME as home from 2015_summary limit 4""").show()
++-------------+
+|         home|
++-------------+
+|      Romania|
+|      Croatia|
+|      Ireland|
+|United States|
++-------------+
 
 
 >>> df.selectExpr('ORIGIN_COUNTRY_NAME', 'DEST_COUNTRY_NAME', '(ORIGIN_COUNTRY_NAME != DEST_COUNTRY_NAME) as is_abroad').show(3)
@@ -314,7 +337,23 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 ### Configuration
 This is a practical exam and the candidate should be familiar with all aspects of generating a result, not just writing code.
 - Supply command-line options to change your application **configuration**, such as increasing available memory
+```py
 
+>>> type(spark)
+<class 'pyspark.sql.session.SparkSession'>
+>>> help(spark.read)
+
+>>> spark.stop()
+>>> spark = SparkSession.builder.appName('Demo').config('spark.ui.port', '0').getOrCreate()
+>>> spark.sparkContext
+<SparkContext master=local[*] appName=Demo>
+>>> spark.sparkContext.getConf()
+<pyspark.conf.SparkConf object at 0x106e84090>
+>>> spark.sparkContext.getConf().getAll()
+[('spark.driver.port', '64137'), ('spark.ui.port', '0'), ('spark.sql.catalogImplementation', 'hive'), ('spark.rdd.compress', 'True'), ('spark.app.id', 'local-1592361987030'), ('spark.serializer.objectStreamReset', '100'), ('spark.master', 'local[*]'), ('spark.executor.id', 'driver'), ('spark.submit.deployMode', 'client'), ('spark.driver.host', 'bos-mbp-24477.attlocal.net'), ('spark.ui.showConsoleProgress', 'true'), ('spark.app.name', 'Demo')]
+
+
+```
 
 ## Outline
 ### Introduction
