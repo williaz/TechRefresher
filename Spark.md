@@ -1,6 +1,33 @@
 ## Required Skills
 ### Transform, Stage, and Store
 Convert a set of data values in a given format stored in HDFS into new data values or a new data format and write them into HDFS. 
+```bash
+/etc/hadoop/conf/core-site.xml
+fs.defaultFS # url
+
+/etc/hadoop/conf/hdfs-site.xml
+dfs.blocksize
+dfs.replication
+
+hadoop fs -help
+
+hadoop fs -put localPath remotePath # copyFromLocal
+hadoop fs -ls remotePath # -R: all
+
+hadoop fs -du -s -h remotePath
+
+hadoop fs -tail remotePath
+
+hadoop fs -get # copyToLocal
+hadoop fs -cp # one to anther hdfs
+
+
+/etc/hadoop/conf/yarn-site.xml
+resourcemanager
+
+/etc/spark/conf/spark-env.xml
+```
+
 - **Load** data from HDFS for use in Spark applications
 - **Write** the results back into HDFS using Spark
 - Read and write files in a variety of file **formats**
