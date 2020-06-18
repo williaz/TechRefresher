@@ -29,7 +29,21 @@ resourcemanager
 ```
 
 - **Load** data from HDFS for use in Spark applications
+```py
+pyspark --master yarn
+
+orig = read
+selectExpr.groupBy
+write
+
+```
+
+
 - **Write** the results back into HDFS using Spark
+```py
+to 1 file. no parition
+manaul add header
+```
 - Read and write files in a variety of file **formats**
 ```py
 DataFrameReader.format(...).option("key", "value").schema(...).load() 
