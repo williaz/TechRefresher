@@ -12,7 +12,8 @@ dfs.replication
 hadoop fs -help
 
 hadoop fs -put localPath remotePath # copyFromLocal
-hadoop fs -ls remotePath # -R: all
+hadoop fs -ls -h remotePath # -R: all, human read
+hdfs fsck file -blocks
 
 hadoop fs -du -s -h remotePath
 
@@ -21,6 +22,7 @@ hadoop fs -tail remotePath
 hadoop fs -get # copyToLocal
 hadoop fs -cp # one to anther hdfs
 
+gunzip part*
 
 /etc/hadoop/conf/yarn-site.xml
 resourcemanager
@@ -30,7 +32,7 @@ resourcemanager
 
 - **Load** data from HDFS for use in Spark applications
 ```py
-pyspark --master yarn
+pyspark --master yarn -- num-executors 6 --executor-cores 2 --executor-memory 3G
 
 orig = read
 selectExpr.groupBy
