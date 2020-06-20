@@ -36,13 +36,15 @@ orig = read
 selectExpr.groupBy
 write
 
+df.selectExpr('_c0 as id', '_c2 as name')
 ```
 
 
 - **Write** the results back into HDFS using Spark
 ```py
-to 1 file. no parition
+to 1 file. no parition: repartiton VS coalesce
 manaul add header
+text format with ,
 ```
 - Read and write files in a variety of file **formats**
 ```py
