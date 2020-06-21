@@ -32,6 +32,30 @@ resourcemanager
 ```
 
 - **Load** data from HDFS for use in Spark applications
+  - CSV:
+    - read default option
+      - sep=','
+      - header=False, isFirstLineHeader
+      - inferSchema=False
+      - dateFormat='yyyy-MM-dd'
+      - escapeQuotes=True
+      - compression=None
+        - gzip
+      - mode=PERMISSIVE (case insensitive)
+        - FAILFAST
+        - DROPMALFORMED
+    - write
+      - sep=','
+      - header=False, isFirstLineHeader
+      - quoteAll=False
+      - dateFormat='yyyy-MM-dd'
+      - compression=None
+        - gzip
+      - mode='errorIfExists'
+        - append
+        - overwrite
+        - ignore
+      
 ```py
 pyspark --master yarn --num-executors 6 --executor-cores 2 --executor-memory 3G
 
@@ -39,8 +63,27 @@ df.selectExpr('_c0 as id', '_c2 as name')
 
 # TODO text read skip header
 # TODO csv handle ,"ss,ss",
-# TODO read/write csv, text, json options
 
+## Q1
+# to_date, date_format
+>>> crime = spark.read.csv('/public/crime/csv', inferSchema=True, header=True, dateFormat='MM/dd/yyyy')
+>>> crime.schema
+>>> byMon = crime.withColumn('Month', date_format(to_date('Date', 'MM/dd/yyyy'), 'YYYYMM')).select(col('Month'), col('Primary Type').alias('Type'))
+>>> aggType = byMon.groupBy('Type','Month').count().orderBy(col('Month'), col('Type').desc())
+
+>>> ret = aggType.select('Month', col('Type').alias('crime type'), col('count').alias('crime count'))
+>>> ret.coalesce(1).write.csv('/user/williaz257/soluation/1/crimeByMonType', sep='\t', compression='gzip')
+
+# post
+>>> os.system('hadoop fs -ls -h /user/williaz257/soluation/1/crimeByMonType')
+>>> os.system('hadoop fs -get /user/williaz257/soluation/1/crimeByMonType/par* .'
+>>> os.system('gunzip par*')
+>>> os.system('ls -ltr .')
+>>> os.system('vim par*')
+
+
+
+## Q3
 # pre-check
 from os import system
 os.system('hadoop fs -cat filePath | head -n 3')
@@ -58,6 +101,7 @@ top3.write.json('/user/williaz257/solutions/03/res_crime')
 # post-check
 os.system('hadoop fs -ls /user/williaz257/solutions/03/res_crime')
 os.system('hadoop fs -cat /user/williaz257/solutions/03/res_crime/p* | head -n 5')
+os.system('hadoop fs -cat /user/williaz257/sample/s1/* | wc -l')
 ```
 
 
