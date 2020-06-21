@@ -64,60 +64,6 @@ df.selectExpr('_c0 as id', '_c2 as name')
 # TODO text read skip header
 # TODO csv handle ,"ss,ss",
 
-## Q1
-# to_date, date_format
->>> crime = spark.read.csv('/public/crime/csv', inferSchema=True, header=True, dateFormat='MM/dd/yyyy')
->>> crime.schema
->>> byMon = crime.withColumn('Month', date_format(to_date('Date', 'MM/dd/yyyy'), 'YYYYMM')).select(col('Month'), col('Primary Type').alias('Type'))
->>> aggType = byMon.groupBy('Type','Month').count().orderBy(col('Month'), col('Type').desc())
-
->>> ret = aggType.select('Month', col('Type').alias('crime type'), col('count').alias('crime count'))
->>> ret.coalesce(1).write.csv('/user/williaz257/soluation/1/crimeByMonType', sep='\t', compression='gzip')
-
-# post
->>> os.system('hadoop fs -ls -h /user/williaz257/soluation/1/crimeByMonType')
->>> os.system('hadoop fs -get /user/williaz257/soluation/1/crimeByMonType/par* .'
->>> os.system('gunzip par*')
->>> os.system('ls -ltr .')
->>> os.system('vim par*')
-
-## Q2: local files
-pyspark
->>> os.system('vim /data/retail_db/orders/*')
->>> os.system('vim /data/retail_db/customers/*')
-
->>> order = spark.read.csv('file:///data/retail_db/orders/*', inferSchema = True)
->>> customer = spark.read.csv('file:///data/retail_db/customers', inferSchema = True)
-
->>> cst = customer.selectExpr('_c1 as fname', '_c2 as lname', '_c0 as cid')
->>> ord = order.selectExpr('_c2 as cid')
-
->>> jexp = cst['cid'] == ord['cid']
->>> ret = cst.join(ord, jexp, 'left_anti')
-
->>> ret.selectExpr('lname as customer_lname', 'fname as customer_fname').distinct().orderBy('customer_lname', 'customer_fname').coalesce(1).write.csv('file:///home/williaz257/inactive_cst', mode='overwrite')
->>> os.system('vim /home/williaz257/inactive_cst/p*')
->>> os.system('hadoop fs -put /home/williaz257/inactive_cst /user/williaz257/solutions/2/.')
-
-## Q3
-# pre-check
-from os import system
-os.system('hadoop fs -cat filePath | head -n 3')
-
-from pyspark.sql.functions import *
-# ETL
-crime = spark.read.csv('/public/crime/csv/', inferSchema=True, header=True)
-cc = crime.select(col('Primary Type').alias('type'), col('Location Description').alias('loc'))
-res = cc.where('loc = "RESIDENCE"')
-byT = res.groupBy('type').count()
-top3 = byT.orderBy(col('count').desc()).limit(3)
-
-top3.write.json('/user/williaz257/solutions/03/res_crime')
-
-# post-check
-os.system('hadoop fs -ls /user/williaz257/solutions/03/res_crime')
-os.system('hadoop fs -cat /user/williaz257/solutions/03/res_crime/p* | head -n 5')
-os.system('hadoop fs -cat /user/williaz257/sample/s1/* | wc -l')
 ```
 
 
@@ -234,6 +180,88 @@ root
 >>> csvFile.write.csv('tmp/csv-mydata.csv', header=True, mode='overwrite')
 
 ```
+  - Mocks
+```py
+
+## Q1
+# to_date, date_format
+>>> crime = spark.read.csv('/public/crime/csv', inferSchema=True, header=True, dateFormat='MM/dd/yyyy')
+>>> crime.schema
+>>> byMon = crime.withColumn('Month', date_format(to_date('Date', 'MM/dd/yyyy'), 'YYYYMM')).select(col('Month'), col('Primary Type').alias('Type'))
+>>> aggType = byMon.groupBy('Type','Month').count().orderBy(col('Month'), col('Type').desc())
+
+>>> ret = aggType.select('Month', col('Type').alias('crime type'), col('count').alias('crime count'))
+>>> ret.coalesce(1).write.csv('/user/williaz257/soluation/1/crimeByMonType', sep='\t', compression='gzip')
+
+# post
+>>> os.system('hadoop fs -ls -h /user/williaz257/soluation/1/crimeByMonType')
+>>> os.system('hadoop fs -get /user/williaz257/soluation/1/crimeByMonType/par* .'
+>>> os.system('gunzip par*')
+>>> os.system('ls -ltr .')
+>>> os.system('vim par*')
+
+## Q2: local files
+pyspark
+>>> os.system('vim /data/retail_db/orders/*')
+>>> os.system('vim /data/retail_db/customers/*')
+
+>>> order = spark.read.csv('file:///data/retail_db/orders/*', inferSchema = True)
+>>> customer = spark.read.csv('file:///data/retail_db/customers', inferSchema = True)
+
+>>> cst = customer.selectExpr('_c1 as fname', '_c2 as lname', '_c0 as cid')
+>>> ord = order.selectExpr('_c2 as cid')
+
+>>> jexp = cst['cid'] == ord['cid']
+>>> ret = cst.join(ord, jexp, 'left_anti')
+
+>>> ret.selectExpr('lname as customer_lname', 'fname as customer_fname').distinct().orderBy('customer_lname', 'customer_fname').coalesce(1).write.csv('file:///home/williaz257/inactive_cst', mode='overwrite')
+>>> os.system('vim /home/williaz257/inactive_cst/p*')
+>>> os.system('hadoop fs -put /home/williaz257/inactive_cst /user/williaz257/solutions/2/.')
+
+## Q3
+# pre-check
+from os import system
+os.system('hadoop fs -cat filePath | head -n 3')
+
+from pyspark.sql.functions import *
+# ETL
+crime = spark.read.csv('/public/crime/csv/', inferSchema=True, header=True)
+cc = crime.select(col('Primary Type').alias('type'), col('Location Description').alias('loc'))
+res = cc.where('loc = "RESIDENCE"')
+byT = res.groupBy('type').count()
+top3 = byT.orderBy(col('count').desc()).limit(3)
+
+top3.write.json('/user/williaz257/solutions/03/res_crime')
+
+# post-check
+os.system('hadoop fs -ls /user/williaz257/solutions/03/res_crime')
+os.system('hadoop fs -cat /user/williaz257/solutions/03/res_crime/p* | head -n 5')
+os.system('hadoop fs -cat /user/williaz257/sample/s1/* | wc -l')
+
+## Q4 schema
+>>> from pyspark.sql.types import *
+# ETL
+>>> mySchm = StructType(\
+>>> [StructField('stockticker', StringType (), True),\
+>>> StructField('transactiondate', StringType (), True),\
+>>> StructField('openprice', FloatType (), True),\
+>>> StructField('volumn', LongType (), True)])
+
+>>> nyse = spark.read.csv('file:///data/nyse', schema=mySchm)
+>>> nyse.write.parquet('file:///home/williaz257/myParquet')
+>>> os.system('ls -ltr /home/williaz257/myParquet')
+
+# transfer
+>>> os.system('hadoop fs -mkdir /user/williaz257/solutions/4/')
+>>> os.system('hadoop fs -ls -h /user/williaz257/solutions')
+>>> os.system('hadoop fs -put /home/williaz257/myParquet /user/williaz257/solutions/4/.')
+
+# validate
+>>> nyse.count()                                                         
+>>> parq = spark.read.parquet('/user/williaz257/solutions/4/myParquet')
+>>> parq.count()
+```
+
 
 ### Data Analysis
 Use Spark SQL to interact with the metastore programmatically in your applications. Generate reports by using queries against loaded data.
