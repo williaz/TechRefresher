@@ -81,7 +81,23 @@ df.selectExpr('_c0 as id', '_c2 as name')
 >>> os.system('ls -ltr .')
 >>> os.system('vim par*')
 
+## Q2: local files
+pyspark
+>>> os.system('vim /data/retail_db/orders/*')
+>>> os.system('vim /data/retail_db/customers/*')
 
+>>> order = spark.read.csv('file:///data/retail_db/orders/*', inferSchema = True)
+>>> customer = spark.read.csv('file:///data/retail_db/customers', inferSchema = True)
+
+>>> cst = customer.selectExpr('_c1 as fname', '_c2 as lname', '_c0 as cid')
+>>> ord = order.selectExpr('_c2 as cid')
+
+>>> jexp = cst['cid'] == ord['cid']
+>>> ret = cst.join(ord, jexp, 'left_anti')
+
+>>> ret.selectExpr('lname as customer_lname', 'fname as customer_fname').distinct().orderBy('customer_lname', 'customer_fname').coalesce(1).write.csv('file:///home/williaz257/inactive_cst', mode='overwrite')
+>>> os.system('vim /home/williaz257/inactive_cst/p*')
+>>> os.system('hadoop fs -put /home/williaz257/inactive_cst /user/williaz257/solutions/2/.')
 
 ## Q3
 # pre-check
