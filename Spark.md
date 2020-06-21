@@ -1,6 +1,7 @@
 ## Required Skills
 ### Transform, Stage, and Store
 Convert a set of data values in a given format stored in HDFS into new data values or a new data format and write them into HDFS. 
+
 ```bash
 /etc/hadoop/conf/core-site.xml
 fs.defaultFS # url
@@ -32,21 +33,42 @@ resourcemanager
 
 - **Load** data from HDFS for use in Spark applications
 ```py
-pyspark --master yarn -- num-executors 6 --executor-cores 2 --executor-memory 3G
-
-orig = read
-selectExpr.groupBy
-write
+pyspark --master yarn --num-executors 6 --executor-cores 2 --executor-memory 3G
 
 df.selectExpr('_c0 as id', '_c2 as name')
+
+# TODO text read skip header
+# TODO csv handle ,"ss,ss",
+# TODO read/write csv, text, json options
+
+# pre-check
+from os import system
+os.system('hadoop fs -cat filePath | head -n 3')
+
+from pyspark.sql.functions import *
+# ETL
+crime = spark.read.csv('/public/crime/csv/', inferSchema=True, header=True)
+cc = crime.select(col('Primary Type').alias('type'), col('Location Description').alias('loc'))
+res = cc.where('loc = "RESIDENCE"')
+byT = res.groupBy('type').count()
+top3 = byT.orderBy(col('count').desc()).limit(3)
+
+top3.write.json('/user/williaz257/solutions/03/res_crime')
+
+# post-check
+os.system('hadoop fs -ls /user/williaz257/solutions/03/res_crime')
+os.system('hadoop fs -cat /user/williaz257/solutions/03/res_crime/p* | head -n 5')
 ```
 
 
 - **Write** the results back into HDFS using Spark
+  - coalesce: combine partition without a full shuffle
 ```py
-to 1 file. no parition: repartiton VS coalesce
-manaul add header
-text format with ,
+df.coalesce(1)
+
+# TODO manaul add header
+# TODO text format with ,
+
 ```
 - Read and write files in a variety of file **formats**
 ```py
