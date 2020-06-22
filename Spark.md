@@ -161,6 +161,14 @@ $ pyspark --driver-class-path sqlite-jdbc-3.30.1.jar --jars sqlite-jdbc-3.30.1.j
 ... .write.partitionBy('count')\
 ... .text('tmp/txt-temp3.txt')
 
+# avro
+pyspark --packages org.apache.spark:spark-avro_2.11:2.4.0 
+pyspark --jars 
+
+
+>>> flight = spark.read.csv('flight-data/csv/2010-summary.csv', inferSchema=True, header=True)
+>>> flight.write.format('avro').save('temp/avro-sample')
+>>> avroFlg = spark.read.format('avro').load('temp/avro-sample')
 ```
 
 
