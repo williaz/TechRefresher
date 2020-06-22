@@ -268,6 +268,19 @@ os.system('hadoop fs -cat /user/williaz257/sample/s1/* | wc -l')
 >>> nyse.count()                                                         
 >>> parq = spark.read.parquet('/user/williaz257/solutions/4/myParquet')
 >>> parq.count()
+
+## Q5 spk config, avro
+
+pyspark2 --packages 'com.databricks:spark-avro_2.10:2.0.1' --master yarn --num-executors 10 --executor-memory 3G --executor-cores 2
+
+>>> data = sc.textFile("/public/randomtextwriter")
+>>> type(data)
+<class 'pyspark.rdd.RDD'>
+
+>>> from operator import add
+>>> words = data.flatMap(lambda x:x.split(' ')).map(lambda x:(x, 1)).reduceByKey(add)
+>>> df = words.toDF(schema=['word', 'count'])
+>>> df.coalesce(8).write.format('com.databricks.spark.avro').save('/user/williaz257/solutions/5/word_count')
 ```
 
 
