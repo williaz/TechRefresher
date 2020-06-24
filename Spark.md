@@ -287,6 +287,38 @@ pyspark2 --packages 'com.databricks:spark-avro_2.10:2.0.1' --master yarn --num-e
 ### Data Analysis
 Use Spark SQL to interact with the metastore programmatically in your applications. Generate reports by using queries against loaded data.
 - Use **metastore** tables as an input source or an output sink for Spark applications
+```py
+>>> spark.sql('select current_database()').show()
+
+>>> spark.sql('show databases').show()
+>>> spark.sql('create database order_db')
+>>> orders.write.saveAsTable('order_db.orders') # MapredParquetInputFormat
+
+>>> spark.sql('describe formatted order_db.orders').show(100, False)
+
+>>> spark.read.table('order_db.orders').show(3)
+>>> spark.sql('select * from order_db.orders').show(3)
+
+>>> spark.sql('select count(*) from order_db.orders').show()
+>>> spark.read.table('order_db.orders').count()
+
+>>> spark.sql('drop table order_db.orders')
+
+>>> spark.sql("""
+... create table order_db.orders (
+... order_id INT, 
+... order_date TIMESTAMP,
+... customer_id INT,
+... order_status STRING
+... ) ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'
+... """)  # TextInputFormat
+
+>>> orders.write.insertInto('order_db.orders')
+>>> orders.write.format('orc').saveAsTable('order_db.orders2')
+
+```
+
+
 
 - Understand the fundamentals of **querying** datasets in Spark
 ```py
@@ -307,14 +339,6 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 ... .show(3)
 
 >>> spark.sql("""select ORIGIN_COUNTRY_NAME as home from 2015_summary limit 4""").show()
-+-------------+
-|         home|
-+-------------+
-|      Romania|
-|      Croatia|
-|      Ireland|
-|United States|
-+-------------+
 
 
 >>> df.selectExpr('ORIGIN_COUNTRY_NAME', 'DEST_COUNTRY_NAME', '(ORIGIN_COUNTRY_NAME != DEST_COUNTRY_NAME) as is_abroad').show(3)
@@ -364,21 +388,9 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 
 # left_semi
 >>> person.join(graduateProgram, joinExpr, 'left_semi').show(5)
-+---+----------------+----------------+---------------+
-| id|            name|graduate_program|   spark_status|
-+---+----------------+----------------+---------------+
-|  0|   Bill Chambers|               0|          [100]|
-|  1|   Matei Zaharia|               1|[500, 250, 100]|
-|  2|Michael Armbrust|               1|     [250, 100]|
-+---+----------------+----------------+---------------+
 
 # left_anti
 >>> graduateProgram.join(person, joinExpr, 'left_anti').show(5)
-+---+-------+----------+-----------+
-| id| degree|department|     school|
-+---+-------+----------+-----------+
-|  2|Masters|      EECS|UC Berkeley|
-+---+-------+----------+-----------+
 
 ```
 
