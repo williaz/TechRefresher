@@ -281,6 +281,34 @@ pyspark2 --packages 'com.databricks:spark-avro_2.10:2.0.1' --master yarn --num-e
 >>> words = data.flatMap(lambda x:x.split(' ')).map(lambda x:(x, 1)).reduceByKey(add)
 >>> df = words.toDF(schema=['word', 'count'])
 >>> df.coalesce(8).write.format('com.databricks.spark.avro').save('/user/williaz257/solutions/5/word_count')
+
+## Q6 table
+>>> os.system('hadoop fs -ls -h /public/retail_*')
+>>> orders = spark.read.json('/public/retail_db_json/orders')
+>>> items = spark.read.json('/public/retail_db_json/order_items')
+>>> customers = spark.read.json('/public/retail_db_json/customers')
+
+>>> spark.sql('create database williaz257_retail_db_txt')
+>>> spark.sql('select current_database()').show()
+
+>>> orders.write.saveAsTable('orders')
+>>> spark.sql('describe formatted orders').show(100, False)
+>>> spark.sql('select * from orders limit 4').show()  
+>>> customers.write.saveAsTable('customers')
+>>> spark.sql('select * from customers').show(3)
+>>> items.write.saveAsTable('order_items')
+>>> spark.sql('select * from order_items limit 3').show(4)
+
+>>> order_info = spark.sql("""
+... select ord.order_id, ord.order_customer_id, itm.order_item_subtotal
+... from orders
+... ord join order_items itm on ord.order_id = itm.order_item_order_id""")
+
+>>> cst_rev = order_info.join(customers, joinExpr, 'left_outer').selectExpr('customer_id', 'order_item_subtotal', 'customer_fname || " " || customer_lname as name')
+
+rev = cst_rev.groupBy('customer_id').agg(sum(col('order_item_subtotal')).alias('total'))
+>>> rev.orderBy(col('total').desc()).limit(5).write.saveAsTable('top5_customers')
+>>> spark.sql('select * from top5_customers').show()
 ```
 
 
