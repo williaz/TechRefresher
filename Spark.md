@@ -29,6 +29,10 @@ gunzip part*
 resourcemanager
 
 /etc/spark/conf/spark-env.xml
+
+# check command history
+import readline
+readline.write_history_file('python_history.txt')
 ```
 
 - **Load** data from HDFS for use in Spark applications
@@ -61,7 +65,6 @@ pyspark --master yarn --num-executors 6 --executor-cores 2 --executor-memory 3G
 
 df.selectExpr('_c0 as id', '_c2 as name')
 
-# TODO text read skip header
 # TODO csv handle ,"ss,ss",
 
 ```
@@ -72,8 +75,9 @@ df.selectExpr('_c0 as id', '_c2 as name')
 ```py
 df.coalesce(1)
 
-# TODO manaul add header
-# TODO text format with ,
+# specify column names
+newDf = df.toDF('col1, col2, col3')
+
 
 ```
 - Read and write files in a variety of file **formats**
@@ -169,6 +173,11 @@ pyspark --jars
 >>> flight = spark.read.csv('flight-data/csv/2010-summary.csv', inferSchema=True, header=True)
 >>> flight.write.format('avro').save('temp/avro-sample')
 >>> avroFlg = spark.read.format('avro').load('temp/avro-sample')
+
+# panda for local file
+>>> import pandas as pd
+>>> order = pd.read_csv('/data/retail_db/orders/part-00000')
+>>> ord_spk = spark.createDataFrame(order)
 ```
 
 
