@@ -200,10 +200,31 @@ root
 ```
   - split: to arr
   - explode: values of the array in a cloumn to rows
+  - date_format
+  - Window.partitionBy().orderBy().rowsBeteen()
+  - rank().over(win)
 ```py
 # word count
 >>> words = spark.read.text('/public/randomtextwriter').select(explode(split(col('value'), ' ')).alias('word'))
 >>> wc = words.groupBy('word').count()
+
+# window ranking
+>>> orders = spark.read.json('/public/retail_db_json/orders')
+>>> items = spark.read.json('/public/retail_db_json/order_items')
+>>> customers = spark.read.json('/public/retail_db_json/customers')
+
+>>> ordByMon = orders.withColumn('Month', date_format(col('order_date'), 'yyyy-MM'))
+>>> joinOrdCst = customers['customer_id'] == ordByMon['order_customer_id']
+>>> joinOrdItm = ordByMon['order_id'] == items['order_item_order_id']
+>>> info = items.join(ordByMon, joinOrdItm, 'left_outer').join(customers, joinOrdCst, 'left_outer')
+>>> revenue = info.select('Month', 'customer_id', 'order_item_subtotal').groupBy('Month', 'customer_id').agg(sum('order_item_subtotal').alias('total'))
+
+>>> from pyspark.sql.window import Window
+>>> win = Window.partitionBy('Month').orderBy(desc('total'))
+>>> tRank = rank().over(win)
+>>> tops = revenue.select('Month', 'total', 'customer_id', tRank.alias('rank'))
+>>> top5 = tops.where('rank <= 5').select('Month', 'customer_id', 'total')
+
 ```
 
   - Mocks
