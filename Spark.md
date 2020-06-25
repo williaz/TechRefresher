@@ -60,6 +60,7 @@ readline.write_history_file('python_history.txt')
         - overwrite
         - ignore
       
+
 ```py
 pyspark --master yarn --num-executors 6 --executor-cores 2 --executor-memory 3G
 
@@ -197,6 +198,14 @@ root
 >>> csvFile.write.csv('tmp/csv-mydata.csv', header=True, mode='overwrite')
 
 ```
+  - split: to arr
+  - explode: values of the array in a cloumn to rows
+```py
+# word count
+>>> words = spark.read.text('/public/randomtextwriter').select(explode(split(col('value'), ' ')).alias('word'))
+>>> wc = words.groupBy('word').count()
+```
+
   - Mocks
 ```py
 
@@ -278,7 +287,7 @@ os.system('hadoop fs -cat /user/williaz257/sample/s1/* | wc -l')
 >>> parq = spark.read.parquet('/user/williaz257/solutions/4/myParquet')
 >>> parq.count()
 
-## Q5 spk config, avro
+## Q5 spk config, word count, avro
 
 pyspark2 --packages 'com.databricks:spark-avro_2.10:2.0.1' --master yarn --num-executors 10 --executor-memory 3G --executor-cores 2
 
