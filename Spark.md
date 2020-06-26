@@ -1,4 +1,8 @@
 ```py
+pyspark --master yarn --conf spark.ui.port=0 # random port
+sc
+spark
+
 # packages
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
@@ -6,7 +10,36 @@ from pyspark.sql.window import Window
 
 # docs
 help(functions.substring)
-spark.sql('describe fucntion substring').show(truncate=False)
+spark.sql('describe function substring').show(truncate=False)
+
+# C
+toDF()
+cast()
+alias()
+
+
+df.printSchema()
+
+# R
+df.select(substring('order_date', 1, 7)) # index start from 1, then len
+df.selectExpr('*', '1 as dummy').show(3)
+
+# filter & |
+df.where('loc_type in ("STREET", "RESIDENCE") or Arrest!="false"')
+date_format
+
+# Join
+
+df.join(df1, df.cid = df1.oid, 'left_outer')
+
+# agg
+
+groupBy().agg(round(sum('subtotal'), 2).alias('revenue'))
+
+# sort
+orderBy(['year', 'district'], ascending=[0, 1]) # 0 as desc
+sortWithinPartitions
+
 ```
 
 
@@ -419,8 +452,9 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 
 >>> df.columns
 ['DEST_COUNTRY_NAME', 'ORIGIN_COUNTRY_NAME', 'count']
->>> df.select('ORIGIN_COUNTRY_NAME').show(3)
 
+>>> df.select('ORIGIN_COUNTRY_NAME').show(3)
+>>> crime.select(crime.Location).show(5)
 
 >>> df.createOrReplaceTempView('2015_summary')
 
