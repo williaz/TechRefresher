@@ -1,3 +1,16 @@
+```py
+# packages
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
+from pyspark.sql.window import Window
+
+# docs
+help(functions.substring)
+spark.sql('describe fucntion substring').show(truncate=False)
+```
+
+
+
 ## Required Skills
 ### Transform, Stage, and Store
 Convert a set of data values in a given format stored in HDFS into new data values or a new data format and write them into HDFS. 
@@ -33,6 +46,9 @@ resourcemanager
 # check command history
 import readline
 readline.write_history_file('python_history.txt')
+
+pyspark --master yarn --conf spark.ui.port=0 # random port
+sc
 ```
 
 - **Load** data from HDFS for use in Spark applications
@@ -62,10 +78,16 @@ readline.write_history_file('python_history.txt')
       
 
 ```py
+pyspark --help
 pyspark --master yarn --num-executors 6 --executor-cores 2 --executor-memory 3G
 
+df.describe().show()
 df.selectExpr('_c0 as id', '_c2 as name')
+# TODO .schema() types
 
+from pyspark.sql.types import *
+.withColumn('order_id', order_id.cast('int'))
+.withColumn('customer_id', customer_id.cast(IntegerType()))
 # TODO csv handle ,"ss,ss",
 
 ```
@@ -146,8 +168,10 @@ $ pyspark --driver-class-path sqlite-jdbc-3.30.1.jar --jars sqlite-jdbc-3.30.1.j
 ... .option('dbtable', tableName)\
 ... .option('driver', driver).load()
 
+## option: user, password, url, 
 
->> props = {'driver': 'org.sqlite.JDBC'}
+
+>> props = {'driver': 'org.sqlite.JDBC', 'user': 'user', 'password': '123'}
 >>> predicates = [ "DEST_COUNTRY_NAME != 'Sweden' OR ORIGIN_COUNTRY_NAME != 'Sweden'" , "DEST_COUNTRY_NAME != 'Anguilla' OR ORIGIN_COUNTRY_NAME != 'Anguilla'" ] 
 >>> colName = 'count'
 >>> lowerBound = 0
@@ -360,6 +384,7 @@ Use Spark SQL to interact with the metastore programmatically in your applicatio
 >>> spark.sql('show databases').show()
 >>> spark.sql('create database order_db')
 >>> orders.write.saveAsTable('order_db.orders') # MapredParquetInputFormat
+>>> spark.sql('show tables')
 
 >>> spark.sql('describe formatted order_db.orders').show(100, False)
 
