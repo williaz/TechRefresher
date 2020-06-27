@@ -304,128 +304,6 @@ root
 
 ```
 
-  - Mocks
-```py
-
-## Q1
-# to_date, date_format
->>> crime = spark.read.csv('/public/crime/csv', inferSchema=True, header=True, dateFormat='MM/dd/yyyy')
->>> crime.schema
->>> byMon = crime.withColumn('Month', date_format(to_date('Date', 'MM/dd/yyyy'), 'YYYYMM')).select(col('Month'), col('Primary Type').alias('Type'))
->>> aggType = byMon.groupBy('Type','Month').count().orderBy(col('Month'), col('Type').desc())
-
->>> ret = aggType.select('Month', col('Type').alias('crime type'), col('count').alias('crime count'))
->>> ret.coalesce(1).write.csv('/user/williaz257/soluation/1/crimeByMonType', sep='\t', compression='gzip')
-
-# post
->>> os.system('hadoop fs -ls -h /user/williaz257/soluation/1/crimeByMonType')
->>> os.system('hadoop fs -get /user/williaz257/soluation/1/crimeByMonType/par* .'
->>> os.system('gunzip par*')
->>> os.system('ls -ltr .')
->>> os.system('vim par*')
-
-## Q2: local files
-pyspark
->>> os.system('vim /data/retail_db/orders/*')
->>> os.system('vim /data/retail_db/customers/*')
-
->>> order = spark.read.csv('file:///data/retail_db/orders/*', inferSchema = True)
->>> customer = spark.read.csv('file:///data/retail_db/customers', inferSchema = True)
-
->>> cst = customer.selectExpr('_c1 as fname', '_c2 as lname', '_c0 as cid')
->>> ord = order.selectExpr('_c2 as cid')
-
->>> jexp = cst['cid'] == ord['cid']
->>> ret = cst.join(ord, jexp, 'left_anti')
-
->>> ret.selectExpr('lname as customer_lname', 'fname as customer_fname').distinct().orderBy('customer_lname', 'customer_fname').coalesce(1).write.csv('file:///home/williaz257/inactive_cst', mode='overwrite')
->>> os.system('vim /home/williaz257/inactive_cst/p*')
->>> os.system('hadoop fs -put /home/williaz257/inactive_cst /user/williaz257/solutions/2/.')
-
-## Q3
-# pre-check
-from os import system
-os.system('hadoop fs -cat filePath | head -n 3')
-
-from pyspark.sql.functions import *
-# ETL
-crime = spark.read.csv('/public/crime/csv/', inferSchema=True, header=True)
-cc = crime.select(col('Primary Type').alias('type'), col('Location Description').alias('loc'))
-res = cc.where('loc = "RESIDENCE"')
-byT = res.groupBy('type').count()
-top3 = byT.orderBy(col('count').desc()).limit(3)
-
-top3.write.json('/user/williaz257/solutions/03/res_crime')
-
-# post-check
-os.system('hadoop fs -ls /user/williaz257/solutions/03/res_crime')
-os.system('hadoop fs -cat /user/williaz257/solutions/03/res_crime/p* | head -n 5')
-os.system('hadoop fs -cat /user/williaz257/sample/s1/* | wc -l')
-
-## Q4 schema
->>> from pyspark.sql.types import *
-# ETL
->>> mySchm = StructType(\
->>> [StructField('stockticker', StringType (), True),\
->>> StructField('transactiondate', StringType (), True),\
->>> StructField('openprice', FloatType (), True),\
->>> StructField('volumn', LongType (), True)])
-
->>> nyse = spark.read.csv('file:///data/nyse', schema=mySchm)
->>> nyse.write.parquet('file:///home/williaz257/myParquet')
->>> os.system('ls -ltr /home/williaz257/myParquet')
-
-# transfer
->>> os.system('hadoop fs -mkdir /user/williaz257/solutions/4/')
->>> os.system('hadoop fs -ls -h /user/williaz257/solutions')
->>> os.system('hadoop fs -put /home/williaz257/myParquet /user/williaz257/solutions/4/.')
-
-# validate
->>> nyse.count()                                                         
->>> parq = spark.read.parquet('/user/williaz257/solutions/4/myParquet')
->>> parq.count()
-
-## Q5 spk config, word count, avro
-
-pyspark2 --packages 'com.databricks:spark-avro_2.10:2.0.1' --master yarn --num-executors 10 --executor-memory 3G --executor-cores 2
-
->>> data = sc.textFile("/public/randomtextwriter")
->>> type(data)
-<class 'pyspark.rdd.RDD'>
-
->>> from operator import add
->>> words = data.flatMap(lambda x:x.split(' ')).map(lambda x:(x, 1)).reduceByKey(add)
->>> df = words.toDF(schema=['word', 'count'])
->>> df.coalesce(8).write.format('com.databricks.spark.avro').save('/user/williaz257/solutions/5/word_count')
-
-## Q6 table
->>> os.system('hadoop fs -ls -h /public/retail_*')
->>> orders = spark.read.json('/public/retail_db_json/orders')
->>> items = spark.read.json('/public/retail_db_json/order_items')
->>> customers = spark.read.json('/public/retail_db_json/customers')
-
->>> spark.sql('create database williaz257_retail_db_txt')
->>> spark.sql('select current_database()').show()
-
->>> orders.write.saveAsTable('orders')
->>> spark.sql('describe formatted orders').show(100, False)
->>> spark.sql('select * from orders limit 4').show()  
->>> customers.write.saveAsTable('customers')
->>> spark.sql('select * from customers').show(3)
->>> items.write.saveAsTable('order_items')
->>> spark.sql('select * from order_items limit 3').show(4)
-
->>> order_info = spark.sql("""
-... select ord.order_id, ord.order_customer_id, itm.order_item_subtotal
-... from orders
-... ord join order_items itm on ord.order_id = itm.order_item_order_id""")
-
->>> cst_rev = order_info.join(customers, joinExpr, 'left_outer').selectExpr('customer_id', 'order_item_subtotal', 'customer_fname || " " || customer_lname as name')
-
-rev = cst_rev.groupBy('customer_id').agg(sum(col('order_item_subtotal')).alias('total'))
->>> rev.orderBy(col('total').desc()).limit(5).write.saveAsTable('top5_customers')
->>> spark.sql('select * from top5_customers').show()
-```
 
 
 ### Data Analysis
@@ -702,37 +580,169 @@ pyspark2 --master yarn --conf spark.ui.port=0
 >>> customers = spark.read.json('/public/retail_db_json/customers')
 
 
-
+# compression='gzip'
 flight.select('DEST_COUNTRY_NAME', 'count').write.parquet('temp/parq-gzip', compression='gzip', mode='overwrite')
 
-# groupBy VS partitionBy: select what
+# groupBy VS partitionBy: what to select
+
+# Window.partitionBy()
+# count(col).over(win).alias(name)
 >>> winCst = Window.partitionBy('customer_id')
 >>> byCst = cstJoin.select('customer_id','customer_fname', count('order_id').over(winCst).alias('count')).where('count > 4').orderBy('count')
 
+# groupBy(cols).agg(max(col).alias(name))
 >>> sol3 = items.groupBy('order_item_order_id').agg(max('order_item_product_price').alias('max_price')).orderBy('max_price')
+# df.coalesce(n)
 >>> sol3.coalesce(1).write.csv('/user/williaz257/sol.32', sep='|', compression='gzip', mode='overwrite')
 
+# || " " || as 
 >>> cst1 = spark.read.csv('/user/williaz257/customers', sep='\t', inferSchema=True)
 >>> sol4 = cst1.selectExpr('_c0 as city', '_c2 || " " || _c4 as name').where('city = "Caguas"')
 flight.write.format('avro').option('compression', 'deflate').save('temp/avro-deflate')
 
 ## compression: (none, bzip2, gzip, lz4, snappy and deflate).
-
+# substring
 >>> sol5 = customers.withColumn('f_init', substring('customer_fname', 1, 3)).select('customer_id', 'f_init', 'customer_lname')
+# sep='\t'
 >>> sol5.write.csv('/user/williaz257/sol1.5', sep='\t', compression='bzip2')
 
-
+# date_format
 >>> sol7 = orders.where(date_format('order_date', 'yyyy-MM') == '2014-03').where('order_status = "PENDING_PAYMENT"')
+# like %
 >>> orders.where('order_date like "2014-03%"').where('order_status = "PENDING_PAYMENT"').show(4)
-
+# agg(count('*').alias(name))
 sol8 = orders.where('order_date like "2013%" and order_status = "COMPLETE"').groupBy('order_customer_id').agg(count('*').alias('count'))
 
 spark.sqlContext.setConf("hive.exec.dynamic.partition", "true")
 spark.sqlContext.setConf("hive.exec.dynamic.partition.mode", "nonstrict") 
 
+# create database, describe table
 >>> spark.sql('create database williaz257')
+# df.write.partitionBy
 >>> sol8.write.partitionBy('order_status').saveAsTable('williaz257.sol_1_8')                                                                                    
 >>> spark.sql('describe williaz257.sol_1_8').show()
+```
+- Mocks
+```py
+
+## Q1
+# to_date, date_format
+>>> crime = spark.read.csv('/public/crime/csv', inferSchema=True, header=True, dateFormat='MM/dd/yyyy')
+>>> crime.schema
+>>> byMon = crime.withColumn('Month', date_format(to_date('Date', 'MM/dd/yyyy'), 'YYYYMM')).select(col('Month'), col('Primary Type').alias('Type'))
+>>> aggType = byMon.groupBy('Type','Month').count().orderBy(col('Month'), col('Type').desc())
+
+>>> ret = aggType.select('Month', col('Type').alias('crime type'), col('count').alias('crime count'))
+>>> ret.coalesce(1).write.csv('/user/williaz257/soluation/1/crimeByMonType', sep='\t', compression='gzip')
+
+# post
+>>> os.system('hadoop fs -ls -h /user/williaz257/soluation/1/crimeByMonType')
+>>> os.system('hadoop fs -get /user/williaz257/soluation/1/crimeByMonType/par* .'
+>>> os.system('gunzip par*')
+>>> os.system('ls -ltr .')
+>>> os.system('vim par*')
+
+## Q2: local files
+pyspark
+>>> os.system('vim /data/retail_db/orders/*')
+>>> os.system('vim /data/retail_db/customers/*')
+
+>>> order = spark.read.csv('file:///data/retail_db/orders/*', inferSchema = True)
+>>> customer = spark.read.csv('file:///data/retail_db/customers', inferSchema = True)
+
+>>> cst = customer.selectExpr('_c1 as fname', '_c2 as lname', '_c0 as cid')
+>>> ord = order.selectExpr('_c2 as cid')
+
+>>> jexp = cst['cid'] == ord['cid']
+>>> ret = cst.join(ord, jexp, 'left_anti')
+
+>>> ret.selectExpr('lname as customer_lname', 'fname as customer_fname').distinct().orderBy('customer_lname', 'customer_fname').coalesce(1).write.csv('file:///home/williaz257/inactive_cst', mode='overwrite')
+>>> os.system('vim /home/williaz257/inactive_cst/p*')
+>>> os.system('hadoop fs -put /home/williaz257/inactive_cst /user/williaz257/solutions/2/.')
+
+## Q3
+# pre-check
+from os import system
+os.system('hadoop fs -cat filePath | head -n 3')
+
+from pyspark.sql.functions import *
+# ETL
+crime = spark.read.csv('/public/crime/csv/', inferSchema=True, header=True)
+cc = crime.select(col('Primary Type').alias('type'), col('Location Description').alias('loc'))
+res = cc.where('loc = "RESIDENCE"')
+byT = res.groupBy('type').count()
+top3 = byT.orderBy(col('count').desc()).limit(3)
+
+top3.write.json('/user/williaz257/solutions/03/res_crime')
+
+# post-check
+os.system('hadoop fs -ls /user/williaz257/solutions/03/res_crime')
+os.system('hadoop fs -cat /user/williaz257/solutions/03/res_crime/p* | head -n 5')
+os.system('hadoop fs -cat /user/williaz257/sample/s1/* | wc -l')
+
+## Q4 schema
+>>> from pyspark.sql.types import *
+# ETL
+>>> mySchm = StructType(\
+>>> [StructField('stockticker', StringType (), True),\
+>>> StructField('transactiondate', StringType (), True),\
+>>> StructField('openprice', FloatType (), True),\
+>>> StructField('volumn', LongType (), True)])
+
+>>> nyse = spark.read.csv('file:///data/nyse', schema=mySchm)
+>>> nyse.write.parquet('file:///home/williaz257/myParquet')
+>>> os.system('ls -ltr /home/williaz257/myParquet')
+
+# transfer
+>>> os.system('hadoop fs -mkdir /user/williaz257/solutions/4/')
+>>> os.system('hadoop fs -ls -h /user/williaz257/solutions')
+>>> os.system('hadoop fs -put /home/williaz257/myParquet /user/williaz257/solutions/4/.')
+
+# validate
+>>> nyse.count()                                                         
+>>> parq = spark.read.parquet('/user/williaz257/solutions/4/myParquet')
+>>> parq.count()
+
+## Q5 spk config, word count, avro
+
+pyspark2 --packages 'com.databricks:spark-avro_2.10:2.0.1' --master yarn --num-executors 10 --executor-memory 3G --executor-cores 2
+
+>>> data = sc.textFile("/public/randomtextwriter")
+>>> type(data)
+<class 'pyspark.rdd.RDD'>
+
+>>> from operator import add
+>>> words = data.flatMap(lambda x:x.split(' ')).map(lambda x:(x, 1)).reduceByKey(add)
+>>> df = words.toDF(schema=['word', 'count'])
+>>> df.coalesce(8).write.format('com.databricks.spark.avro').save('/user/williaz257/solutions/5/word_count')
+
+## Q6 table
+>>> os.system('hadoop fs -ls -h /public/retail_*')
+>>> orders = spark.read.json('/public/retail_db_json/orders')
+>>> items = spark.read.json('/public/retail_db_json/order_items')
+>>> customers = spark.read.json('/public/retail_db_json/customers')
+
+>>> spark.sql('create database williaz257_retail_db_txt')
+>>> spark.sql('select current_database()').show()
+
+>>> orders.write.saveAsTable('orders')
+>>> spark.sql('describe formatted orders').show(100, False)
+>>> spark.sql('select * from orders limit 4').show()  
+>>> customers.write.saveAsTable('customers')
+>>> spark.sql('select * from customers').show(3)
+>>> items.write.saveAsTable('order_items')
+>>> spark.sql('select * from order_items limit 3').show(4)
+
+>>> order_info = spark.sql("""
+... select ord.order_id, ord.order_customer_id, itm.order_item_subtotal
+... from orders
+... ord join order_items itm on ord.order_id = itm.order_item_order_id""")
+
+>>> cst_rev = order_info.join(customers, joinExpr, 'left_outer').selectExpr('customer_id', 'order_item_subtotal', 'customer_fname || " " || customer_lname as name')
+
+rev = cst_rev.groupBy('customer_id').agg(sum(col('order_item_subtotal')).alias('total'))
+>>> rev.orderBy(col('total').desc()).limit(5).write.saveAsTable('top5_customers')
+>>> spark.sql('select * from top5_customers').show()
 ```
 
 
