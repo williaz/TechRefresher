@@ -689,6 +689,55 @@ This is a practical exam and the candidate should be familiar with all aspects o
 
 ```
 
+
+## Hands on
+```py
+export PYSPARK_PYTHON=/usr/local/bin/python3
+pyspark --packages org.apache.spark:spark-avro_2.11:2.4.0
+
+pyspark2 --master yarn --conf spark.ui.port=0
+
+>>> orders = spark.read.json('/public/retail_db_json/orders')
+>>> items = spark.read.json('/public/retail_db_json/order_items')
+>>> customers = spark.read.json('/public/retail_db_json/customers')
+
+
+
+flight.select('DEST_COUNTRY_NAME', 'count').write.parquet('temp/parq-gzip', compression='gzip', mode='overwrite')
+
+# groupBy VS partitionBy: select what
+>>> winCst = Window.partitionBy('customer_id')
+>>> byCst = cstJoin.select('customer_id','customer_fname', count('order_id').over(winCst).alias('count')).where('count > 4').orderBy('count')
+
+>>> sol3 = items.groupBy('order_item_order_id').agg(max('order_item_product_price').alias('max_price')).orderBy('max_price')
+>>> sol3.coalesce(1).write.csv('/user/williaz257/sol.32', sep='|', compression='gzip', mode='overwrite')
+
+>>> cst1 = spark.read.csv('/user/williaz257/customers', sep='\t', inferSchema=True)
+>>> sol4 = cst1.selectExpr('_c0 as city', '_c2 || " " || _c4 as name').where('city = "Caguas"')
+flight.write.format('avro').option('compression', 'deflate').save('temp/avro-deflate')
+
+## compression: (none, bzip2, gzip, lz4, snappy and deflate).
+
+>>> sol5 = customers.withColumn('f_init', substring('customer_fname', 1, 3)).select('customer_id', 'f_init', 'customer_lname')
+>>> sol5.write.csv('/user/williaz257/sol1.5', sep='\t', compression='bzip2')
+
+
+>>> sol7 = orders.where(date_format('order_date', 'yyyy-MM') == '2014-03').where('order_status = "PENDING_PAYMENT"')
+>>> orders.where('order_date like "2014-03%"').where('order_status = "PENDING_PAYMENT"').show(4)
+
+sol8 = orders.where('order_date like "2013%" and order_status = "COMPLETE"').groupBy('order_customer_id').agg(count('*').alias('count'))
+
+spark.sqlContext.setConf("hive.exec.dynamic.partition", "true")
+spark.sqlContext.setConf("hive.exec.dynamic.partition.mode", "nonstrict") 
+
+>>> spark.sql('create database williaz257')
+>>> sol8.write.partitionBy('order_status').saveAsTable('williaz257.sol_1_8')                                                                                    
+>>> spark.sql('describe williaz257.sol_1_8').show()
+```
+
+
+
+
 ## Outline
 ### Introduction
 Introduction to Apache Hadoop and the Hadoop Ecosystem 
