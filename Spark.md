@@ -40,6 +40,26 @@ groupBy().agg(round(sum('subtotal'), 2).alias('revenue'))
 orderBy(['year', 'district'], ascending=[0, 1]) # 0 as desc
 sortWithinPartitions
 
+# window
+win = Window.partitionBy('order_item_order_id')
+items.withColumn('order_total', sum(items.order_item_subtotal).over(win)).show(10)
+
+## rank, dense_rank, row_number(random rank for tie)
+winProd = Window.partitionBy(order_items.order_item_product_id).orderBy(order_items.order_total.desc()) #
+ranking = order_items.select(\
+order_items.order_item_product_id,\
+order_items.order_total,\
+order_items.order_item_order_id,\
+rank().over(winProd).alias('rank')) #
+
+## lag, lead(aCol, nth=1), first(col), last
+>>> winOrd = Window.partitionBy(items.order_item_order_id).orderBy(items.order_item_product_id)
+>>> items.withColumn('next_item_price', lead(items.order_item_product_price).over(winOrd)).show(10)
+>>> items.withColumn('next_item_price', lag(items.order_item_product_price, 2).over(winOrd)).show(10)
+
+>>> winLast = Window.partitionBy(items.order_item_order_id).orderBy(items.order_item_product_id).rangeBetween(Window.unboundedPreceding, Window.unboundedFollowing)
+>>> items.withColumn('next_item_price', last(items.order_item_product_price).over(winLast)).show(10)
+
 ```
 
 
