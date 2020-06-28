@@ -29,8 +29,10 @@ df.where('loc_type in ("STREET", "RESIDENCE") or Arrest!="false"')
 date_format
 
 # Join
-
+### column name for FK to avoid ambiguous
 df.join(df1, df.cid = df1.oid, 'left_outer')
+## left_semi : filter, keep duplicate key
+## left_anti: NOT IN
 
 # agg
 
@@ -256,6 +258,12 @@ pyspark --jars
 >>> import pandas as pd
 >>> order = pd.read_csv('/data/retail_db/orders/part-00000')
 >>> ord_spk = spark.createDataFrame(order)
+
+# xml
+.write
+.format('com.databricks.spark.xml')
+.option('rootTag', 'persons')
+.option('rawTag', 'person')
 ```
 
 
@@ -570,6 +578,17 @@ This is a practical exam and the candidate should be familiar with all aspects o
 
 ## Hands on
 ```py
+$ hadoop fs -ls /public/retail_db
+Found 6 items
+drwxr-xr-x   - hdfs hdfs          0 2016-12-19 03:52 /public/retail_db/categories
+drwxr-xr-x   - hdfs hdfs          0 2016-12-19 03:52 /public/retail_db/customers
+drwxr-xr-x   - hdfs hdfs          0 2016-12-19 03:52 /public/retail_db/departments
+drwxr-xr-x   - hdfs hdfs          0 2016-12-19 03:52 /public/retail_db/order_items
+drwxr-xr-x   - hdfs hdfs          0 2016-12-19 03:52 /public/retail_db/orders
+drwxr-xr-x   - hdfs hdfs          0 2016-12-19 03:52 /public/retail_db/products
+
+
+
 export PYSPARK_PYTHON=/usr/local/bin/python3
 pyspark --packages org.apache.spark:spark-avro_2.11:2.4.0
 
@@ -600,6 +619,9 @@ flight.select('DEST_COUNTRY_NAME', 'count').write.parquet('temp/parq-gzip', comp
 >>> sol4 = cst1.selectExpr('_c0 as city', '_c2 || " " || _c4 as name').where('city = "Caguas"')
 flight.write.format('avro').option('compression', 'deflate').save('temp/avro-deflate')
 
+# concat_ws
+customers.select(concat_ws(',','customer_lname', 'customer_fname').alias('name')).show()
+
 ## compression: (none, bzip2, gzip, lz4, snappy and deflate).
 # substring
 >>> sol5 = customers.withColumn('f_init', substring('customer_fname', 1, 3)).select('customer_id', 'f_init', 'customer_lname')
@@ -621,6 +643,13 @@ spark.sqlContext.setConf("hive.exec.dynamic.partition.mode", "nonstrict")
 # df.write.partitionBy
 >>> sol8.write.partitionBy('order_status').saveAsTable('williaz257.sol_1_8')                                                                                    
 >>> spark.sql('describe williaz257.sol_1_8').show()
+
+# cast
+>>> item1 = item.withColumn('item_subtotal', item.Order_item_subtotal.cast(DoubleType()))
+df . withColumn ( "count2" , col ( "count" ). cast ( "long" )) 
+
+spark.sql("select concat(fname, '\t', lname, ':', city) from ...")
+
 ```
 - Mocks
 ```py
@@ -744,6 +773,19 @@ rev = cst_rev.groupBy('customer_id').agg(sum(col('order_item_subtotal')).alias('
 >>> rev.orderBy(col('total').desc()).limit(5).write.saveAsTable('top5_customers')
 >>> spark.sql('select * from top5_customers').show()
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
