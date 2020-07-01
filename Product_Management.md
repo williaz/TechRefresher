@@ -103,7 +103,12 @@ its behavior accordingly.
 - monitoring: visibility
 
 
-
+## Process
+- phrases of life cycles
+  - spec
+  - design and impl
+  - verf and validation
+- process > phase > activity > task
 
 
 
