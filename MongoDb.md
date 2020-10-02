@@ -74,6 +74,39 @@
     - nearest
     - my anlaysis node
 
+- ER VS workload
+
+- workload
+  - size data
+  - quantify ops
+  - qualify ops
+- Relationship
+  - identify
+  - quantify
+  - embed or link
+- Patterns
+  - recognize
+  - apply
+
+- Data Staleness
+
+- reference
+  - many side: huge
+  - one piece is freq use with memory issue
+  
+- [Schema design pattern](https://www.mongodb.com/blog/post/building-with-patterns-a-summary)
+  - computed pattern
+  - Bucket pattern: IoT
+
+
+- JSON schema to validate
+  - required field, types, values
+  - shape: There is a construct in JSON Schema called oneOf that let you specify two sub-schemas.
+
+- sharding
+- change Stream to trigger checking
+
+
 
 
 
