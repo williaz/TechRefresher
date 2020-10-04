@@ -106,8 +106,13 @@
 - sharding
 - change Stream to trigger checking
 
-
-
+## Query: 
+- MQL
+  - db.<collection>.find({<field:value>, ...})
+  - condtion: db.<collection>.find({<field:{<ops:value>}, ...})
+  - limit
+  - sort
+- aggregation pipeline/stages
 
 
 
