@@ -115,4 +115,12 @@
 - aggregation pipeline/stages
 
 
+## HA
+
+- Automatic election
+- evolve schema without downtime
+
+https://docs.mongodb.com/manual/sharding/
+
+
 
