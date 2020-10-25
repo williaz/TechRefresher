@@ -127,6 +127,46 @@ https://docs.mongodb.com/manual/sharding/
 - instance, replica, cluster
 - 
 
+## JSON/BSON
+- JSON: keys in ""
+- BSON
+  - mongodump
+  - mongostore --drop dump
+- JSON
+  - mongoexport
+  - mongoimport
+
+- it iterates through the cursor.
+```json
+{"birth year": 1961, "start station name": "Howard St & Centre St"}
+
+show dbs
+
+use sample_training
+
+show collections
+
+db.zips.find({"state": "NY"})
+db.zips.find({"state": "NY"}).count()
+
+db.zips.find({"state": "NY", "city": "ALBANY"})
+
+db.zips.find({"state": "NY", "city": "ALBANY"}).pretty()
+```
+- ```_id```: uniq value in collection
+  - ObjectId, can other type
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
