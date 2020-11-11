@@ -156,6 +156,24 @@ db.zips.find({"state": "NY", "city": "ALBANY"}).pretty()
 - ```_id```: uniq value in collection
   - ObjectId, can other type
 
+### CRUD
+```
+db.inspections.insert([{ "_id": 1, "test": 1 },{ "_id": 1, "test": 2 },
+                       { "_id": 3, "test": 3 }],{ "ordered": false })
+                       
+                       
+// $set, $inc, $push
+db.zips.updateOne({ "zip": "12534" }, { "$set": { "population": 17630 } })
+updateMany
+
+
+db.inspections.deleteMany({ "test": 1 })
+db.inspections.deleteOne({ "test": 3 })
+db.inspection.drop()
+```
+- When all collections are dropped from a database, the database no longer appears in the list of databases when you run show dbs.
+
+
 
 
 
