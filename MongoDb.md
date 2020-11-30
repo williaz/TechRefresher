@@ -173,9 +173,22 @@ db.inspection.drop()
 ```
 - When all collections are dropped from a database, the database no longer appears in the list of databases when you run show dbs.
 
+## MQL
+- $eq, $and as default
+```
+db.trips.find({ "tripduration": { "$lte" : 70 },
+                "usertype": { "$eq": "Customer" }}).pretty()
+                
+                
+db.routes.find({ "$and": [ { "$or" :[ { "dst_airport": "KZN" },
+                                    { "src_airport": "KZN" }
+                                  ] },
+                          { "$or" :[ { "airplane": "CR2" },
+                                     { "airplane": "A81" } ] }
+                         ]}).pretty()
 
-
-
+```
+- Atlas: Add IP Access List Entries
 
 
 
