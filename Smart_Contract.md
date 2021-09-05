@@ -92,3 +92,29 @@ uint num = numberContract.getNum(msg.sender);
   -  lead to the "Year 2038" problem, when 32-bit unix timestamps will overflow and break a lot of legacy systems. 
 - calldata is somehow similar to memory, but it's only available to external functions.
 
+
+- We have visibility modifiers that control when and where the function can be called from: private means it's only callable from other functions inside the contract; internal is like private but can also be called by contracts that inherit from this one; external can only be called outside the contract; and finally public can be called anywhere, both internally and externally.
+
+- We also have state modifiers, which tell us how the function interacts with the BlockChain: view tells us that by running the function, no data will be saved/changed. pure tells us that not only does the function not save any data to the blockchain, but it also doesn't read any data from the blockchain. Both of these don't cost any gas to call if they're called externally from outside the contract (but they do cost gas if called internally by another function).
+
+- Then we have custom modifiers, can define custom logic to determine how they affect a function.
+
+### payable
+- It is important to note that you cannot transfer Ether to an address unless that address is of type address payable. But the _owner variable is of type uint160, meaning that we must explicitly cast it to address payable.
+
+```sol
+uint randNonce = 0;
+uint random = uint(keccak256(abi.encodePacked(now, msg.sender, randNonce))) % 100;
+randNonce++;
+uint random2 = uint(keccak256(abi.encodePacked(now, msg.sender, randNonce))) % 100;
+
+// use an oracle to access a random number function from outside of the Ethereum blockchain.
+```
+
+
+
+
+
+
+
+
