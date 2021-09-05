@@ -59,7 +59,7 @@ uint num = numberContract.getNum(msg.sender);
 - Storage refers to variables stored permanently on the blockchain. Memory variables are temporary, and are erased between external function calls to your contract. Think of it like your computer's hard disk vs RAM.
   - Most of the time you don't need to use these keywords because Solidity handles them by default. State variables (variables declared outside of functions) are by default storage and written permanently to the blockchain, while variables declared inside functions are memory and will disappear when the function call ends.
 
-#### internal, external
+#### internal, external, address
 - internal is the same as private, except that it's also accessible to contracts that inherit from this contract. (Hey, that sounds like what we want here!).
 
 - external is similar to public, except that these functions can ONLY be called outside the contract — they can't be called by other functions inside that contract.
@@ -67,9 +67,28 @@ uint num = numberContract.getNum(msg.sender);
 - address == onject
 
 
+### Ownable, 
+- onlyOwner is such a common requirement for contracts that most Solidity DApps start with a copy/paste of this Ownable contract, and then their first contract inherits from it.
 
+- A function modifier looks just like a function, but uses the keyword modifier instead of the keyword function. And it can't be called directly like a function can — instead we can attach the modifier's name at the end of a function definition to change that function's behavior.
 
+- modifier == Annotation
+```sol
+  modifier onlyOwner() {
+    require(isOwner());
+    _;
+  }
+```
+- Each individual operation has a gas cost based roughly on how much computing resources will be required to perform that operation (e.g. writing to storage is much more expensive than adding two integers). The total gas cost of your function is the sum of the gas costs of all its individual operations.
 
-
-
+### Gas
+- if you have multiple uints inside a struct, using a smaller-sized uint when possible will allow Solidity to pack these variables together to take up less storage. 
+- You'll also want to cluster identical data types together (i.e. put them next to each other in the struct) so that Solidity can minimize the required storage space
+- view functions don't cost any gas when they're called **externally** by a user.
+- One of the more expensive operations in Solidity is using storage — particularly writes.
+- 
+### now, seconds, minutes, hours, days, weeks and years; calldata
+- The variable now will return the current unix timestamp of the latest block (the number of seconds that have passed since January 1st 1970). 
+  -  lead to the "Year 2038" problem, when 32-bit unix timestamps will overflow and break a lot of legacy systems. 
+- calldata is somehow similar to memory, but it's only available to external functions.
 
