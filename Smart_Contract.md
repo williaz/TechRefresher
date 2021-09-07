@@ -126,22 +126,52 @@ contract ERC721 {
 }
 
 
-Note that the ERC721 spec has 2 different ways to transfer tokens:
+// Note that the ERC721 spec has 2 different ways to transfer tokens:
 
 function transferFrom(address _from, address _to, uint256 _tokenId) external payable;
-
-and
-
+// and
 function approve(address _approved, uint256 _tokenId) external payable;
 
 function transferFrom(address _from, address _to, uint256 _tokenId) external payable;
-
+/*
 The first way is the token's owner calls transferFrom with his address as the _from parameter, the address he wants to transfer to as the _to parameter, and the _tokenId of the token he wants to transfer.
 
 The second way is the token's owner first calls approve with the address he wants to transfer to, and the _tokenID . The contract then stores who is approved to take a token, usually in a mapping (uint256 => address). Then, when the owner or the approved address calls transferFrom, the contract checks if that msg.sender is the owner or is approved by the owner to take the token, and if so it transfers the token to him.
+*/
 ```
 
+### library, assert
+- libraries allow us to use the using keyword, which automatically tacks on all of the library's methods to another data type
+- assert is similar to require, where it will throw an error if false. The difference between assert and require is that require will refund the user the rest of their gas when a function fails, whereas assert will not. 
+- It's a good idea in general to just use SafeMath instead of the basic math operations. 
+```sol
 
+using SafeMath for uint256;
+
+uint256 a = 5;
+uint256 b = a.add(3); // 5 + 3 = 8
+uint256 c = a.mul(2); // 5 * 2 = 10
+
+
+/// @title A contract for basic math operations
+/// @author H4XF13LD MORRIS
+/// @notice For now, this contract just adds a multiply function
+contract Math {
+  /// @notice Multiplies 2 numbers together
+  /// @param x the first uint.
+  /// @param y the second uint.
+  /// @return z the product of (x * y)
+  /// @dev This function does not currently check for overflows
+  function multiply(uint x, uint y) returns (uint z) {
+    // This is just a normal comment, and won't get picked up by natspec
+    z = x * y;
+  }
+}
+
+```
+- @title and @author are straightforward.
+- @notice explains to a user what the contract / function does. @dev is for explaining extra details to developers.
+- @param and @return are for describing what each parameter and return value of a function are for.
 
 
 
