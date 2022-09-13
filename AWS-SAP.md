@@ -16,10 +16,35 @@
 - User, Group, Role, Policy
 
 - STS(Secuirty Token Service)
+- IAM role
   - Trust policy: who can assume the role
-  - Permission policy
+    - cross account access
+    - resource based
+  - Permission policy: identity-based
 
 - MFA
   - something you know: password
   - have: MFA device, authenticator
   - are: fingerprint
+
+- inline policy: 1:1 with user/group/role
+- managed policy: by AWS/customer
+- resource-based policy: principle
+- Access control
+  - RBAC: role based
+  - ABAC: Attribute/Tag(K:V)
+    - Condition: tag
+- IAM Permission Boundary: on Users/Roles
+  - Preventing privilege escalation: cant bypass access by creating new users
+
+- Effective permissions
+  - union of ID based and reousrce based
+  - interect: SCP, perm boundary
+
+- Evaluation logi: Deny -> Org SCP -> Resource based -> IAM perm boundary -> session -> ID based
+
+
+
+
+
+
