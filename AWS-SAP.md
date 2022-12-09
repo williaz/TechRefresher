@@ -41,7 +41,22 @@
   - union of ID based and reousrce based
   - interect: SCP, perm boundary
 
-- Evaluation logi: Deny -> Org SCP -> Resource based -> IAM perm boundary -> session -> ID based
+- Evaluation logic: Deny -> Org SCP -> Resource based -> IAM perm boundary -> session -> ID based
+
+### AD
+- Id providers
+- 
+### Id Federation
+- IAM: LDAP(ID store) -> IdP <-> user -> STS
+- SSO
+- Cognito: web/mobile
+
+
+
+
+
+
+
 
 
 
