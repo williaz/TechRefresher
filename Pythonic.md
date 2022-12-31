@@ -71,11 +71,49 @@ for i, n in enumerate(arr):
 ```py
 a[::2]
 ```
+### 13. prefer Catch-all unpacking over Slicing
+- starred expression
+  - occur only once
+  - in any position 
+  - with at least one required part
+  - as a list => memory
+```py
+>>> l = ['Will', 12, 34, 'male']
+>>> name, *others, gender = l
+>>> print(f'{name} and {gender}')
+Will and male
+```
 
+### 14. sort with key
+- multiple sorts preserve previous relative order
+- tuple for multipel ordering
+```py
+>>> name = ['Will', 'Bob', 'alex', 'Abby', 'Zoe']
+>>> name.sort(key=lambda x : x.lower(), reverse=True)
+>>> name
+['Zoe', 'Will', 'Bob', 'alex', 'Abby']
 
+>>> people = [('Will', 33), ('Bob', 2), ('Zoe', 28), ('alex', 1)]
+>>> people.sort(key = lambda x: (x[1], x[0].lower()))
+>>> people
+[('alex', 1), ('Bob', 2), ('Zoe', 28), ('Will', 33)]
+```
+### 15. dict Insertion ordering
+- starts from 3.7 officially
 
+### 16. Perfer get Over in and KeyError for dict missing key
 
-
+```py
+>>> try:
+...     age = mapp['Will']
+... except KeyError:
+...     age = "Unknown"
+... 
+>>> age
+'Unknown'
+>>> mapp.get('Will', 33)
+33
+```
 
 
 
