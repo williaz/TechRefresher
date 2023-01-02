@@ -114,10 +114,52 @@ Will and male
 >>> mapp.get('Will', 33)
 33
 ```
+### 17. defaultdict Over setdefault 
 
+```py
+>>> from collections import defaultdict
+>>> owner_cars = defaultdict(set)
+>>> owner_cars['Will'].add('cra')
+```
+### 18. use dict's __missing to set default value if key-dependent like func
 
+```py
+>>> class Pictures(dict):
+...     def __missing__(self, key):
+...         value = key % 10
+...         self[key] = value
+...         return value
+... 
+>>> p = Pictures()
+>>> p[2]
+2
+```
+### 19. Never unpack >3 var for func return values
+### 20. perfer Raising Exception to returning None
 
+```py
+>>> def div(a: float, b: float) -> float:
+...     try:
+...         return a / b
+...     except ZeroDivisionError as e:
+...         raise ValueError('Invalid Input')
+... 
+>>> div(3.2, 0)
+Traceback (most recent call last):
+  File "<stdin>", line 3, in div
+ZeroDivisionError: float division by zero
 
+During handling of the above exception, another exception occurred:
 
-
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 5, in div
+ValueError: Invalid Input
+>>> try:
+...     div(3.2, 0)
+... except ValueError as ve:
+...     print('something wrong')
+... 
+something wrong
+```
 
