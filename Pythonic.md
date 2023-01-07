@@ -163,3 +163,46 @@ ValueError: Invalid Input
 something wrong
 ```
 
+### 21. Closure scope
+- closure can refer to variables from any of the scopes in which they were defined
+- use nonlocal: when closure can modufy a variable in its enclosing scopes; better use class instead
+
+
+```py
+def sort_with_vip(nums, group):
+     found = False
+     def helper(x):
+         nonlocal found
+         if x in group:
+             found = True
+             return (0, x)
+         return (1, x)
+     nums.sort(key = helper)
+     return found
+
+nums = [0, 1, 2, 3, 4, 5, 6]
+group = [2, 4]
+print(sort_with_vip(nums, group))
+```
+
+### 22, position arguments ```*varargs``` in func
+```py
+def log(msg, *values):
+    print(f'{msg}: {values}')
+
+log("print: ", 1, 2, 3)
+nums = [2, 3, 4]
+log("list: ", *nums) # pass items from nums as tuple => may OOM error
+
+print: : (1, 2, 3)
+list: : (2, 3, 4)
+```
+
+
+
+
+
+
+
+
+
