@@ -198,7 +198,18 @@ print: : (1, 2, 3)
 list: : (2, 3, 4)
 ```
 
+### 23 Keyword Argument for optional arg
+- clearer, optional, backword compatible when extend
+```py
+def func(name, age=18, gender="male"):
+    print(f'{name} is {gender} at age of {age}')
 
+func('Will')
+func(name="Zoe", gender="female")
+
+arg = {'name':"Alex", 'age':1, 'gender':"male"}
+func(**arg)
+```
 
 
 
