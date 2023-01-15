@@ -67,6 +67,22 @@
   - HDD, cold(sc): lowest cost, can't boot vol
 
 
+- same IOPS for encrypted volume
+- encryption key(CMK in KMS)
+- Update volume type/size/perf at run time
+- RAID: increase IOPS, no boot/root
+- VolumeR/WBytes: CloudWatch EBS
+- DiskR/WBytes: CW - instance store  
+
+### ELB
+- 1 region
+- target group
+  - only 1 protocol and 1 port
+  - only assciate to 1 LB
+
+#### ALB
+- host(dp,aom)/path based routing: other HTTP things
+- >= 1 listner: rules per target group[
 
 
 
