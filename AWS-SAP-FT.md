@@ -82,7 +82,38 @@
 
 #### ALB
 - host(dp,aom)/path based routing: other HTTP things
-- >= 1 listner: rules per target group[
+- >= 1 listner: rules per target group
+
+
+#### NLB
+- to IP-based across diff region
+
+### Auto Scaling
+- region specific
+- options
+  - Maintain: certain/min num
+  - Manual: max/min 
+  - Scheduled
+  - Dynamic: real-time metrics
+    - policy: Target tracking, simple/step scaling
+  - Predictive: ML
+- by default, use EC2 status check
+- IAM role, service-linked role; no resource-based policies
+- scale-in/out
+- standby stuats: manual move; charged, not available
+
+### ECS
+- EKS: ECS for Kubernetes
+- Launch types
+  - EC2
+  - Fargate: serverless, auto provision infra; only ECR/Docker hub
+- Task: running continer
+- Container Instance: EC2 runing the ECS agent
+- task definition
+  - JSON
+  - describe >= 1 container <=10 
+
+- Service/Custom scheduler to schedule ECS
 
 
 
