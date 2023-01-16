@@ -54,6 +54,61 @@
 
 
 
+### EC2
+
+#### pricing VS use cases
+- on-demand: no discount
+- reserved: 1/3yr; predictable workloads; 75%
+  - std RI: change AZ
+  - convertible RI: OS, type
+- scheduled reserved: @@ 
+- spot: bid; 90% discount; terminated at any time
+  - spot block: time
+- Dedicated instance: physical isolation at hardware level
+- Dedicated hosts: server; socket/core visibilty
+- saving paln: usage amount; can be combination
+
+#### AMI
+
+#### Placement group
+
+- cluster: 1 AZ
+- parition, spread: multi-AZ
+
+#### NI
+- private/public subnet
+- ENI
+- ENA: newtork perf 
+- EFA: ML
+
+#### EIP
+- across AZ
+- static public IP
+- public IP: lost when stop, keep if reboot
+#### NAT
+
+- EC2 only know private IP
+- Internet gateway perform NAT
+
+#### Auto scaling
+- tracking: SQS with metric data
+- step scaling: diff range
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
