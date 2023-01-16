@@ -115,6 +115,46 @@
 
 - Service/Custom scheduler to schedule ECS
 
+### Lambdda
+- can connect 1 VPC, slow down
+- event driven
+- VPC subnet ID, SG ID
+- default timeout: 3 sec, max 15m
+- event source mapping
+  - on lambda side: SQS, DynamoDB, kinesis
+  - S3, SNS side: async
+- aias traffic shifting
+  - canary deployment
+  - version weight
 
+- Lambda at Edge: custom content that CloudFront delivers
+- AWSLambdaVPCAccessExecutionRole: createNI, DescribeNI, DeleteNI
 
+- SAM(Serverless App Model)
+- ALB's target
+  - same region with Target Group
+  - max 1MB in/out
+  - no WebSocket
+  - by default, disabled target's health check
 
+### Beanstalk
+- deployment infra
+- PaaS
+- 1 region
+- compiance: ISO< PCI, SOC1-3
+- if RDS in beanstalk, terminate beanstalk, lost RDS
+
+### S3
+- in a region, bucket name is globally unqiue as ARN no region/namespace
+- max file: 5TB; single PUT: 5GB
+- multipart upload: >100MB
+- Notification: SQS, SNS, Lambda
+- read after write consistency for create
+- eventual consisitenyc for update or delete
+- can requester pays
+- no nested buckets, but prefix
+- can't rename
+- CORS config on bucket
+- obj
+  - uploader own
+  - bucket owner can deny access, archive, pay charges
