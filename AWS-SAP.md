@@ -95,6 +95,20 @@
 - step scaling: diff range
 
 
+### ELB
+
+#### NLB
+
+- EIP
+- can single encrupted connection
+
+### AWS Batch
+- job def, queue
+- EC2 or farget
+
+### LightSail
+- simple cloud server
+
 
 
 
