@@ -158,3 +158,27 @@
 - obj
   - uploader own
   - bucket owner can deny access, archive, pay charges
+
+- charge:
+  - into S3 is free
+  - free data transfer between EC2 and S3 in the same region 
+
+- Transfer Acceleration
+  - leverage CloudFront's Edege
+
+- static web
+  - domain name have to be same with bucket name
+  - auto scales
+  - not support HTTPS
+  - only GET, HEAD
+- CRR(Cross Region replication)
+  - auto replicates
+  - becket level
+- SRR(same region)
+
+
+
+
+
+
+
