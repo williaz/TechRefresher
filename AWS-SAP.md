@@ -113,14 +113,35 @@
 
 
 
+### EBS
+- replics within AZ
 
 
+### EFS
+- region
+- NFS protocol, only Linux
+- NAS: network attached server
+- mount IP for EFS in diff VPC peering
 
+### S3
+- Replication need enable versioning
+- S3 Gateway endpoint, connect private IP
+- Storage classes: 11-9 duratbility
+  - std
+  - std-IA: per GB retrieved
+  - intelligent: > 30d duration
+  - one Zone IA
+  - Glacier: 90d; min/hours latency
+  - Glacier Deep archv 180d; hours ltncy
+- lifecycle
+  - Transition
+- encryption
+  - SSE-S: S3
+  - SSE-KMS
+  - SSE-C
+  - client encry/decry
 
-
-
-
-
+- presigned URLs: limted time access
 
 
 
