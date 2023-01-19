@@ -142,10 +142,13 @@
   - client encry/decry
 
 - presigned URLs: limted time access
+- log bucket changes: seperate bucket->loop
+- Storage Gateway
+  - File gw: FS -> S3
+  - volume gw
+  - Tape gw : S3 std first; backup 
 
-
-
-
+- start-up quick, effienct
 
 
 
