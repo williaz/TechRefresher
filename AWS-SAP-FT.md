@@ -174,7 +174,24 @@
 - CRR(Cross Region replication)
   - auto replicates
   - becket level
+  - no replicate obj with SS-c and SSE-KMS
 - SRR(same region)
+
+
+### Glacier
+
+- can't specify Glacier as storage class when create obj
+- upload: sync; download is async
+- add 32-40kb meta to each obj -> zip small objs before
+- GET btye range
+
+### EFS
+- region
+- mount from on-prem using AWS Direct Connect or VPN
+- encryption at rest enable at creation time
+
+
+
 
 
 
