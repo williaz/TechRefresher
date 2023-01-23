@@ -190,12 +190,29 @@
 - mount from on-prem using AWS Direct Connect or VPN
 - encryption at rest enable at creation time
 
+### Storage Gateway
+- hybrid storage: cache freq data on-prem
+- backed by S3 and Glacier
+- diff interface: File, Volume, Tape
 
+### FSX
+- fully managed 3rd party file systems
+- Windows File server: SMB, NTFS, AD
+- auto encryption
+- Lustre: ML< HPC, video processing, finanacial modeling, EDA
 
-
-
-
-
-
+### VPC
+- region
+- logically isolated DC
+- 1 IGW per vpc
+- default VPC auto created, has all-public subnets(auto-assing public IPv4, IGW)
+- maps of AZ names are diff for diff users
+- subnet
+  - in 1 AZ
+  - IP range
+- router: routing between AZs
+  - subnet's route table 
+  - main route table: auto create time, can't delete
+  - routing between subnets always possible with a default rule which can't be deleted or changed
 
 
