@@ -210,7 +210,28 @@ func(name="Zoe", gender="female")
 arg = {'name':"Alex", 'age':1, 'gender':"male"}
 func(**arg)
 ```
+### 24 None as default val for dynamic arg
+- A default argument value is evaluated only once per module load, which usually happens when a program starts up.
 
+### 25 Keyword-Only and Positional-Only Arguments
+
+- The / symbol in the argument list indicates where positional-only arguments end:
+
+- * symbol in an argument list indicates the end of positional arguments and the beginning of keyword-only arguments:
+
+- any parameter name between the / and * symbols in the argument list may be passed either by position or by keyword
+
+### 26 Decorator with functools.wraps
+```py
+from functools import wraps
+
+def annot(func):
+    @wraps(func)
+    def wrapper():
+        ...
+```
+
+- When you apply it to the wrapper function, it copies all of the important metadata about the inner function to the outer function
 
 
 
