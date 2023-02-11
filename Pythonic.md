@@ -233,6 +233,38 @@ def annot(func):
 
 - When you apply it to the wrapper function, it copies all of the important metadata about the inner function to the outer function
 
+### 27 use Comprehensions
+```py
+even_squares = [x**2 for x in a if x % 2 == 0]
+even_squares_dict = {x: x**2 for x in a if x % 2 == 0}
+threes_cubed_set = {x**3 for x in a if x % 3 == 0}
+
+flat = [x for row in matrix for x in row]
+
+```
+
+### 28 avoid using more than two control subexpressions in a comprehension.
+
+### 29 Assignment expr in comprehension to avoid repeated work
+
+- Assignment expressions make it possible for comprehensions and generator expressions to reuse the value from one condition elsewhere in the same comprehension, which can improve readability and performance.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
