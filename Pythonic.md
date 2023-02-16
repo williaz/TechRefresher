@@ -249,14 +249,23 @@ flat = [x for row in matrix for x in row]
 
 - Assignment expressions make it possible for comprehensions and generator expressions to reuse the value from one condition elsewhere in the same comprehension, which can improve readability and performance.
 
+### 30 Generators Instead of Returning Lists
+Generators are produced by functions that use yield expressions.
+- Memory
+- can't be reused
+
+### 31 Be Defensive When Iterating Over Arguments
+
+- define your own iterable container type by implementing the ```__iter__``` method as a generator.
 
 
+### 32 Generator Expressions for Large List Comprehensions
 
+- You create a generator expression by putting list-comprehension-like syntax between () characters.
+- Chaining generators together like this executes very quickly in Python. When you’re looking for a way to compose functionality that’s operating on a large stream of input, generator expressions are a great choice. The only gotcha is that the iterators returned by generator expressions are stateful, so you must be careful not to use these iterators more than once
 
-
-
-
-
+### 33 Compose Multiple Generators with yield from
+- yield from essentially causes the Python interpreter to handle the nested for loop and yield expression boilerplate for you, which results in better performance.
 
 
 
