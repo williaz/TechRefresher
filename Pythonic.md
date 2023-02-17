@@ -264,14 +264,18 @@ Generators are produced by functions that use yield expressions.
 - You create a generator expression by putting list-comprehension-like syntax between () characters.
 - Chaining generators together like this executes very quickly in Python. When you’re looking for a way to compose functionality that’s operating on a large stream of input, generator expressions are a great choice. The only gotcha is that the iterators returned by generator expressions are stateful, so you must be careful not to use these iterators more than once
 
-### 33 Compose Multiple Generators with yield from
+## 33 Compose Multiple Generators with yield from
 - yield from essentially causes the Python interpreter to handle the nested for loop and yield expression boilerplate for you, which results in better performance.
 
+## 34 inject data into Generators with iterator instead of send
+## 35 Avoid Causing State Transitions in Generators with throw
 
+- to use a class that implements the __iter__ method along with methods to cause exceptional state transitions.
 
+## 36 Consider itertools for Working with Iterators and Generators
+- linking iterators together, filtering items they output, and producing combinations of items.
 
-
-
+### 
 
 
 
